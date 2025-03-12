@@ -7,3 +7,6 @@
 [submodule "Sem3/testdocker"]
 	path = Sem3/testdocker
 	url = https://gitlab.com/nskowron/testdocker.git
+[submodule "Sem1-2/PaintApp"]
+	path = Sem1-2/PaintApp
+	url = https://github.com/nskowron/PaintApp.git
