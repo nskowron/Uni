@@ -1,3 +1,9 @@
 [submodule "Sem3/ChineseCheckers"]
 	path = Sem3/ChineseCheckers
 	url = https://github.com/nskowron/ChineseCheckers.git
+[submodule "Sem3/Statistics2024"]
+	path = Sem3/Statistics2024
+	url = https://github.com/nskowron/Statistics2024.git
+[submodule "Sem3/testdocker"]
+	path = Sem3/testdocker
+	url = https://gitlab.com/nskowron/testdocker.git
