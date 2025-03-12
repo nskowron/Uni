@@ -1,0 +1,39 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes
+</help_text><element><id>UMLClass</id><coordinates><x>243</x><y>0</y><w>410</w><h>110</h></coordinates><panel_attributes>valign=center
+halign=center
+fontsize=15
+*AddBook*
+
+Opis przypadku uzycia</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>243</x><y>110</y><w>140</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+Aktor:</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>383</x><y>110</y><w>270</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+Bibliotekarz</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>243</x><y>180</y><w>140</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+Warunek poczatkowy:</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>383</x><y>180</y><w>270</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+style=wordwrap
+Bibliotekarz wybral opcje [a] (add) w menu poczatkowym</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>243</x><y>250</y><w>140</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+Warunek koncowy:</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>383</x><y>250</y><w>270</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+style=wordwrap
+Bibliotekarz pomyslnie dodal ksiazke</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>243</x><y>320</y><w>140</w><h>160</h></coordinates><panel_attributes>valign=center
+halign=center
+Scenariusz glowny:</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>383</x><y>320</y><w>270</w><h>160</h></coordinates><panel_attributes>valign=center
+halign=left
+style=wordwrap
+1) Program wyswietla opcje dodawania
+2) Bibliotekarz wybiera opcje dodania ksiazki
+3) Bibliotekarz wpisuje tytul ksiazki i autora
+4) Program dodaje ksiazke i przypisuje jej ID
+5) Pomyslne dodanie ksiazki</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>383</x><y>480</y><w>270</w><h>150</h></coordinates><panel_attributes>valign=center
+halign=left
+style=wordwrap
+4a)  Program napotyka blad popdczas zapisu do bazy danych
+4a.1) Program informuje Bibliotekarza o bledzie
+4a.2) Bibliotekarz potwierdza informacje (enter)
+4a.3) Powrot do menu glownego</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>243</x><y>480</y><w>140</w><h>150</h></coordinates><panel_attributes>valign=center
+halign=center
+style=wordwrap
+Scenariusz alternatywny:</panel_attributes><additional_attributes></additional_attributes></element></diagram>

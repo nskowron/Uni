@@ -1,0 +1,39 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes
+</help_text><element><id>UMLClass</id><coordinates><x>270</x><y>100</y><w>410</w><h>110</h></coordinates><panel_attributes>valign=center
+halign=center
+fontsize=15
+*Test na refleks*
+
+Opis przypadku uzycia</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>270</x><y>210</y><w>140</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+Aktor:</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>410</x><y>210</y><w>270</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+Uzytkownik</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>270</x><y>280</y><w>140</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+Warunek poczatkowy:</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>410</x><y>280</y><w>270</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+style=wordwrap
+Uzytkownik wybral opcje [s] (start) w menu poczatkowym</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>270</x><y>350</y><w>140</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+Warunek koncowy:</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>410</x><y>350</y><w>270</w><h>70</h></coordinates><panel_attributes>valign=center
+halign=center
+style=wordwrap
+Uzytkownik pomyslnie zakonczyl test</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>270</x><y>420</y><w>140</w><h>160</h></coordinates><panel_attributes>valign=center
+halign=center
+Scenariusz glowny:</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>410</x><y>420</y><w>270</w><h>160</h></coordinates><panel_attributes>valign=center
+halign=left
+style=wordwrap
+1) Program czeka losowa ilosc czasu pomiedzy 1s a 3s
+2) Program wyswietla sygnal uzytkownikowi
+3) Uzytkownik klika [enter] aby zakonczyc pomiar
+4) Program zwraca wynik uzytkownika
+5) Pomyslne zakonczenie testu</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>410</x><y>580</y><w>270</w><h>150</h></coordinates><panel_attributes>valign=center
+halign=left
+style=wordwrap
+1a) Uzytkownik klika [enter] przed wyswietleniem sygnalu
+1a.2) Program konczy czekanie i wyswietla sygnal
+1a.3) Program zwraca wynik 0-5ms
+1a.4) Pomyslne zakonczenie testu</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>270</x><y>580</y><w>140</w><h>150</h></coordinates><panel_attributes>valign=center
+halign=center
+style=wordwrap
+Scenariusz alternatywny:</panel_attributes><additional_attributes></additional_attributes></element></diagram>
