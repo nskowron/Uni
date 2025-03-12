@@ -1,0 +1,3 @@
+[submodule "Sem3/ChineseCheckers"]
+	path = Sem3/ChineseCheckers
+	url = https://github.com/nskowron/ChineseCheckers.git
