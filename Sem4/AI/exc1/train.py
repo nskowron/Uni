@@ -1,5 +1,7 @@
 import numpy as np
 import tensorflow as tf
+import seaborn as sns
+import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
 
 # mnist dataset
@@ -35,16 +37,16 @@ model = tf.keras.models.Sequential([
 
 # compilation and training
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
+model.fit(x_train, y_train, epochs=7, validation_data=(x_test, y_test))
+model.save("neural_model.keras")
 
 # evaluation
 y_pred = model.predict(x_test)
 
 # confusion matrix and classification report
 y_pred_classes = np.argmax(y_pred, axis=1)
-y_test_classes = np.argmax(y_test, axis=1)
 
-cm = confusion_matrix(y_test_classes, y_pred_classes)
+cm = confusion_matrix(y_pred_classes, y_test)
 plt.figure(figsize=(10, 7))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=np.arange(10), yticklabels=np.arange(10))
 plt.title('Confusion Matrix')
@@ -53,6 +55,6 @@ plt.ylabel('True')
 plt.savefig('confusion_matrix.png')
 plt.close()
 
-report = classification_report(y_test_classes, y_pred_classes)
+report = classification_report(y_test, y_pred_classes)
 with open('classification_report.txt', 'w') as f:
     f.write(report)
