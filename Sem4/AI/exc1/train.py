@@ -43,7 +43,8 @@ model.save("neural_model.keras")
 # evaluation
 y_pred = model.predict(x_test)
 
-# confusion matrix and classification report
+# argmax - returns the index of the maximum value at the specified axis
+# in this case index = predicted digit
 y_pred_classes = np.argmax(y_pred, axis=1)
 
 cm = confusion_matrix(y_pred_classes, y_test)
