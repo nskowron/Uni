@@ -31,13 +31,13 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
 
     # final interpretation layer
-    tf.keras.layers.Dense(128, activation='relu'),
+    # tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(10, activation='softmax')
 ])
 
 # compilation and training
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=7, validation_data=(x_test, y_test))
+model.fit(x_train, y_train, epochs=6, validation_data=(x_test, y_test))
 model.save("neural_model.keras")
 
 # evaluation
@@ -47,7 +47,7 @@ y_pred = model.predict(x_test)
 # in this case index = predicted digit
 y_pred_classes = np.argmax(y_pred, axis=1)
 
-cm = confusion_matrix(y_pred_classes, y_test)
+cm = confusion_matrix(y_test, y_pred_classes)
 plt.figure(figsize=(10, 7))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=np.arange(10), yticklabels=np.arange(10))
 plt.title('Confusion Matrix')
