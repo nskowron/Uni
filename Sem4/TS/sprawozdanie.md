@@ -1,76 +1,76 @@
 # Sprawozdanie - Technologie Sieciowe, Lista 1
 
-## Komunikacja z zewnetrznym serwerem
+## Komunikacja z zewnętrznym serwerem
 
-Pingowalam serwer youtube'a, co, jak widac ponizej, dalo sie wychwycic WireSharkiem.
-Dodatkowo, odpalilam jednoczesnie w przegladarce strone YouTube i, zgodnie z oczekiwniami,
-dalo sie zaobserwowac komunikacje z tym samym adresem uzywajaca protokolu TCP.
+Pingowałam serwer youtube'a, co, jak widać poniżej, dało się wychwycić WireSharkiem.
+Dodatkowo, odpaliłam jednocześnie w przeglądarce stronę YouTube i, zgodnie z oczekiwaniami,
+dało sie zaobserwować komunikację z tym samym adresem używającą protokołu TCP.
 
 ![ping yt](image-1.png)
 ![tcp yt](image-2.png)
 
-Ponizej wyznaczalam liczbe wezlow do serwera youtube za pomoca pinga i traceroute'a.
-Odleglosc z mojej sieci wynosi 11 wezlow:
+Poniżej wyznaczałam liczbę węzłów do serwera youtube za pomocą pinga i traceroute'a.
+Odległość z mojej sieci wynosi 11 węzłów:
 
 ![ttl yt](image-3.png)
 ![trace yt](image-13.png)
 
-## Rozne trasy
+## Różne trasy
 
-Jak widac ponizej - trasy przebyte przez pakiety moga byc rozne i miec rozne dlugosci,
-w zaleznosci od - np. jak ponizej - ustawionego TTL.
+Jak widać poniżej - trasy przebyte przez pakiety mogą być różne i mieć różne długości,
+w zależnosci od - np. jak poniżej - ustawionego TTL.
 
 ![diff ttl](<Screenshot From 2025-03-13 12-23-03.png>)
 
-## Fragmentacja pakietow i czas propagacji
+## Fragmentacja pakietów i czas propagacji
 
-Jak widac ponizej, YouTube i wiele innych serwerow blokuja pakiety, ktore wymagaja fragmentacji.
+Jak widać poniżej, YouTube i wiele innych serweów blokują pakiety, które wymagają fragmentacji.
 
 ![alt text](image-5.png)
 
-Spingowalam wiec kolege we wspolnej sieci lokalnej:
+Spingowałam więc kolegę we wspólnej sieci lokalnej:
 
 ![big ping](<Screenshot From 2025-03-13 12-01-37.png>)
 ![small ping](image-6.png)
 
-Jak widac, czas dojscia pakietow rozni sie znaczaco w wypadku wyslania standardowego 56B
-pakietu a 64kB. Jest to niewatpliwie zwiazane z koniecznoscia czekania na wszystkie
-fragmenty oraz zlozenia ich spowrotem.
+Jak widać, czas dojścia pakietów różni się znacząco w wypadku wysłania standardowego 56B
+pakietu a 64kB. Jest to niewątpliwie związane z koniecznością czekania na wszystkie
+fragmenty oraz złożenia ich spowrotem.
 
-Aby sprawdzic, czy pakiet rzeczywiscie wymaga fragmentacji, wystarczy uzyc odpowiednich flag 
-w programach ping lub traceroute, co widac w nastepnej sekcji - lub uzyc programu WireShark:
+Aby sprawdzić, czy pakiet rzeczywiście wymaga fragmentacji, wystarczy użyć odpowiednich flag 
+w programach ping lub traceroute, co widać w nastepnej sekcji - lub użyć programu WireShark:
 
 ![frag yt](image-9.png)
 
-## Najwiekszy niefragmentowany pakiet
+## Największy niefragmentowany pakiet
 
-Metoda bisekcji sprawdzilam, ze najwiekszy niefragmentowany pakiet to 1500B (z ramka).
+Metodą bisekcji sprawdziłam, ąe największy niefragmentowany pakiet to 1500B (z ramką).
 
 ![frag](image-8.png)
 
 ## Komunikacja w LAN
 
-Jak widac na jednym z poprzednich screenshotow - zgodnie z oczekiwaniami pakiet  
-do urzadzenia w LAN nie wyjdzie poza LAN:
+Jak widac na jednym z poprzednich screenshotów - zgodnie z oczekiwaniami pakiet  
+do urządzenia w LAN nie wyjdzie poza LAN:
 
 ![small ping](image-6.png)
 
-Dodatkowo, uzywajac narzedzia nc, mozna wysylac do siebie wiadomosci, a nastepnie podsluchiwac 
+Dodatkowo, używając narzędzia nc, można wysyłać do siebie wiadomości, a następnie podsłuchiwać 
 w WireSharku.
 
 ![hejo](<Screenshot From 2025-03-13 11-39-53.png>)
 
-Natomiast WireShark nie podsluchuje takich rozmow pomiedzy innymi dwoma 
-urzadzeniami w tej samej sieci lokalnej.
+Natomiast WireShark nie podsłuchuje takich rozmów pomiędzy innymi dwoma 
+urządzeniami w tej samej sieci lokalnej.
 
 ## Srednica internetu
 
-Mozemy probowac eksperymentalnie wyznaczac najdluzsza sciezke do serwera, natomiast musimy 
-brac pod uwage, ze tez znajdujemy sie w jednym z wezlow sieci, i to jednym z lepiej skomunikowanych, 
-wiec najwieksza odleglosc do nas (i od nas) na pewno i tak bedzie mniejsza niz faktyczna 
-srednica internetu.
+Mozemy próbować eksperymentalnie wyznaczać najdłuzszą ścieżkę do serwera, natomiast musimy 
+brać pod uwagę, że też znajdujemy się w jednym z węzłów sieci, i to jednym z lepiej skomunikowanych, 
+więc największa odległość do nas (i od nas) na pewno i tak będzie mniejsza niż faktyczna 
+średnica internetu.
 
-Najdluzsza sciezka, jaka udalo mi sie znalezc to 24 do sydney.edu.au:
+Najdłuższa ścieżka, jaką udało mi się znaleźć to 24 do sydney.edu.au:
 
 ![sydney](image-10.png)
 
@@ -78,6 +78,6 @@ Najdluzsza sciezka, jaka udalo mi sie znalezc to 24 do sydney.edu.au:
 
 ![cloud](image-11.png) ![alt text](image-12.png)
 
-Jak widac, w przypadku serwerow Google i Microsoft, dlugosc trasy nie odbiega za bardzo 
-od standardowych 10 wezlow. Nie dziwi nas to, poniewaz serwery takich uslug musza byc 
+Jak widać, w przypadku serwerów Google i Microsoft, długość trasy nie odbiega za bardzo 
+od 10 węzłów. Nie dziwi nas to, ponieważ serwery takich usług muszą być 
 bardzo dobrze skomunikowane.
