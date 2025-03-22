@@ -29,7 +29,7 @@ train_accuracies = []
 val_accuracies = []
 custom_accuracies = []
 
-epochs = 30
+epochs = 20
 for epoch in range(epochs):
 
     # train for one epoch
