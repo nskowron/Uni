@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 import seaborn as sns
+import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
 from custom_data.process_img import get_imgs
@@ -38,6 +39,18 @@ y_custom_pred_classes = np.argmax(model.predict(x_custom), axis=1)
 # training_data
 base_file = 'training_data/'
 
+report_dict = classification_report(y_test, y_pred_classes, output_dict=True)
+accuracy = report_dict["accuracy"]
+report_df = pd.DataFrame(report_dict).T
+report_df = report_df.drop(["accuracy", "macro avg", "weighted avg"], errors="ignore")
+plt.figure(figsize=(10, 7))
+sns.heatmap(report_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
+plt.title(f"Classification Report - accuracy: {accuracy:.1f}")
+plt.xlabel("Metrics")
+plt.ylabel("Classes")
+plt.savefig(base_file + 'classification_report.png')
+plt.close()
+
 cm = confusion_matrix(y_test, y_pred_classes)
 plt.figure(figsize=(10, 7))
 sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=np.arange(10), yticklabels=np.arange(10))
@@ -47,12 +60,20 @@ plt.ylabel('True')
 plt.savefig(base_file + 'confusion_matrix.png')
 plt.close()
 
-report = classification_report(y_test, y_pred_classes)
-with open(base_file + 'classification_report.txt', 'w') as f:
-    f.write(report)
-
 # custom_data
 base_file = 'custom_data/'
+
+report_dict = classification_report(y_custom, y_custom_pred_classes, output_dict=True)
+accuracy = report_dict["accuracy"]
+report_df = pd.DataFrame(report_dict).T
+report_df = report_df.drop(["accuracy", "macro avg", "weighted avg"], errors="ignore")
+plt.figure(figsize=(10, 7))
+sns.heatmap(report_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
+plt.title(f"Classification Report - accuracy: {accuracy:.1f}")
+plt.xlabel("Metrics")
+plt.ylabel("Classes")
+plt.savefig(base_file + 'classification_report.png')
+plt.close()
 
 cm = confusion_matrix(y_custom, y_custom_pred_classes)
 plt.figure(figsize=(10, 7))
@@ -62,7 +83,3 @@ plt.xlabel('Predicted')
 plt.ylabel('True')
 plt.savefig(base_file + 'confusion_matrix.png')
 plt.close()
-
-report = classification_report(y_custom, y_custom_pred_classes)
-with open(base_file + 'classification_report.txt', 'w') as f:
-    f.write(report)
