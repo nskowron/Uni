@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
 from custom_data.process_img import get_imgs
 
-BEST_EPOCHS = 14
+BEST_EPOCHS = 8
 
 np.random.seed(279679)
 tf.random.set_seed(279679)
@@ -45,7 +45,7 @@ report_df = pd.DataFrame(report_dict).T
 report_df = report_df.drop(["accuracy", "macro avg", "weighted avg"], errors="ignore")
 plt.figure(figsize=(10, 7))
 sns.heatmap(report_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
-plt.title(f"Classification Report - accuracy: {accuracy:.1f}")
+plt.title(f"Classification Report - accuracy: {accuracy:.2f}")
 plt.xlabel("Metrics")
 plt.ylabel("Classes")
 plt.savefig(base_file + 'classification_report.png')
@@ -69,7 +69,7 @@ report_df = pd.DataFrame(report_dict).T
 report_df = report_df.drop(["accuracy", "macro avg", "weighted avg"], errors="ignore")
 plt.figure(figsize=(10, 7))
 sns.heatmap(report_df, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5)
-plt.title(f"Classification Report - accuracy: {accuracy:.1f}")
+plt.title(f"Classification Report - accuracy: {accuracy:.2f}")
 plt.xlabel("Metrics")
 plt.ylabel("Classes")
 plt.savefig(base_file + 'classification_report.png')
