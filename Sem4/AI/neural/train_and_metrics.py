@@ -7,6 +7,9 @@ from custom_data.process_img import get_imgs
 
 BEST_EPOCHS = 11
 
+np.random.seed(279679)
+tf.random.set_seed(279679)
+
 # mnist dataset
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 

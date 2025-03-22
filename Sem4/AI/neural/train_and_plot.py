@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from custom_data.process_img import get_imgs
 
+np.random.seed(279679)
+tf.random.set_seed(279679)
+
 # mnist dataset
 (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 
@@ -26,7 +29,7 @@ train_accuracies = []
 val_accuracies = []
 custom_accuracies = []
 
-epochs = 20
+epochs = 30
 for epoch in range(epochs):
 
     # train for one epoch
@@ -39,6 +42,8 @@ for epoch in range(epochs):
     # accuracy on custom data
     y_custom_pred = np.argmax(model.predict(x_custom), axis=1)
     custom_acc = accuracy_score(y_custom, y_custom_pred)
+
+    print(f"MY ACCURACY: {custom_acc}")
 
     # Store accuracies
     train_accuracies.append(train_acc)
