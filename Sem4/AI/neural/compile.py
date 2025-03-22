@@ -13,12 +13,14 @@ model = tf.keras.models.Sequential([
     
     # relu - rectified linear unit
     # zero negative values, shut down neuron, help with vanishing gradient
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu'),
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
 
     # flattens image to 1D array
     tf.keras.layers.Flatten(),
 
     # final interpretation layer
+    tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(10, activation='softmax')
 ])
 
