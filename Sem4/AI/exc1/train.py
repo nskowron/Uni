@@ -11,7 +11,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 x_train = x_train / 255.0
 x_test = x_test / 255.0
 
-# reshape
+# reshape (60000, 784) -> (60000, 28, 28, 1)
 x_train = x_train.reshape(-1, 28, 28, 1)
 x_test = x_test.reshape(-1, 28, 28, 1)
 
@@ -24,20 +24,22 @@ model = tf.keras.models.Sequential([
     # downsamples the image
     tf.keras.layers.MaxPooling2D((2, 2)),
     
+    # relu - rectified linear unit
+    # zero negative values, shut down neuron, help with vanishing gradient
     tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-    tf.keras.layers.MaxPooling2D((2, 2)),
+    # tf.keras.layers.MaxPooling2D((2, 2)),
 
     # flattens image to 1D array
     tf.keras.layers.Flatten(),
 
     # final interpretation layer
-    # tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(10, activation='softmax')
 ])
 
 # compilation and training
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=6, validation_data=(x_test, y_test))
+model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
 model.save("neural_model.keras")
 
 # evaluation
