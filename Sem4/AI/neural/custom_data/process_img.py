@@ -6,6 +6,7 @@ def process_img(img_path):
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     img = cv2.resize(img, (28, 28))
     img = img / 255.0
+    img = 1 - img
     return img
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
 from custom_data.process_img import get_imgs
 
-BEST_EPOCHS = 8
+BEST_EPOCHS = 4
 
 np.random.seed(279679)
 tf.random.set_seed(279679)
