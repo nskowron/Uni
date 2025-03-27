@@ -1,0 +1,16 @@
+V "GNAT Lib v13"
+P ZX
+
+RN
+
+U rec%s			rec.ads			2228cf2e NE OO PK
+
+D rec.ads		20250327142449 2228cf2e rec%s
+D system.ads		20240521074738 426dafb8 system%s
+G a e
+G c Z s s [nameIP rec 3 6 none]
+X 1 rec.ads
+1K9*Rec 7l5 7e8
+3R6*Name 5e11
+4i7*A{integer}
+

@@ -1,0 +1,40 @@
+V "GNAT Lib v13"
+P ZX
+
+RN
+RV NO_IMPLICIT_CONDITIONALS
+RV NO_STANDARD_STORAGE_POOLS
+RV NO_DEFAULT_INITIALIZATION
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_ELABORATION_CODE
+
+U var%b			var.adb			9fde9e7a NE OO PK
+
+U var%s			var.ads			430cee77 EE OO PK
+
+D system.ads		20240521074738 426dafb8 system%s
+D var.ads		20250327145534 430cee77 var%s
+D var.adb		20250327150034 dcd2700d var%b
+G a e
+G c Z s s [varrecIP var 5 6 none]
+G c Z s b [modify var 29 11 none]
+G c Z s s [vectorIP var 24 6 none]
+X 2 var.ads
+1K9*Var 31l5 31e8 3|1b14 8l5 8t8
+3E6*OptionType 3e38 5r23
+3n21*Option1{3E6} 9r12 17r28 3|5r28
+3n30*Option2{3E6} 5r37 11r12 18r31
+5R6*varRec 5d14 14e11 16r9 17r10 18r10 22r23 27r17
+5e14*Option{3E6} 8r9 18m21
+6i4*A{integer} 18m40 3|5m37
+10a10*O1{string} 3|5m46
+12i10*O2{integer} 18m48
+16r1*myVar{5R6}
+17r1*myVar2{5R6}
+18r1*myVar3{5R6}
+22P6*varAcc(5R6) 26r9
+24A6*vector(integer)<integer>
+26p1*myAcc{22P6} 3|5r4
+27p1*myAcc2(5R6)
+29U11*Modify 3|3b11 6l5 6t11
+
