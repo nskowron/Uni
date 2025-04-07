@@ -6,7 +6,7 @@ tf.random.set_seed(279679)
 model = tf.keras.models.Sequential([
 
     # scans image with 32 filters of size 3x3
-    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)),
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu', input_shape=(28, 28, 1)),
 
     # downsamples the image (bochen)
     tf.keras.layers.MaxPooling2D((2, 2)),
@@ -19,7 +19,7 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Flatten(),
 
     # final interpretation layer
-    tf.keras.layers.Dense(128, activation='relu'),
+    # tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(10, activation='softmax')
 ])
 
