@@ -21,7 +21,7 @@ while True:
         f"{(time.time() - start_time):.5f}",
         f"{packet['IP'].src if packet.haslayer('IP') else packet.src}",
         f"{packet['IP'].dst if packet.haslayer('IP') else packet.dst}",
-        f"{IP_PROTOS.get(packet['IP'].proto, None) if packet.haslayer('IP') and packet['IP'].proto else None}",
+        f"{packet.sprintf("%IP.proto%") if packet.haslayer('IP') and packet['IP'].proto else None}",
         f"{len(packet)}",
         f"{packet.summary()}"
     ])
@@ -31,26 +31,37 @@ while True:
     if len(log_lines) > max_lines:
         log_lines.pop(0)
 
-    # initial line
-    print("\033[2JNo \t Time \t Source \t Destination \t Protocol \t Length \t Summary")
+    # initial line and clear screen
+    print("\033[2JNo | Time | Source | Destination | Protocol | Length | Summary")
 
     # packet log lines
     for i in range(len(log_lines)):
         print(log_lines[i])
 
     # separator
-    print("-" * 80)
+    print("-" * 100)
 
     # last packet summary
     if packet.haslayer('Ether'):
         print(f"Ethernet: {packet['Ether'].summary()}")
+    else:
+        print()
     if packet.haslayer('IP'):
         print(f"IP: {packet['IP'].summary()}")
+    else:
+        print() 
     if packet.haslayer('TCP'):
         print(f"TCP: {packet['TCP'].summary()}")
-    if packet.haslayer('UDP'):
+    elif packet.haslayer('UDP'):
         print(f"UDP: {packet['UDP'].summary()}")
-    if packet.haslayer('ICMP'):
+    elif packet.haslayer('ICMP'):
         print(f"ICMP: {packet['ICMP'].summary()}")
-    print(f"Raw: {bytes(packet).hex()}")
+    else:
+        print()
+    
+    raw = bytes(packet).hex()
+    if len(raw) > 100:
+        print(f"{raw[:97]}...")
+    else:
+        print(raw)
 
