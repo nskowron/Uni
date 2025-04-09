@@ -8,7 +8,7 @@ def sigint_handler(signal, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
-max_lines = 20
+max_lines = 15
 log_lines = []
 
 no = 1
