@@ -19,22 +19,22 @@ def build_graph(data):
         G.add_edge(edge['from'], edge['to'], weight=edge['weight'])
     return G
 
-def draw_graph(G):
-    plt.clf()
-    pos = nx.get_node_attributes(G, 'pos')
-    nx.draw(G, pos, with_labels=True, node_color='skyblue', edge_color='gray', node_size=500)
-    plt.pause(0.1)
+def draw_graph(G, ax):
+    ax.clear()
+    pos = nx.spring_layout(G)
+    nx.draw(G, pos, with_labels=True, node_color='skyblue', edge_color='gray', node_size=500, ax=ax)
+    plt.show(block=True)
 
 def main():
-    # plt.ion()
-    plt.figure()
+    plt.ion()
+    _, ax = plt.subplots()
 
     path = 'graph_fifo'
     while True:
         data = read_graph(path)
         if data:
             G = build_graph(data)
-            draw_graph(G)
+            draw_graph(G, ax)
         else:
             time.sleep(1)
 
