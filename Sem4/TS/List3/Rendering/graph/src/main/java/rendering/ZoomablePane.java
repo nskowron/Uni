@@ -78,7 +78,7 @@ public class ZoomablePane extends Pane {
         List<Circle> nodes = new ArrayList<>();
         List<Line> edges = new ArrayList<>();
         for(Node node : graph.nodes) {
-            nodes.add(new Circle(node.x, node.y, 1));
+            nodes.add(new Circle(node.x, node.y, 10));
         }
         for(Edge edge : graph.edges) {
             edges.add(new Line(
