@@ -1,46 +1,37 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric #-}
-
 {-
     Main.hs
 -}
+module Main where
 
-import System.IO
-import GHC.Generics (Generic)
-import Data.Aeson (encode, ToJSON)
-import qualified Data.ByteString.Lazy as BL
+import Graph
+import Data.Aeson (encode) -- encode into json
 import System.IO (stdout)
+import System.Random (newStdGen, Random(randomR)) -- random seed
+import qualified Data.ByteString.Lazy as BL -- writes json bytes
+-- qualified - forces lib name prefix
 
-data Node = Node
-    { id :: Int
-    , x :: Int
-    , y :: Int
-    } deriving (Show, Generic, ToJSON)
-
-data Edge = Edge
-    { from :: Int
-    , to:: Int
-    , weight :: Int
-    } deriving (Show, Generic, ToJSON)
-
-data Graph = Graph
-    { nodes :: [Node]
-    , edges :: [Edge]
-    } deriving (Show, Generic, ToJSON)
-
+-- writes graph as json into standard output
 writeGraphJSON :: Graph -> IO ()
 writeGraphJSON graph = BL.hPutStr stdout (encode graph)
 
-exampleGraph :: Graph
-exampleGraph = Graph
-    [ Node 0 100 100
-    , Node 1 300 100
-    , Node 2 200 300
-    ]
-    [ Edge 0 1 10
-    , Edge 1 2 20
-    , Edge 2 0 40
-    ]
+-- pseudo-random Node based on previous node
+nextNode :: Node -> Node
+nextNode (Node id x y) = 
+    let idf = fromIntegral id :: Float
+        xf = fromIntegral x :: Float
+        yf = fromIntegral y :: Float
+        r = sqrt (xf^2 + yf^2)
+        x' = ((r+10) * sin (0.3 * idf + yf))
+        y' = (sqrt (abs (r^2 - x'^2)) + ((^2) . cos) (0.4 * xf + idf))
+    in Node (id+1) (round x') (round y')
 
+-- main loop
 main :: IO ()
-main = writeGraphJSON exampleGraph
+main = do
+    g <- newStdGen
+    let (start_x, g2) = randomR (0, 10::Int) g
+    let (start_y, g3) = randomR (0, 10::Int) g2
+
+    let nodes = Node 0 start_x start_y : map nextNode nodes
+
+    writeGraphJSON (generateGraph (take 20 nodes) 30)

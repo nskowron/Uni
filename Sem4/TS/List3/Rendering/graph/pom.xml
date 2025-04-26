@@ -25,6 +25,26 @@
             <artifactId>javafx-fxml</artifactId>
             <version>21.0.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+
+        <!-- Jackson annotations (optional but recommended for POJOs) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+
+        <!-- Jackson data format (optional, for handling specific formats) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <version>2.15.0</version>
+        </dependency>
     </dependencies>
     
     <build>

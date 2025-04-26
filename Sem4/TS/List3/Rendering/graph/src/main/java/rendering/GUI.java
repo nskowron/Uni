@@ -5,9 +5,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 public class GUI {
-    public GUI(Stage stage) {
+    public GUI(Stage stage, GraphReader reader) {
         BorderPane root = new BorderPane();
-        ZoomablePane graphPane = new ZoomablePane();
+        ZoomablePane graphPane = new ZoomablePane(reader);
 
         root.setCenter(graphPane);
 
