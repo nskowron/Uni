@@ -6,9 +6,10 @@
 -}
 
 import System.IO
-import GHC.Generics
+import GHC.Generics (Generic)
 import Data.Aeson (encode, ToJSON)
 import qualified Data.ByteString.Lazy as BL
+import System.IO (stdout)
 
 data Node = Node
     { id :: Int
@@ -27,8 +28,8 @@ data Graph = Graph
     , edges :: [Edge]
     } deriving (Show, Generic, ToJSON)
 
-writeGraphJSON :: FilePath -> Graph -> IO ()
-writeGraphJSON path graph = BL.writeFile path (encode graph)
+writeGraphJSON :: Graph -> IO ()
+writeGraphJSON graph = BL.hPutStr stdout (encode graph)
 
 exampleGraph :: Graph
 exampleGraph = Graph
@@ -42,4 +43,4 @@ exampleGraph = Graph
     ]
 
 main :: IO ()
-main = writeGraphJSON "graph_fifo" exampleGraph
+main = writeGraphJSON exampleGraph
