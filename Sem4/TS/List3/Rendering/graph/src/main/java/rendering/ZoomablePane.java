@@ -18,7 +18,6 @@ public class ZoomablePane extends Pane {
     private int nodes = 20;
 
     // For scrolling
-    private double zoomFactor = 1.0;
     private double scale = 1.0;
     private final PauseTransition pause = new PauseTransition(Duration.millis(200));
 
@@ -35,21 +34,23 @@ public class ZoomablePane extends Pane {
         contentGroup.setTranslateY(getPrefHeight() / 2);
 
         // Initial graph
-        this.updateGraph(reader.read());
+        System.err.println("dupa1");
+        this.updateGraph(reader.read(20));
+        System.err.println("dupa2");
 
         // Zoom handling
         this.setOnScroll(event -> {
             if(event.getDeltaY() > 0) { // scroll in
-                zoomFactor += 0.05;
                 scale *= 1.05;
             } else {                    // scroll out
-                zoomFactor -= 0.05;
                 scale *= 0.95;
             }
+            contentGroup.setScaleX(scale);
+            contentGroup.setScaleY(scale);
 
             pause.playFromStart();
             pause.setOnFinished(e -> { // when user stops scrolling
-                this.updateGraph(reader.read()); // todo
+                this.updateGraph(reader.read((int)(20.0 / scale))); // todo
             });
         });
 
@@ -72,6 +73,11 @@ public class ZoomablePane extends Pane {
     }
 
     private void updateGraph(Graph newGraph) {
+        if(newGraph == null) {
+            System.err.println("whoopsie daisy happenned");
+            return;
+        }
+
         contentGroup.getChildren().clear();
         graph = newGraph;
 
