@@ -5,14 +5,17 @@ module Main where
 
 import Graph
 import Data.Aeson (encode) -- encode into json
-import System.IO (stdout, isEOF)
+import System.IO (stdout, isEOF, hFlush)
 import System.Random (newStdGen, Random(randomR)) -- random seed
 import qualified Data.ByteString.Lazy as BL -- writes json bytes
 -- qualified - forces lib name prefix
 
 -- writes graph as json into standard output
 writeGraphJSON :: Graph -> IO ()
-writeGraphJSON graph = BL.hPutStr stdout (encode graph)
+writeGraphJSON graph = do
+    BL.hPutStr stdout (encode graph)
+    putStrLn ""
+    hFlush stdout
 
 -- pseudo-random Node based on previous node
 nextNode :: Node -> Node
@@ -34,6 +37,7 @@ main = do
     let (start_y, g3) = randomR (0, 100::Int) g2
     let nodes = Node 0 start_x start_y : map nextNode nodes
 
+    -- writeGraphJSON (generateGraph (take 20 nodes) 30)
     mainLoop nodes
 
 mainLoop :: [Node] -> IO ()

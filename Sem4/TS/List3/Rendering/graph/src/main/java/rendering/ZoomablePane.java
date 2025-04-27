@@ -34,9 +34,7 @@ public class ZoomablePane extends Pane {
         contentGroup.setTranslateY(getPrefHeight() / 2);
 
         // Initial graph
-        System.err.println("dupa1");
         this.updateGraph(reader.read(20));
-        System.err.println("dupa2");
 
         // Zoom handling
         this.setOnScroll(event -> {

@@ -1,13 +1,10 @@
 #!/bin/bash
 
-mkfifo json_pipe
+# mkfifo json_pipe
 mkfifo node_pipe
 cd Generating
-cabal run -v0 < ../node_pipe > ../json_pipe &
-cd ../Rendering/graph
-sleep 2
-mvn -q javafx:run < ../../json_pipe > ../../node_pipe &&
-cd ../..
-rm -rf json_pipe
+cabal run -v0 < ../node_pipe | tee ../husky | mvn -q -f ../Rendering/graph/pom.xml javafx:run | tee ../node_pipe ../tea
+#cd ../Rendering/graph
+cd ..
 rm -rf node_pipe
 echo "all's well that ends well"
