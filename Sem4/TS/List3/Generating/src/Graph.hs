@@ -46,8 +46,9 @@ nodeId (Node id _ _) = id
 generateEdges :: [Node] -> Int -> [Edge]
 generateEdges nodes count = map (uncurry newEdge) $
     Map.foldr (++) [] $ snd $
-    uncurry (ballanceFor 3 nodes nodes) $
-    uncurry (ballanceFor 1 nodes (reverse nodes)) $
+    uncurry (ballanceFor 3 (2 * div count 3 + 50) nodes (reverse nodes)) $
+    uncurry (ballanceFor 2 (2 * div count 3 + 50) nodes nodes) $
+    uncurry (ballanceFor 1 (2 * div count 3 + 50) nodes (reverse nodes)) $
     connectOutwards nodes [] count Map.empty -- temp
 
 -- connect all nodes going from the middle
@@ -62,20 +63,20 @@ connectOutwards (n:ns) visited count acc =
     in connectOutwards ns (n:visited) (count-1) newAcc
 
 -- connect nodes with <= edges
-ballanceFor :: Int -> [Node] -> [Node] -> Int -> Map.Map Int [(Node, Node)] -> (Int, Map.Map Int [(Node, Node)])
-ballanceFor _ _ [] count acc = (count, acc)
-ballanceFor _ _ _ 0 acc = (0, acc)
-ballanceFor edges nodes (n:ns) count acc =
+ballanceFor :: Int -> Int -> [Node] -> [Node] -> Int -> Map.Map Int [(Node, Node)] -> (Int, Map.Map Int [(Node, Node)])
+ballanceFor _ _ _ [] count acc = (count, acc)
+ballanceFor _ _ _ _ 0 acc = (0, acc)
+ballanceFor edges dist nodes (n:ns) count acc =
     let connected = connectedNodes n acc
     in  if length connected > edges
-        then ballanceFor edges nodes ns count acc
+        then ballanceFor edges dist nodes ns count acc
         else
             let rest = nodes \\ (n:connected)
-                closestWith = closestNodeWith (edges + 1) n rest acc
+                closestWith = closestNodeWith (edges + 2) dist n rest acc
                 closest = fromMaybe (closestNode n rest) closestWith
                 newAcc = Map.insertWith (++) (nodeId n) [(n, closest)]
                     (Map.insertWith (++) (nodeId closest) [(closest, n)] acc)
-            in ballanceFor edges nodes ns (count-1) newAcc
+            in ballanceFor edges dist nodes ns (count-1) newAcc
 
 -- get connected nodes
 connectedNodes :: Node -> Map.Map Int [(Node, Node)] -> [Node]
@@ -83,13 +84,16 @@ connectedNodes node nodes =
     let pairs = Map.findWithDefault [] (nodeId node) nodes
     in map snd pairs
 
-closestNodeWith :: Int -> Node -> [Node] -> Map.Map Int [(Node, Node)] -> Maybe Node
-closestNodeWith edges node nodes pairs = foldl (\n m ->
-    if length (Map.findWithDefault [] (nodeId m) pairs) > edges then n
-    else if (distance node m) > 100 then n
-    else if n == Nothing then Just m
-    else if (distance node (fromMaybe (Node 0 0 0) n)) > (distance node m) then Just m
-    else n
+closestNodeWith :: Int -> Int -> Node -> [Node] -> Map.Map Int [(Node, Node)] -> Maybe Node
+closestNodeWith edges dist node nodes pairs = foldl (\n m ->
+    let mEdges = length (Map.findWithDefault [] (nodeId m) pairs)
+    in
+        if mEdges > edges then n
+        else if (distance node m) > fromIntegral dist then n
+        else if n == Nothing then Just m
+        else if length (Map.findWithDefault [] (nodeId (fromMaybe (Node 0 0 0) n)) pairs) > mEdges then Just m
+        else if (distance node (fromMaybe (Node 0 0 0) n)) > (distance node m) then Just m
+        else n
     ) Nothing nodes
 
 -- Closest node by euclidean

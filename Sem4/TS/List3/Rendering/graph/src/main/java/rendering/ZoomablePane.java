@@ -38,36 +38,45 @@ public class ZoomablePane extends Pane {
 
         // Zoom handling
         this.setOnScroll(event -> {
-            if(event.getDeltaY() > 0) { // scroll in
-                scale *= 1.05;
-            } else {                    // scroll out
-                scale *= 0.95;
-            }
-            contentGroup.setScaleX(scale);
-            contentGroup.setScaleY(scale);
+            double prevScale = scale;
+            scale *= Math.exp(event.getDeltaY() * 0.0015);
+
+            double dx = event.getSceneX() - (this.getBoundsInParent().getMinX() + contentGroup.getTranslateX() + this.getTranslateX());
+            double dy = event.getSceneY() - (this.getBoundsInParent().getMinY() + contentGroup.getTranslateY() + this.getTranslateY());
+            double f = (scale / prevScale) - 1;
+
+            this.setScaleX(scale);
+            this.setScaleY(scale);
+            this.setTranslateX(this.getTranslateX() + f * dx);
+            this.setTranslateY(this.getTranslateY() + f * dy);
 
             pause.playFromStart();
             pause.setOnFinished(e -> { // when user stops scrolling
-                this.updateGraph(reader.read((int)(20.0 / scale))); // todo
+                int nodesVisible = (int)(60.0 / scale - 40); // todo
+                if(nodesVisible > graph.nodes.length) {
+                    this.updateGraph(reader.read(nodesVisible));
+                }
             });
+
+            event.consume();
         });
 
-        // // Dragging (panning) handling
-        // this.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-        //     lastMouseX = event.getSceneX();
-        //     lastMouseY = event.getSceneY();
-        // });
+        // Dragging (panning) handling
+        this.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            lastMouseX = event.getSceneX();
+            lastMouseY = event.getSceneY();
+        });
 
-        // this.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
-        //     double deltaX = event.getSceneX() - lastMouseX;
-        //     double deltaY = event.getSceneY() - lastMouseY;
+        this.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
+            double deltaX = event.getSceneX() - lastMouseX;
+            double deltaY = event.getSceneY() - lastMouseY;
 
-        //     contentGroup.setTranslateX(contentGroup.getTranslateX() + deltaX);
-        //     contentGroup.setTranslateY(contentGroup.getTranslateY() + deltaY);
+            this.setTranslateX(this.getTranslateX() + deltaX);
+            this.setTranslateY(this.getTranslateY() + deltaY);
 
-        //     lastMouseX = event.getSceneX();
-        //     lastMouseY = event.getSceneY();
-        // });
+            lastMouseX = event.getSceneX();
+            lastMouseY = event.getSceneY();
+        });
     }
 
     private void updateGraph(Graph newGraph) {
@@ -95,5 +104,7 @@ public class ZoomablePane extends Pane {
 
         contentGroup.getChildren().addAll(nodes);
         contentGroup.getChildren().addAll(edges);
+
+        contentGroup.getChildren().add(new Circle(0, 0, 50)); // debug
     }
 }

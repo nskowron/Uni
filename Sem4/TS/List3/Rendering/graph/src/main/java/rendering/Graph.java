@@ -14,5 +14,5 @@ class Node {
 class Edge {
     public int from;
     public int to;
-    public int weight;
+    public double weight;
 }

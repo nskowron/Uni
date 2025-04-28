@@ -45,5 +45,5 @@ mainLoop nodes = do
     input <- getLine
     let c = read input :: Int
 
-    writeGraphJSON (generateGraph (take c nodes) (round (fromIntegral c * 3 / 2)))
+    writeGraphJSON (generateGraph (take c nodes) (round (fromIntegral c * 35 / 20 - 5)))
     mainLoop nodes
