@@ -1,0 +1,203 @@
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp$ ls
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp$ echo "Nel Skowronek 279679"
+Nel Skowronek 279679
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp$ svn export https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/
+A    List1
+A    List1/Exc1
+A    List1/Exc2
+A    List1/Exc3
+A    List1/Exc4
+A    List1/Exc5
+A    List1/Exc1/travelers.go
+A    List1/Exc2/random_seeds.adb
+A    List1/Exc2/random_seeds.ads
+A    List1/Exc2/travelers.adb
+A    List1/Exc3/travelers.go
+A    List1/Exc4/random_seeds.adb
+A    List1/Exc4/random_seeds.ads
+A    List1/Exc4/travelers.adb
+A    List1/Exc5/travelers.go
+Exported revision 23.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp$ ls
+List1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp$ cd List1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1$ ls
+Exc1  Exc2  Exc3  Exc4  Exc5
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1$ cd Exc1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ ls
+travelers.go
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ go run travelers.go > out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ go run travelers.go > out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ go run travelers.go > out3
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ shasum out1
+32cd09d529fb45250e5d8dcd01503ef589d38914  out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ shasum out2
+456da9eb628f4d45094a0b320b78353cb6fa9faa  out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ shasum out3
+bc7485cc00e2c574990a44ed47614305899f2ec4  out3
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ svn import out1 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc1/out1
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out1
+Committing transaction...
+Committed revision 24.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ svn import out2 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc1/out2                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out2
+Committing transaction...
+Committed revision 25.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ svn import out3 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc1/out3                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out3
+Committing transaction...
+Committed revision 26.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc1$ cd ..
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1$ cd Exc2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ ls
+random_seeds.adb  random_seeds.ads  travelers.adb
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ gnatmake travelers.adb 
+x86_64-linux-gnu-gcc-13 -c travelers.adb
+x86_64-linux-gnu-gcc-13 -c random_seeds.adb
+x86_64-linux-gnu-gnatbind-13 -x travelers.ali
+x86_64-linux-gnu-gnatlink-13 travelers.ali
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ ./travelers > out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ ./travelers > out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ ./travelers > out3
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ shasum out1
+10b41d5b7f1cc0b55af80d146368f2ea81d0130f  out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ shasum out2
+f30ca320e4376a2978339021ace66d4ac9fe9898  out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ shasum out3
+a7964929c7dd7c7b3ab358f08ceee3e59e8336f7  out3
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ svn import out1 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc2/out1                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out1
+Committing transaction...
+Committed revision 27.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ svn import out2 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc2/out2                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out2
+Committing transaction...
+Committed revision 28.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ svn import out3 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc2/out3                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out3
+Committing transaction...
+Committed revision 29.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc2$ cd ..
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1$ cd Exc3
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ ls
+travelers.go
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ go run travelers.go > out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ go run travelers.go > out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ go run travelers.go > out3
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ shasum out1
+f9ea9c1d6395bb4c391d95c5a598f4b5201d361f  out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ shasum out2
+069b2dd1d61d154c360b2aa05965cb1c34f2e030  out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ shasum out3
+ce5ad77c0c0c832bf5a1597f13b8d2f9d031289b  out3
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ svn import out1 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc3/out1                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out1
+Committing transaction...
+Committed revision 30.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ svn import out2 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc3/out2                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out2
+Committing transaction...
+Committed revision 31.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ svn import out3 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc3/out3                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out3
+Committing transaction...
+Committed revision 32.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc3$ cd ..                           
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1$ cd Exc4
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc4$ ls
+random_seeds.adb  random_seeds.ads  travelers.adb
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc4$ gnatmake travelers.adb 
+x86_64-linux-gnu-gcc-13 -c travelers.adb
+x86_64-linux-gnu-gcc-13 -c random_seeds.adb
+x86_64-linux-gnu-gnatbind-13 -x travelers.ali
+x86_64-linux-gnu-gnatlink-13 travelers.ali
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc4$ ./travelers > out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc4$ ./travelers > out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc4$ shasum out1
+d443ab162c05e06aeffb47e8fd0affd8072b7eab  out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc4$ shasum out2
+9f6d2297583e35a108bed9bac753c07aeb2afaa6  out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc4$ svn import out1 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc4/out1                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out1
+Committing transaction...
+Committed revision 33.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc4$ svn import out2 https://repo.cs.
+pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc4/out2                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out2
+Committing transaction...
+Committed revision 34.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc4$ cd ..
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1$ cd Exc5
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc5$ ls
+travelers.go
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc5$ go run travelers.go > out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc5$ go run travelers.go > out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc5$ shasum ou1
+shasum: ou1: No such file or directory
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc5$ shasum out1
+6c25a214d26619231ba420a1a5131c9ac5628106  out1
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc5$ shasum out2
+ce3dc8ce29990fa75e7163e02a874efb0721c89d  out2
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc5$ svn import out1 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc5/out1                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out1
+Committing transaction...
+Committed revision 35.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc5$ svn import out2 https://repo.cs.pwr.edu.pl/279679-dir/mk1/Sem4/ProgWsp/List1/Exc5/out2                                     
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Adding         out2
+Committing transaction...
+Committed revision 36.
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1/Exc5$ cd ..
+nel@Uwuntu:~/Uni/svn/mk1/Sem4/ProgWsp/List1/tmp/List1$ tmux capture-pane -p -S'-' -E'-' -J > sprawozdanie
+

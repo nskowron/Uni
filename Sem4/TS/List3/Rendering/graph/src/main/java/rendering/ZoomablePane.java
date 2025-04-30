@@ -104,7 +104,5 @@ public class ZoomablePane extends Pane {
 
         contentGroup.getChildren().addAll(nodes);
         contentGroup.getChildren().addAll(edges);
-
-        contentGroup.getChildren().add(new Circle(0, 0, 50)); // debug
     }
 }
