@@ -201,7 +201,7 @@ func (n *Node) Start() {
 						var nodeResponse Response
 						directions := []int{0, 1, 2, 3}
 						for _, dir := range directions {
-							newPosition := n.position
+							newPosition = n.position
 							Move_Direction(&newPosition, dir)
 
 							request := EnterRequest{n.traveler, make(chan Response)}
