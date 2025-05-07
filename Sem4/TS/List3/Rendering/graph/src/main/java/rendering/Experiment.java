@@ -1,16 +1,14 @@
 package rendering;
 
-import javafx.scene.layout.BorderPane;
-
-public class ExperimentPane extends BorderPane {
+public class Experiment {
     private Graph graph;
     private GraphUI graphUI;
-
     private MatrixesPane matrixes;
 
-    public ExperimentPane(Graph initialGraph, GraphUI initialGraphUI) {
+    public Experiment(Graph initialGraph, GraphUI initialGraphUI, MatrixesPane initialMatrixes) {
         graph = initialGraph;
         graphUI = initialGraphUI;
+        matrixes = initialMatrixes; 
     }
 
     public void runExperiment() {} // todo

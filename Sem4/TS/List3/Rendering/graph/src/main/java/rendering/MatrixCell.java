@@ -4,19 +4,21 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 
-public class MatrixNode extends StackPane {
-    private Line edge;
-    private int value;
+public class MatrixCell extends StackPane {
+    public final Shape node;
+    public int value;
 
-    public MatrixNode(Line newEdge, int newValue) {
+    public MatrixCell(Shape newNode, int newValue) {
+        node = newNode;
         value = newValue;
+
         this.getChildren().add(new Text(Integer.toString(value)));
         this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
 
-        if(newEdge == null) {
+        if(node == null) {
             this.setOnMouseDragEntered(event -> {
                 this.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
             });
@@ -25,14 +27,15 @@ public class MatrixNode extends StackPane {
             });
         }
         else {
-            edge = newEdge;
             this.setOnDragEntered(event -> {
                 this.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
-                edge.setStroke(Color.GREEN);
+                node.setStroke(Color.GREEN);
+                node.setFill(Color.GREEN);
             });
             this.setOnDragExited(event -> {
                 this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-                edge.setStroke(Color.BLACK);
+                node.setStroke(Color.BLACK);
+                node.setFill(Color.BLACK);
             });
             this.setOnScroll(event -> {
                 if(event.getDeltaY() > 0) {
@@ -44,13 +47,15 @@ public class MatrixNode extends StackPane {
                 this.getChildren().add(new Text(Integer.toString(value)));
             });
 
-            edge.setOnDragEntered(event -> {
+            node.setOnDragEntered(event -> {
                 this.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
-                edge.setStroke(Color.GREEN);
+                node.setStroke(Color.GREEN);
+                node.setFill(Color.GREEN);
             });
-            edge.setOnDragExited(event -> {
+            node.setOnDragExited(event -> {
                 this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-                edge.setStroke(Color.BLACK);
+                node.setStroke(Color.BLACK);
+                node.setFill(Color.BLACK);
             });
         }
     }

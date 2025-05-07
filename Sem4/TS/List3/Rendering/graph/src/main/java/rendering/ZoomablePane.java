@@ -9,6 +9,8 @@ public class ZoomablePane extends Pane {
     private final GraphUI graphUI;
     private final Graph graph;
 
+    public boolean experimentMode = false;
+
     // For scrolling
     private double scale = 1.0;
     private final PauseTransition pause = new PauseTransition(Duration.millis(200));
@@ -30,6 +32,11 @@ public class ZoomablePane extends Pane {
 
         // Zoom handling
         this.setOnScroll(event -> {
+            if(experimentMode) {
+                event.consume();
+                return;
+            }
+
             double prevScale = scale;
             scale *= Math.exp(event.getDeltaY() * 0.0015);
 
@@ -55,11 +62,21 @@ public class ZoomablePane extends Pane {
 
         // Dragging (panning) handling
         this.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            if(experimentMode) {
+                event.consume();
+                return;
+            }
+
             lastMouseX = event.getSceneX();
             lastMouseY = event.getSceneY();
         });
 
         this.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
+            if(experimentMode) {
+                event.consume();
+                return;
+            }
+            
             double deltaX = event.getSceneX() - lastMouseX;
             double deltaY = event.getSceneY() - lastMouseY;
 

@@ -8,13 +8,16 @@ public class GUI {
     public GUI(Stage stage, GraphReader reader) {
         BorderPane root = new BorderPane();
 
-        Graph initialGraph = reader.read(20);
-        GraphUI initialGraphUI = new GraphUI(initialGraph);
+        Graph graph = reader.read(20);
+        GraphUI graphUI = new GraphUI(graph);
 
-        ZoomablePane zoom = new ZoomablePane(initialGraph, initialGraphUI, reader);
-        ExperimentPane experiment = new ExperimentPane(initialGraph, initialGraphUI);
+        ZoomablePane zoom = new ZoomablePane(graph, graphUI, reader);
+        MatrixesPane matrixes = new MatrixesPane();
+        Experiment experiment = new Experiment(graph, graphUI, matrixes);
+        ExperimentButton experimentButton = new ExperimentButton(experiment, graph, graphUI, matrixes, zoom, root);
 
         root.setCenter(zoom);
+        root.setTop(experimentButton);
 
         Scene scene = new Scene(root);
         stage.setScene(scene);
