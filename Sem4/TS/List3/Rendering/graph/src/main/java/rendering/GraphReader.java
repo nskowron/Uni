@@ -16,6 +16,7 @@ public class GraphReader {
             System.out.println(count);
             System.out.flush();
             graph = mapper.readValue(reader.readLine(), Graph.class);
+            graph.mirrorEdges(); // to reduce json size
         } catch (IOException e) {
             e.printStackTrace(System.err);
         }

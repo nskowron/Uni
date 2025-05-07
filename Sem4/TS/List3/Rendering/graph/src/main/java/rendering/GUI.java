@@ -7,9 +7,14 @@ import javafx.stage.Stage;
 public class GUI {
     public GUI(Stage stage, GraphReader reader) {
         BorderPane root = new BorderPane();
-        ZoomablePane graphPane = new ZoomablePane(reader);
 
-        root.setCenter(graphPane);
+        Graph initialGraph = reader.read(20);
+        GraphUI initialGraphUI = new GraphUI(initialGraph);
+
+        ZoomablePane zoom = new ZoomablePane(initialGraph, initialGraphUI, reader);
+        ExperimentPane experiment = new ExperimentPane(initialGraph, initialGraphUI);
+
+        root.setCenter(zoom);
 
         Scene scene = new Scene(root);
         stage.setScene(scene);

@@ -1,9 +1,5 @@
 package rendering;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Scanner;
-
 import javafx.application.Application;
 import javafx.stage.Stage;
 
