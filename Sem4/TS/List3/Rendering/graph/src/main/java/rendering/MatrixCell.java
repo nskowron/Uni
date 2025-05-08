@@ -27,32 +27,28 @@ public class MatrixCell extends StackPane {
             });
         }
         else {
-            this.setOnDragEntered(event -> {
+            this.setOnMouseEntered(event -> {
                 this.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
                 node.setStroke(Color.GREEN);
                 node.setFill(Color.GREEN);
             });
-            this.setOnDragExited(event -> {
+            this.setOnMouseExited(event -> {
                 this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
                 node.setStroke(Color.BLACK);
                 node.setFill(Color.BLACK);
             });
             this.setOnScroll(event -> {
-                if(event.getDeltaY() > 0) {
-                    value += 1;
-                } else {
-                    value = Math.max(0, value - 1);
-                }
+                    value = Math.max(0, value + (int)event.getDeltaY() / 40);
                 this.getChildren().removeFirst();
                 this.getChildren().add(new Text(Integer.toString(value)));
             });
 
-            node.setOnDragEntered(event -> {
+            node.setOnMouseEntered(event -> {
                 this.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
                 node.setStroke(Color.GREEN);
                 node.setFill(Color.GREEN);
             });
-            node.setOnDragExited(event -> {
+            node.setOnMouseExited(event -> {
                 this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
                 node.setStroke(Color.BLACK);
                 node.setFill(Color.BLACK);

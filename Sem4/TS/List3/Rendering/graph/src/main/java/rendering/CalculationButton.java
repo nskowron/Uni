@@ -3,20 +3,15 @@ package rendering;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 
-public class ExperimentButton extends Button {
+public class CalculationButton extends Button {
     private boolean experimentMode = false;
 
-    public ExperimentButton(Experiment experiment, Graph graph, GraphUI graphUI, MatrixesPane matrixes, ZoomablePane zoom, BorderPane root) {
-        super("Experiment");
+    public CalculationButton(Graph graph, GraphUI graphUI, CalculationPane matrixes, ZoomablePane zoom, BorderPane root) {
+        super("Calculate");
         setOnAction(e -> {
             if(experimentMode == false) {
                 matrixes.update(graph, graphUI);
                 root.setRight(matrixes);
-                root.setBottom(new Button("Run") {{
-                    setOnAction(event1 -> {
-                        experiment.runExperiment();
-                    });
-                }});
                 zoom.experimentMode = true;
                 experimentMode = true;
                 this.setText("Back");
@@ -26,7 +21,7 @@ public class ExperimentButton extends Button {
                 root.setBottom(null);
                 zoom.experimentMode = false;
                 experimentMode = false;
-                this.setText("Experiment");
+                this.setText("Calculate");
             }
         });
     }

@@ -12,9 +12,8 @@ public class GUI {
         GraphUI graphUI = new GraphUI(graph);
 
         ZoomablePane zoom = new ZoomablePane(graph, graphUI, reader);
-        MatrixesPane matrixes = new MatrixesPane();
-        Experiment experiment = new Experiment(graph, graphUI, matrixes);
-        ExperimentButton experimentButton = new ExperimentButton(experiment, graph, graphUI, matrixes, zoom, root);
+        CalculationPane matrixes = new CalculationPane();
+        CalculationButton experimentButton = new CalculationButton(graph, graphUI, matrixes, zoom, root);
 
         root.setCenter(zoom);
         root.setTop(experimentButton);

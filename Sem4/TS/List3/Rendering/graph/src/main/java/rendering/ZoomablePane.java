@@ -62,21 +62,11 @@ public class ZoomablePane extends Pane {
 
         // Dragging (panning) handling
         this.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-            if(experimentMode) {
-                event.consume();
-                return;
-            }
-
             lastMouseX = event.getSceneX();
             lastMouseY = event.getSceneY();
         });
 
         this.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(experimentMode) {
-                event.consume();
-                return;
-            }
-            
             double deltaX = event.getSceneX() - lastMouseX;
             double deltaY = event.getSceneY() - lastMouseY;
 
