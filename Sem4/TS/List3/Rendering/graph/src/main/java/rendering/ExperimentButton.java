@@ -17,12 +17,14 @@ public class ExperimentButton extends Button {
                         experiment.runExperiment();
                     });
                 }});
+                zoom.experimentMode = true;
                 experimentMode = true;
                 this.setText("Back");
             }
             else {
                 root.setRight(null);
                 root.setBottom(null);
+                zoom.experimentMode = false;
                 experimentMode = false;
                 this.setText("Experiment");
             }

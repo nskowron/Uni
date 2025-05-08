@@ -9,12 +9,14 @@ import javafx.scene.text.Text;
 
 public abstract class MatrixPane extends GridPane {
     public static int MATRIX_SIZE_PX = 200;
-    //public static MatrixCell EMPTY_CELL = new MatrixCell(null, 0);
 
     protected List< List<Node> > matrix = new ArrayList<>();
 
     public MatrixPane() {
         this.setPrefSize(MATRIX_SIZE_PX, MATRIX_SIZE_PX);
+        this.setMaxSize(MATRIX_SIZE_PX, MATRIX_SIZE_PX);
+        this.setMinSize(MATRIX_SIZE_PX, MATRIX_SIZE_PX);
+        
         this.setGridLinesVisible(true);
 
         this.set(new Text(""), 0, 0);
