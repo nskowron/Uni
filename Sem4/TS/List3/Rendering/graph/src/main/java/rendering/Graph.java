@@ -2,6 +2,7 @@ package rendering;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Graph {
     public List<Node> nodes = new ArrayList<>();
@@ -10,24 +11,45 @@ public class Graph {
 
     public Graph() {}
 
+    // Apply haskell graph update (completed)
     public void update(Graph graph) {
         nodes.addAll(graph.nodes);
         edges.addAll(graph.edges);
         tempEdges = graph.tempEdges;
     }
 
-    public void mirrorEdges() {
-        List<Edge> mirroredEdges = new ArrayList<>();
+    // Mirror edges and randomise intensities
+    public Graph complete(Random rng) {
+        List<Edge> mirrorEdges = new ArrayList<>();
         for(Edge edge : edges) {
-            mirroredEdges.add(new Edge(edge.to, edge.from, edge.weight));
-        }
-        edges.addAll(mirroredEdges);
+            Edge mirrorEdge = new Edge();
+            mirrorEdge.from = edge.to;
+            mirrorEdge.to = edge.from;
+            mirrorEdge.weight = edge.weight;
 
-        List<Edge> mirroredTempEdges = new ArrayList<>();
-        for(Edge edge : tempEdges) {
-            mirroredTempEdges.add(new Edge(edge.to, edge.from, edge.weight));
+            mirrorEdges.add(mirrorEdge);
         }
-        tempEdges.addAll(mirroredTempEdges);
+        edges.addAll(mirrorEdges);
+        mirrorEdges.clear();
+        for(Edge edge : tempEdges) {
+            Edge mirrorEdge = new Edge();
+            mirrorEdge.from = edge.to;
+            mirrorEdge.to = edge.from;
+            mirrorEdge.weight = edge.weight;
+
+            mirrorEdges.add(mirrorEdge);
+        }
+        tempEdges.addAll(mirrorEdges);
+        return this;
+    }
+
+    // Prepare python simulation
+    public SimulationGraph toSimulationGraph() {
+        SimulationGraph simulationGraph = new SimulationGraph();
+        simulationGraph.nodes = nodes;
+        simulationGraph.edges = edges;
+        simulationGraph.edges.addAll(tempEdges);
+        return simulationGraph;
     }
 }
 
@@ -35,24 +57,10 @@ class Node {
     public int id;
     public int x;
     public int y;
-
-    public Node() {}
-    public Node(int _id, int _x, int _y) {
-        id = _id;
-        x = _x;
-        y = _y;
-    }
 }
 
 class Edge {
     public int from;
     public int to;
-    public double weight;
-
-    public Edge() {}
-    public Edge(int _from, int _to, double _weight) {
-        from = _from;
-        to = _to;
-        weight = _weight;
-    }
+    public int weight;
 }

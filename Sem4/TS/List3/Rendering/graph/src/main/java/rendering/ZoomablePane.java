@@ -1,5 +1,7 @@
 package rendering;
 
+import java.util.Random;
+
 import javafx.animation.PauseTransition;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -9,7 +11,7 @@ public class ZoomablePane extends Pane {
     private final GraphUI graphUI;
     private final Graph graph;
 
-    public boolean experimentMode = false;
+    public boolean simMode = false;
 
     // For scrolling
     private double scale = 1.0;
@@ -19,7 +21,7 @@ public class ZoomablePane extends Pane {
     private double lastMouseX;
     private double lastMouseY;
 
-    public ZoomablePane(Graph initialGraph, GraphUI initialGraphUI, GraphReader reader) {
+    public ZoomablePane(Graph initialGraph, GraphUI initialGraphUI, GraphReader reader, Random rng) {
         graph = initialGraph;
         graphUI = initialGraphUI;
         
@@ -32,7 +34,7 @@ public class ZoomablePane extends Pane {
 
         // Zoom handling
         this.setOnScroll(event -> {
-            if(experimentMode) {
+            if(simMode) {
                 event.consume();
                 return;
             }
@@ -53,7 +55,7 @@ public class ZoomablePane extends Pane {
             pause.setOnFinished(e -> { // when user stops scrolling
                 int nodesVisible = (int)(60.0 / scale - 40); // todo
                 if(nodesVisible > graph.nodes.size()) {
-                    this.updateGraph(reader.read(nodesVisible));
+                    this.updateGraph(reader.read(nodesVisible), rng);
                 }
             });
 
@@ -78,8 +80,10 @@ public class ZoomablePane extends Pane {
         });
     }
 
-    public void updateGraph(Graph graphUpdate) {
-        graph.update(graphUpdate);
+    public void updateGraph(Graph graphUpdate, Random rng) {
         graphUI.update(graphUpdate);
+
+        graphUpdate.complete(rng);
+        graph.update(graphUpdate);
     }
 }

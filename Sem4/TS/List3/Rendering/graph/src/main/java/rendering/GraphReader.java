@@ -1,22 +1,27 @@
 package rendering;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GraphReader {
-    private ObjectMapper mapper = new ObjectMapper();
-    private BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final CommunicationChannel channel;
+
+    public GraphReader(CommunicationChannel _channel) {
+        channel = _channel;
+    }
 
     public Graph read(int count) {
         Graph graph = null;
         try {
-            System.out.println(count);
-            System.out.flush();
-            graph = mapper.readValue(reader.readLine(), Graph.class);
-            graph.mirrorEdges(); // to reduce json size
+            System.err.println("dupa1");
+            channel.writer.write(Integer.toString(count) + "\n");
+            System.err.println("dupa2");
+            channel.writer.flush();
+            System.err.println("dupa3");
+            graph = mapper.readValue(channel.reader.readLine(), Graph.class);
+            System.err.println("dupa4");
         } catch (IOException e) {
             e.printStackTrace(System.err);
         }
