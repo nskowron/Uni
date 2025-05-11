@@ -12,16 +12,14 @@ public class Main extends Application {
     
     @Override
     public void start(Stage stage) {
-        CommunicationChannel gen = null;
-        CommunicationChannel sim = null;
         try (ServerSocket socket = new ServerSocket(port)){
-            //System.err.println("dupa11");
+            socket.accept(); // netcat check
             Socket gen_socket = socket.accept();
-            //System.err.println("dupa22");
-            gen = new CommunicationChannel(gen_socket.getInputStream(), gen_socket.getOutputStream());
-            //sim = new CommunicationChannel(null, null);
-            //System.err.println("dupa33");
-            new GUI(stage, new GraphReader(gen), new SimulationReader(sim));
+            new GUI(
+                stage,
+                new GraphReader(gen_socket.getInputStream(), gen_socket.getOutputStream()),
+                new SimulationReader(null, null)
+            );
         } catch(IOException e) {
             System.err.println("Whoopse daisy! ServerrRRR");
             System.exit(1);

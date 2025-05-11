@@ -24,7 +24,7 @@ public class SimulationPane extends GridPane {
         this.add(reliability, 1, 0);
         this.add(new Button("Calculate") {{
             setOnAction(e -> {
-                reliability.setText(simReader.read(capacities.getMatrix(), intensities.getMatrix()));
+                reliability.setText(Double.toString(simReader.read(capacities.getMatrix(), intensities.getMatrix())));
             });
         }}, 2, 0);
         this.add(new Text("Capacities Matrix"), 0, 1, 1, 3);

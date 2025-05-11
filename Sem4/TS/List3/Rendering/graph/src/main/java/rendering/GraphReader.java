@@ -1,26 +1,34 @@
 package rendering;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GraphReader {
     private final ObjectMapper mapper = new ObjectMapper();
-    private final CommunicationChannel channel;
+    private final BufferedReader reader;
+    private final BufferedWriter writer;
 
-    public GraphReader(CommunicationChannel _channel) {
-        channel = _channel;
+    public GraphReader(InputStream in, OutputStream out) {
+        reader = new BufferedReader(new InputStreamReader(in));
+        writer = new BufferedWriter(new OutputStreamWriter(out));
     }
 
     public Graph read(int count) {
         Graph graph = null;
         try {
             System.err.println("dupa1");
-            channel.writer.write(Integer.toString(count) + "\n");
+            writer.write(Integer.toString(count) + "\n");
             System.err.println("dupa2");
-            channel.writer.flush();
+            writer.flush();
             System.err.println("dupa3");
-            graph = mapper.readValue(channel.reader.readLine(), Graph.class);
+            graph = mapper.readValue(reader.readLine(), Graph.class);
             System.err.println("dupa4");
         } catch (IOException e) {
             e.printStackTrace(System.err);

@@ -3,12 +3,11 @@
 # Java stuff
 cd Rendering/graph
 mvn -q javafx:run &
-sleep 5 &&
+while ! nc -z -v localhost 2137; do sleep 1; done
 
 # Haskell stuff
 cd ../../Generating
 socat TCP:localhost:2137 EXEC:"cabal run -v0" &&
-
 
 # Python stuff
 
