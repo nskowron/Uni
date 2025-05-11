@@ -48,7 +48,7 @@ class MatrixIntensitiesPane extends MatrixPane {
             }
             for(int i = 0; i < matrix.length; i++) { // all fields
                 for(int j = 0; j < matrix.length; j++) {
-                    MatrixEdgeCell cell = new MatrixEdgeCell(rng.nextInt(10), null, i == j);
+                    MatrixEdgeCell cell = new MatrixEdgeCell(rng.nextInt(2), null, i == j);
                     grid.add(cell, i + 1, j + 1);
                     matrix[i][j] = cell;
                 }
@@ -71,8 +71,8 @@ class MatrixCapacitiesPane extends MatrixPane {
             for(int i = 0; i < graph.edges.size(); i++) { // edges
                 Edge edge = graph.edges.get(i);
                 Line edgeUI = graphUI.edges.get(i);
-                MatrixEdgeCell cell1 = new MatrixEdgeCell(edge.weight / 2, edgeUI, edge.from == edge.to);
-                MatrixEdgeCell cell2 = new MatrixEdgeCell(edge.weight / 2, edgeUI, edge.from == edge.to);
+                MatrixEdgeCell cell1 = new MatrixEdgeCell(edge.weight, edgeUI, edge.from == edge.to);
+                MatrixEdgeCell cell2 = new MatrixEdgeCell(edge.weight, edgeUI, edge.from == edge.to);
                 grid.add(cell1, edge.from + 1, edge.to + 1);
                 grid.add(cell2, edge.to + 1, edge.from + 1);
                 matrix[edge.from][edge.to] = cell1;
@@ -81,8 +81,8 @@ class MatrixCapacitiesPane extends MatrixPane {
             for(int i = 0; i < graph.tempEdges.size(); i++) { // tempEdges
                 Edge edge = graph.tempEdges.get(i);
                 Line edgeUI = graphUI.tempEdges.get(i);
-                MatrixEdgeCell cell1 = new MatrixEdgeCell(edge.weight / 2, edgeUI, edge.from == edge.to);
-                MatrixEdgeCell cell2 = new MatrixEdgeCell(edge.weight / 2, edgeUI, edge.from == edge.to);
+                MatrixEdgeCell cell1 = new MatrixEdgeCell(edge.weight, edgeUI, edge.from == edge.to);
+                MatrixEdgeCell cell2 = new MatrixEdgeCell(edge.weight, edgeUI, edge.from == edge.to);
                 grid.add(cell1, edge.from + 1, edge.to + 1);
                 grid.add(cell2, edge.to + 1, edge.from + 1);
                 matrix[edge.from][edge.to] = cell1;

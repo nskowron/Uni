@@ -20,11 +20,10 @@ def create_graph(capacities):
         for j in range(n):
             if capacities[i, j] > 0:
                 G.add_edge(i, j, capacity=capacities[i, j])
-                print(f"edge {i} -> {j} with capacity {capacities[i, j]}")
     return G
 
 def simulate_random_failures(G, intensities, T):
-    broken = [(u, v) for u, v in G.edges() if random.random() > 0.95]
+    broken = [(u, v) for u, v in G.edges() if random.random() > 1]
     brokie = nx.subgraph_view(G, filter_edge=lambda u, v: (u, v) not in broken)
     return mean_time_delay(brokie, intensities) <= T
 
@@ -38,6 +37,7 @@ def mean_time_delay(G, intensities):
                 N += flow
                 success = reroute_flow(G, i, j, flow)
                 if not success:
+                    print("Failed to reroute flow")
                     return float('inf')
     if N == 0:
         return 0
@@ -45,6 +45,7 @@ def mean_time_delay(G, intensities):
     result = 0
     for u, v in G.edges():
         if G[u][v]['capacity'] - G[u][v]['intensity'] == 0:
+            print("Edge is full")
             return float('inf')
         result += G[u][v]['intensity'] / (G[u][v]['capacity'] - G[u][v]['intensity'])
     result /= N
@@ -54,16 +55,16 @@ def mean_time_delay(G, intensities):
 # try to reroute flow in every direction
 def reroute_flow(G, u, v, overflow) -> bool:
     residual = nx.subgraph_view(G, filter_edge=lambda a, b: G.has_edge(a, b) and G[a][b]['capacity'] - G[a][b]['intensity'] > 0)
-    print("new reroute")
     while overflow > 0:
         # filter residual capacity
+        print(f"overflow: {overflow}")
         try:
             path = nx.shortest_path(residual, source=u, target=v)
+            print(f"Path found: {path}")
         except nx.NetworkXNoPath:
+            print(f"No path found from {u} to {v}")
             return False
-        print("path:")
-        for a, b in zip(path, path[1:]):
-            print(f"{a} -> {b}")
+        
         min_residual = min( # min cap on the path
             G[a][b]['capacity'] - G[a][b]['intensity']
             for a, b in zip(path, path[1:])

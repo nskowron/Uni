@@ -13,6 +13,10 @@ public class MatrixCell extends StackPane {
         this.setPrefSize(MatrixPane.MATRIX_SIZE_PX / 10, MatrixPane.MATRIX_SIZE_PX / 10);
         this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
         this.setStyle("-fx-border-color: dimgray; -fx-border-width: 1px;");
+
+        this.setOnScroll(event -> {
+            event.consume();
+        });
     }
 }
 
@@ -28,6 +32,17 @@ class MatrixNodeCell extends MatrixCell {
             nodeUI.setFill(Color.GREEN);
         });
         this.setOnMouseExited(event -> {
+            this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+            nodeUI.setStroke(Color.BLACK);
+            nodeUI.setFill(Color.BLACK);
+        });
+
+        nodeUI.setOnMouseEntered(event -> {
+            this.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
+            nodeUI.setStroke(Color.GREEN);
+            nodeUI.setFill(Color.GREEN);
+        });
+        nodeUI.setOnMouseExited(event -> {
             this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
             nodeUI.setStroke(Color.BLACK);
             nodeUI.setFill(Color.BLACK);
@@ -67,12 +82,23 @@ class MatrixEdgeCell extends MatrixCell {
             }
         });
 
-        if(diagonal) {
-            this.setOnScroll(event -> {
+        this.setOnScroll(event -> {
+            if(!diagonal) {
                 value = Math.max(0, value + (int)event.getDeltaY() / 40);
                 this.getChildren().removeFirst();
                 this.getChildren().add(new Text(Integer.toString(value)));
-                event.consume();
+            }
+            event.consume();
+        });
+
+        if(edgeUI != null) {
+            edgeUI.setOnMouseEntered(event -> {
+                this.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
+                edgeUI.setStroke(Color.GREEN);
+            });
+            edgeUI.setOnMouseExited(event -> {
+                this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+                edgeUI.setStroke(Color.BLACK);
             });
         }
     }
