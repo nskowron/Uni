@@ -19,7 +19,7 @@ main = do
     let (start_x, g2) = randomR (0, 100::Int) g
     let (start_y, g3) = randomR (0, 100::Int) g2
     let nodes = Node 0 start_x start_y : map nextNode nodes
-    let edges = Edge 1 0 0 : Edge 2 1 0 : zipWith (nextEdge nodes) edges (tail edges)
+    let edges = Edge 1 0 100 : Edge 2 1 100 : zipWith (nextEdge nodes) edges (tail edges)
 
     mainLoop nodes edges 0
 

@@ -12,7 +12,7 @@ def receive_matrix(sock, n):
         if not chunk:
             raise ConnectionError("Socket closed while reading matrix.")
         data += chunk
-    return np.frombuffer(data, dtype='i4').reshape((n, n))
+    return np.frombuffer(data, dtype='>i4').reshape((n, n))
 
 
 if __name__ == "__main__":
@@ -28,6 +28,5 @@ if __name__ == "__main__":
             intensities = receive_matrix(s, n)
 
             result = simulate(capacities, intensities)
-
             s.sendall(struct.pack('>d', result)) # send result as double
 

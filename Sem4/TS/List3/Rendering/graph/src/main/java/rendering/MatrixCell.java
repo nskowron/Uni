@@ -39,10 +39,14 @@ class MatrixNodeCell extends MatrixCell {
 class MatrixEdgeCell extends MatrixCell {
     public int value;
 
-    public MatrixEdgeCell(int _value, Line edgeUI) {
+    public MatrixEdgeCell(int _value, Line edgeUI, boolean diagonal) {
         super();
 
-        value = _value;
+        if(diagonal) {
+            value = 0;
+        } else {
+            value = _value;
+        }
 
         this.getChildren().add(new Text(Integer.toString(value)));
         this.setStyle("-fx-border-color: lightgray;");
@@ -63,11 +67,13 @@ class MatrixEdgeCell extends MatrixCell {
             }
         });
 
-        this.setOnScroll(event -> {
-            value = Math.max(0, value + (int)event.getDeltaY() / 40);
-            this.getChildren().removeFirst();
-            this.getChildren().add(new Text(Integer.toString(value)));
-            event.consume();
-        });
+        if(diagonal) {
+            this.setOnScroll(event -> {
+                value = Math.max(0, value + (int)event.getDeltaY() / 40);
+                this.getChildren().removeFirst();
+                this.getChildren().add(new Text(Integer.toString(value)));
+                event.consume();
+            });
+        }
     }
 }
