@@ -4,9 +4,66 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 public class MatrixCell extends StackPane {
     public MatrixCell() {
         this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+    }
+}
+
+class MatrixNodeCell extends MatrixCell {
+    public MatrixNodeCell(int id, Circle nodeUI) {
+        super();
+
+        this.getChildren().add(new Text(Integer.toString(id)));
+
+        this.setOnMouseEntered(event -> {
+            this.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
+            nodeUI.setStroke(Color.GREEN);
+            nodeUI.setFill(Color.GREEN);
+        });
+        this.setOnMouseExited(event -> {
+            this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+            nodeUI.setStroke(Color.BLACK);
+            nodeUI.setFill(Color.BLACK);
+        });
+    }
+    
+}
+
+class MatrixEdgeCell extends MatrixCell {
+    public int value;
+
+    public MatrixEdgeCell(int _value, Line edgeUI) {
+        super();
+
+        value = _value;
+
+        this.getChildren().add(new Text(Integer.toString(value)));
+
+        this.setOnMouseEntered(event -> {
+            if(edgeUI != null) {
+                this.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
+                edgeUI.setStroke(Color.GREEN);
+            } else {
+                this.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
+            }
+        });
+
+        this.setOnMouseExited(event -> {
+            this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+            if(edgeUI != null) {
+                edgeUI.setStroke(Color.BLACK);
+            }
+        });
+
+        this.setOnScroll(event -> {
+            value = Math.max(0, value + (int)event.getDeltaY() / 40);
+            this.getChildren().removeFirst();
+            this.getChildren().add(new Text(Integer.toString(value)));
+        });
     }
 }

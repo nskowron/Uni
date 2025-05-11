@@ -82,8 +82,6 @@ public class ZoomablePane extends Pane {
 
     public void updateGraph(Graph graphUpdate, Random rng) {
         graphUI.update(graphUpdate);
-
-        graphUpdate.complete(rng);
         graph.update(graphUpdate);
     }
 }

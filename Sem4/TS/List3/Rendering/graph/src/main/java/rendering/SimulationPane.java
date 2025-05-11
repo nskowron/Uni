@@ -1,5 +1,7 @@
 package rendering;
 
+import java.util.Random;
+
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
@@ -15,44 +17,14 @@ public class SimulationPane extends GridPane {
         this.setGridLinesVisible(true);
 
         this.reliability = new Text("Not Calculated");
-        this.capacities = new MatrixPane(graph, graphUI, new WeightUpdater() {
-            @Override
-            public void set(int value, Edge edge) {
-                if(edge == null) {
-                    return;
-                }
-                //edge.capacity = value;
-            }
-            @Override
-            public int get(Edge edge) {
-                if(edge == null) {
-                    return 0;
-                }
-                return edge.weight;
-            }
-        });
-        this.intensities = new MatrixPane(graph, graphUI, new WeightUpdater() {
-            @Override
-            public void set(int value, Edge edge) {
-                if(edge == null) {
-                    return;
-                }
-                //edge.intensity = value;
-            }
-            @Override
-            public int get(Edge edge) {
-                if(edge == null) {
-                    return 0;
-                }
-                return edge.weight; //
-            }
-        });
+        this.capacities = new MatrixCapacitiesPane(graph, graphUI);
+        this.intensities = new MatrixIntensitiesPane(graph, graphUI, new Random());
         
         this.add(new Text("Reliability:"), 0, 0);
         this.add(reliability, 1, 0);
         this.add(new Button("Calculate") {{
             setOnAction(e -> {
-                reliability.setText(simReader.read(graph.toSimulationGraph()));
+                reliability.setText(simReader.read(capacities.getMatrix(), intensities.getMatrix()));
             });
         }}, 2, 0);
         this.add(new Text("Capacities Matrix"), 0, 1, 1, 3);

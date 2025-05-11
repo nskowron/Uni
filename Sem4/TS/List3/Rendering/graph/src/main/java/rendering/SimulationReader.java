@@ -12,10 +12,10 @@ public class SimulationReader {
         this.channel = _channel;
     }
 
-    public String read(SimulationGraph graph) {
+    public String read(int[][] capacities, int[][] intensities) {
         String result = null;
         try {
-            channel.writer.write(mapper.writeValueAsString(graph));
+            channel.writer.write("todo");
             channel.writer.newLine();
             channel.writer.flush();
             result = channel.reader.readLine();

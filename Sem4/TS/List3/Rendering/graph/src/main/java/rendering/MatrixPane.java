@@ -1,41 +1,98 @@
 package rendering;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Random;
 
 import javafx.scene.layout.GridPane;
-import javafx.util.Pair;
+import javafx.scene.shape.Line;
 
-public class MatrixPane extends GridPane {
+public abstract class MatrixPane extends GridPane {
     public static int MATRIX_SIZE_PX = 200;
     public static int MATRIX_MAX_SIZE_NODES = 500;
 
-    public MatrixPane(Graph graph, GraphUI graphUI, WeightUpdater weight) {
-        this.setMinSize(MATRIX_SIZE_PX, MATRIX_SIZE_PX);
-        this.setMaxSize(MATRIX_SIZE_PX, MATRIX_SIZE_PX);
+    protected MatrixEdgeCell[][] matrix;
+
+    public MatrixPane(int n) {
         this.setGridLinesVisible(true);
+        this.setPrefSize(MATRIX_SIZE_PX, MATRIX_SIZE_PX);
+        this.setMaxSize(MATRIX_SIZE_PX, MATRIX_SIZE_PX);
 
-        this.add(new MatrixCell(), 0, 0);
+        if(n < MATRIX_MAX_SIZE_NODES) {
+            matrix = new MatrixEdgeCell[n][n];
+        } else {
+            matrix = null;
+        }
+    }
 
-        if(graph.nodes.size() <= MATRIX_MAX_SIZE_NODES) {
-            for(int i = 0; i < graph.nodes.size(); i++) {
-                this.add(new MatrixNodeCell(graph.nodes.get(i), graphUI.nodes.get(i)), 0, i + 1);
-                this.add(new MatrixNodeCell(graph.nodes.get(i), graphUI.nodes.get(i)), i + 1, 0);
+    public int[][] getMatrix() {
+        int[][] result = new int[matrix.length][matrix.length];
+        for(int i = 0; i < matrix.length; i++) {
+            for(int j = 0; j < matrix.length; j++) {
+                result[i][j] = matrix[i][j].value;
             }
+        }
+        return result;
+    }
+}
 
-            Map<Pair<Integer, Integer>, Boolean> actualEdges = new HashMap<>();
-            for(int i = 0; i < graphUI.edges.size(); i++) {
-                Edge edge1 = graph.edges.get(i);
-                Edge edge2 = graph.edges.get(i + graphUI.edges.size());
-                this.add(new MatrixEdgeCell(edge1.from, edge1.to, graph, graphUI, edge1, graphUI.edges.get(i), weight), edge1.from + 1, edge1.to + 1);
-                this.add(new MatrixEdgeCell(edge2.from, edge2.to, graph, graphUI, edge2, graphUI.edges.get(i), weight), edge2.from + 1, edge2.to + 1);
-                actualEdges.put(new Pair<>(edge1.from, edge1.to), true);
-                actualEdges.put(new Pair<>(edge2.from, edge2.to), true);
+class MatrixIntensitiesPane extends MatrixPane {
+    public MatrixIntensitiesPane(Graph graph, GraphUI graphUI, Random rng) {
+        super(graph.nodes.size());
+
+        this.add(new MatrixCell(), 0, 0); // corner cell
+
+        if(graph.nodes.size() < MATRIX_MAX_SIZE_NODES) {
+            for(int i = 0; i < graph.nodes.size(); i++) { // nodes
+                this.add(new MatrixNodeCell(i, graphUI.nodes.get(i)), i + 1, 0);
+                this.add(new MatrixNodeCell(i, graphUI.nodes.get(i)), 0, i + 1);
             }
-            for(int i = 0; i < graph.nodes.size(); i++) {
-                for(int j = 0; j < graph.nodes.size(); j++) {
-                    if(!actualEdges.containsKey(new Pair<>(i, j))) {
-                        this.add(new MatrixEdgeCell(i, j, graph, graphUI, null, null, weight), i + 1, j + 1);
+            for(int i = 0; i < matrix.length; i++) { // all fields
+                for(int j = 0; j < matrix.length; j++) {
+                    MatrixEdgeCell cell = new MatrixEdgeCell(rng.nextInt(10), null);
+                    this.add(cell, i + 1, j + 1);
+                    matrix[i][j] = cell;
+                }
+            }
+        }
+    }
+}
+
+class MatrixCapacitiesPane extends MatrixPane {
+    public MatrixCapacitiesPane(Graph graph, GraphUI graphUI) {
+        super(graph.nodes.size());
+
+        this.add(new MatrixCell(), 0, 0); // corner cell
+
+        if(graph.nodes.size() < MATRIX_MAX_SIZE_NODES) {
+            for(int i = 0; i < graph.nodes.size(); i++) { // nodes
+                this.add(new MatrixNodeCell(i, graphUI.nodes.get(i)), i + 1, 0);
+                this.add(new MatrixNodeCell(i, graphUI.nodes.get(i)), 0, i + 1);
+            }
+            for(int i = 0; i < graph.edges.size(); i++) { // edges
+                Edge edge = graph.edges.get(i);
+                Line edgeUI = graphUI.edges.get(i);
+                MatrixEdgeCell cell1 = new MatrixEdgeCell(edge.weight, edgeUI);
+                MatrixEdgeCell cell2 = new MatrixEdgeCell(edge.weight, edgeUI);
+                this.add(cell1, edge.from + 1, edge.to + 1);
+                this.add(cell2, edge.to + 1, edge.from + 1);
+                matrix[edge.from][edge.to] = cell1;
+                matrix[edge.to][edge.from] = cell2;
+            }
+            for(int i = 0; i < graph.tempEdges.size(); i++) { // tempEdges
+                Edge edge = graph.tempEdges.get(i);
+                Line edgeUI = graphUI.tempEdges.get(i);
+                MatrixEdgeCell cell1 = new MatrixEdgeCell(edge.weight, edgeUI);
+                MatrixEdgeCell cell2 = new MatrixEdgeCell(edge.weight, edgeUI);
+                this.add(cell1, edge.from + 1, edge.to + 1);
+                this.add(cell2, edge.to + 1, edge.from + 1);
+                matrix[edge.from][edge.to] = cell1;
+                matrix[edge.to][edge.from] = cell2;
+            }
+            for(int i = 0; i < matrix.length; i++) { // all other fields
+                for(int j = 0; j < matrix.length; j++) {
+                    if(matrix[i][j] == null) {
+                        MatrixEdgeCell cell = new MatrixEdgeCell(0, null);
+                        this.add(cell, i + 1, j + 1);
+                        matrix[i][j] = cell;
                     }
                 }
             }

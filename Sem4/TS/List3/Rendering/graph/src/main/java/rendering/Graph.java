@@ -2,7 +2,6 @@ package rendering;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Graph {
     public List<Node> nodes = new ArrayList<>();
@@ -18,7 +17,7 @@ public class Graph {
         tempEdges = graph.tempEdges;
     }
 
-    // Mirror edges and randomise intensities
+    /*// Mirror edges and randomise intensities
     public Graph complete(Random rng) {
         List<Edge> mirrorEdges = new ArrayList<>();
         for(Edge edge : edges) {
@@ -50,7 +49,7 @@ public class Graph {
         simulationGraph.edges = edges;
         simulationGraph.edges.addAll(tempEdges);
         return simulationGraph;
-    }
+    }*/
 }
 
 class Node {
