@@ -23,15 +23,12 @@ public class GraphReader {
     public Graph read(int count) {
         Graph graph = null;
         try {
-            System.err.println("dupa1");
             writer.write(Integer.toString(count) + "\n");
-            System.err.println("dupa2");
             writer.flush();
-            System.err.println("dupa3");
             graph = mapper.readValue(reader.readLine(), Graph.class);
-            System.err.println("dupa4");
         } catch (IOException e) {
             e.printStackTrace(System.err);
+            System.exit(1);
         }
         return graph;
     }

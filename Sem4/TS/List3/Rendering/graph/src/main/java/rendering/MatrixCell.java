@@ -10,7 +10,9 @@ import javafx.scene.text.Text;
 
 public class MatrixCell extends StackPane {
     public MatrixCell() {
+        this.setPrefSize(MatrixPane.MATRIX_SIZE_PX / 10, MatrixPane.MATRIX_SIZE_PX / 10);
         this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+        this.setStyle("-fx-border-color: dimgray; -fx-border-width: 1px;");
     }
 }
 
@@ -43,6 +45,7 @@ class MatrixEdgeCell extends MatrixCell {
         value = _value;
 
         this.getChildren().add(new Text(Integer.toString(value)));
+        this.setStyle("-fx-border-color: lightgray;");
 
         this.setOnMouseEntered(event -> {
             if(edgeUI != null) {
@@ -64,6 +67,7 @@ class MatrixEdgeCell extends MatrixCell {
             value = Math.max(0, value + (int)event.getDeltaY() / 40);
             this.getChildren().removeFirst();
             this.getChildren().add(new Text(Integer.toString(value)));
+            event.consume();
         });
     }
 }

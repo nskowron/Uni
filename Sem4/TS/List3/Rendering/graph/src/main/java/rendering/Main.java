@@ -15,10 +15,11 @@ public class Main extends Application {
         try (ServerSocket socket = new ServerSocket(port)){
             socket.accept(); // netcat check
             Socket gen_socket = socket.accept();
+            Socket sim_socket = socket.accept();
             new GUI(
                 stage,
                 new GraphReader(gen_socket.getInputStream(), gen_socket.getOutputStream()),
-                new SimulationReader(null, null)
+                new SimulationReader(sim_socket.getInputStream(), sim_socket.getOutputStream())
             );
         } catch(IOException e) {
             System.err.println("Whoopse daisy! ServerrRRR");

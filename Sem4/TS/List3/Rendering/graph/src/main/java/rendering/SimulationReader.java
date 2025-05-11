@@ -33,6 +33,7 @@ public class SimulationReader {
             result = reader.readDouble();
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
         }
         return result;
     }
