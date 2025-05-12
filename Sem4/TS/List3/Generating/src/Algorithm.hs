@@ -29,7 +29,7 @@ nextNode (Node id x y) =
 -- Generates Edge based on previous two edges
 nextEdge :: [Node] -> Edge -> Edge -> Edge
 nextEdge allNodes (Edge f1 t1 w1) (Edge f2 t2 w2) =
-    let n = if w2 < w1 then f2 else f2 + 1
+    let n = if w2 < w1 - 20 then f2 else f2 + 1
         nodes = take (n + 1) allNodes -- indexing from 0
         (possible, rest) = 
             if w2 < w1 then partition (\(Node id _ _) -> id < f2 && id /= t2) nodes

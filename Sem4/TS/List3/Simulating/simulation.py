@@ -1,15 +1,16 @@
 import networkx as nx
 import random
+import math
 
 def simulate(capacities, intensities) -> float:
     G = create_graph(capacities)
-    simulations = 50
-    successful = 0
-    for _ in range(simulations):
+    simulations = 50.0
+    successful = 0.0
+    for _ in range(math.floor(simulations)):
         for u, v in G.edges(): # clear graph
             G[u][v]['intensity'] = 0
         if simulate_random_failures(G, intensities, 0.1):
-            successful += 1
+            successful += 1.0
     return successful / simulations
 
 def create_graph(capacities):
@@ -23,7 +24,7 @@ def create_graph(capacities):
     return G
 
 def simulate_random_failures(G, intensities, T):
-    broken = [(u, v) for u, v in G.edges() if random.random() > 1]
+    broken = [(u, v) for u, v in G.edges() if random.random() > 0.98]
     brokie = nx.subgraph_view(G, filter_edge=lambda u, v: (u, v) not in broken)
     return mean_time_delay(brokie, intensities) <= T
 
@@ -54,23 +55,23 @@ def mean_time_delay(G, intensities):
 
 # try to reroute flow in every direction
 def reroute_flow(G, u, v, overflow) -> bool:
-    residual = nx.subgraph_view(G, filter_edge=lambda a, b: G.has_edge(a, b) and G[a][b]['capacity'] - G[a][b]['intensity'] > 0)
+    # filter residual capacity
+    residual = nx.subgraph_view(G, filter_edge=lambda a, b: G.has_edge(a, b) and G[a][b]['capacity'] - G[a][b]['intensity'] > 1)
     while overflow > 0:
-        # filter residual capacity
-        print(f"overflow: {overflow}")
         try:
-            path = nx.shortest_path(residual, source=u, target=v)
-            print(f"Path found: {path}")
+            paths = list(nx.all_shortest_paths(residual, u, v))
         except nx.NetworkXNoPath:
-            print(f"No path found from {u} to {v}")
             return False
         
-        min_residual = min( # min cap on the path
-            G[a][b]['capacity'] - G[a][b]['intensity']
-            for a, b in zip(path, path[1:])
+        min_residual = min( # min cap on all paths
+            min(
+                G[a][b]['capacity'] - G[a][b]['intensity']
+                for a, b in zip(path, path[1:])
+            ) for path in paths
         )
-        flow = min(min_residual, overflow)
-        for a, b in zip(path, path[1:]):
-            G[a][b]['intensity'] += flow # affects original graph
-        overflow -= flow
+        flow = min(min_residual - 1, overflow  / len(paths))
+        for path in paths:
+            for a, b in zip(path, path[1:]):
+                G[a][b]['intensity'] += flow # affects original graph
+            overflow -= flow * len(paths)
     return True
