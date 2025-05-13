@@ -19,26 +19,21 @@ main = do
     let (start_x, g2) = randomR (0, 100::Int) g
     let (start_y, g3) = randomR (0, 100::Int) g2
     let nodes = Node 0 start_x start_y : map nextNode nodes
-    let edges = Edge 1 0 100 : Edge 2 1 100 : zipWith (nextEdge nodes) edges (tail edges)
+    let edges = map (nextEdge' nodes) [1..]
+    let webs = map (nextWebbing' nodes edges) [1..]
+    mainLoop nodes edges webs 0
 
-    mainLoop nodes edges 0
-
-mainLoop :: [Node] -> [Edge] -> Int -> IO ()
-mainLoop nodes edges lastC = do
+mainLoop :: [Node] -> [Edge] -> [[Edge]] -> Int -> IO ()
+mainLoop nodes edges webs lastC = do
     input <- getLine
     let c = read input :: Int
-    let cNodes = take c nodes
-    let cEdges = takeWhile (\(Edge f _ _) -> f < c) edges
+    let webIndex x = floor (sqrt (fromIntegral c * 20) / 10)
+    let cNodes = drop lastC $ take c nodes
+    let cEdges = drop (lastC - 1) (take (c - 1) edges) ++ concat (drop (webIndex lastC) (take (webIndex c) webs))
     let tEdges = connectSingles cEdges cNodes
 
-    writeGraphJSON ( -- only the update to the graph
-        Graph
-        (drop lastC cNodes)
-        (dropWhile (\(Edge f _ _) -> f < lastC) cEdges)
-        tEdges
-        )
-
-    mainLoop nodes edges c
+    writeGraphJSON (Graph cNodes cEdges tEdges)
+    mainLoop nodes edges webs c
 
 
 -- writes graph as json into standard output

@@ -2,7 +2,7 @@
     Algorithm.hs
 -}
 
-module Algorithm(nextNode, nextEdge, connectSingles) where
+module Algorithm(nextNode, nextEdge', nextWebbing', connectSingles) where
 
 import Graph
 import Data.List
@@ -38,7 +38,28 @@ nextEdge allNodes (Edge f1 t1 w1) (Edge f2 t2 w2) =
         (cn, dist) = closestNode node search
     in Edge n (nodeId cn) dist
 
--- Connects single nodes
+nextEdge' :: [Node] -> Int -> Edge
+nextEdge' nodes id =
+    let (node, rest) = partition (\n -> nodeId n == id) (take (id + 1) nodes) -- node and all closer to 0
+        (cn, dist) = closestNode (head node) rest
+    in Edge id (nodeId cn) dist
+
+nextWebbing' :: [Node] -> [Edge] -> Int -> [Edge]
+nextWebbing' nodes edges k =
+    let count = 5 * (k ^ 2) -- how many nodes we want webbed
+        len = 5 * k - 2 -- length of the web (duh)
+        nc = drop (count - len) $ take count nodes -- furthest len nodes
+        ec = drop (count - 1 - len) $ take (count - 1) edges -- furthest len edges
+        (m:ms) = sortBy (\(Node _ x1 y1) (Node _ x2 y2) -> 
+            compare (atan2 (fromIntegral x1) (fromIntegral y1)) (atan2 (fromIntegral x2) (fromIntegral y2))) nc -- sort nodes by angle - in a circle
+    in fst $ foldr (\o (acc, n) -> 
+        let e = Edge (max (nodeId o) (nodeId n)) (min (nodeId o) (nodeId n)) (distance o n)
+        in if e `notElem` ec
+            then (e:acc, o)
+            else (acc, o)
+    ) ([], m) (m:ms)
+
+-- Connects single nodes - works dont touch
 connectSingles :: [Edge] -> [Node] -> [Edge]
 connectSingles edges nodes = go [] (reverse edges) Set.empty nodes
     where
