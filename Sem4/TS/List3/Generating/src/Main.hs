@@ -27,7 +27,7 @@ mainLoop :: [Node] -> [Edge] -> [[Edge]] -> Int -> IO ()
 mainLoop nodes edges webs lastC = do
     input <- getLine
     let c = read input :: Int
-    let webIndex x = floor (sqrt (fromIntegral c * 20) / 10)
+    let webIndex x = floor (sqrt (fromIntegral x * 20) / 10)
     let cNodes = drop lastC $ take c nodes
     let cEdges = drop (lastC - 1) (take (c - 1) edges) ++ concat (drop (webIndex lastC) (take (webIndex c) webs))
     let tEdges = connectSingles cEdges cNodes
