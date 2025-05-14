@@ -2,11 +2,12 @@
     Algorithm.hs
 -}
 
-module Algorithm(nextNode, nextEdge', nextWebbing', connectSingles) where
+module Algorithm(nextNode, nextEdge, nextWebbing, connectSingles) where
 
 import Graph
 import Data.List
-import qualified Data.Set as Set
+import qualified Data.Map as Map
+--import qualified Data.Set as Set
 
 -- Closest node by euclidean
 closestNode :: Node -> [Node] -> (Node, Double)
@@ -26,14 +27,16 @@ nextNode (Node id x y) =
             * (sqrt (abs (r^2 - x'^2)) + 10 * ((^2) . cos) (0.4 * xf + idf))
     in Node (id+1) (round x') (round y')
 
-nextEdge' :: [Node] -> Int -> Edge
-nextEdge' nodes id =
-    let (node, rest) = partition (\n -> nodeId n == id) (take (id + 1) nodes) -- node and all closer to 0
-        (cn, dist) = closestNode (head node) rest
+-- Edge from node id to closest previous
+nextEdge :: [Node] -> Int -> Edge
+nextEdge nodes id =
+    let ([node], rest) = partition (\n -> nodeId n == id) (take (id + 1) nodes) -- node and all closer to 0
+        (cn, dist) = closestNode node rest
     in Edge id (nodeId cn) dist
 
-nextWebbing' :: [Node] -> [Edge] -> Int -> [Edge]
-nextWebbing' nodes edges k =
+-- kth connection around the graph - like spider web
+nextWebbing :: [Node] -> [Edge] -> Int -> [Edge]
+nextWebbing nodes edges k =
     let count = 5 * (k ^ 2) -- how many nodes we want webbed
         len = 5 * k - 2 -- length of the web (duh)
         nc = drop (count - len) $ take count nodes -- furthest len nodes
@@ -47,22 +50,16 @@ nextWebbing' nodes edges k =
             else (acc, o)
     ) ([], m) (m:ms)
 
--- Connects single nodes - works dont touch
+-- Connects single nodes to finalize the graph
 connectSingles :: [Edge] -> [Node] -> [Edge]
-connectSingles edges nodes = go [] (reverse edges) Set.empty nodes
-    where
-        go acc [] _ _ = acc
-        go acc [_] _ _ = acc 
-        go acc (Edge f1 t1 w1 : Edge f2 t2 w2 : es) visited nodes =
-            let newVisited = Set.insert t1 (Set.insert f1 visited)
-                newEdges = if t1 == t2 then es else (Edge f2 t2 w2 : es)
-                newAcc = if t1 /= t2 && not (Set.member t1 visited) then
-                    let (search, rest) = partition (\n -> nodeId n /= t1 && nodeId n /= f1) nodes
-                        node = head (filter (\n -> nodeId n == t1) rest)
-                        (cn, dist) = closestNode node search
-                    in Edge (nodeId cn) t1 dist : acc
-                    else acc
-            in go newAcc newEdges newVisited nodes
-
-
-
+connectSingles edges nodes =
+    let map = foldl (\m e -> Map.insertWith (++) (from e) [e] m) Map.empty edges
+        go acc [] = acc
+        go acc (n:ns) = case Map.findWithDefault [] (nodeId n) map of
+            [Edge f t w] -> 
+                let (cut, rest) = partition (\m -> nodeId m `elem` [f, t]) nodes
+                    node = head $ filter (\c -> nodeId c == f) cut
+                    (cn, dist) = closestNode node rest
+                in go (Edge f (nodeId cn) dist:acc) ns
+            _ -> go acc ns
+    in go [] nodes

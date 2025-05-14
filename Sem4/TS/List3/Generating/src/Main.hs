@@ -19,8 +19,8 @@ main = do
     let (start_x, g2) = randomR (0, 100::Int) g
     let (start_y, g3) = randomR (0, 100::Int) g2
     let nodes = Node 0 start_x start_y : map nextNode nodes
-    let edges = map (nextEdge' nodes) [1..]
-    let webs = map (nextWebbing' nodes edges) [1..]
+    let edges = map (nextEdge nodes) [1..]
+    let webs = map (nextWebbing nodes edges) [1..]
     mainLoop nodes edges webs 0
 
 mainLoop :: [Node] -> [Edge] -> [[Edge]] -> Int -> IO ()
