@@ -37,8 +37,8 @@ nextEdge nodes id =
 -- kth connection around the graph - like spider web
 nextWebbing :: [Node] -> [Edge] -> Int -> [Edge]
 nextWebbing nodes edges k =
-    let count = 5 * (k ^ 2) -- how many nodes we want webbed
-        len = 5 * k - 2 -- length of the web (duh)
+    let count = 4 * (k ^ 2) -- how many nodes we want webbed
+        len = floor $ 3 * fromIntegral k * sqrt (fromIntegral k :: Float) -- length of the web (duh)
         nc = drop (count - len) $ take count nodes -- furthest len nodes
         ec = drop (count - 1 - len) $ take (count - 1) edges -- furthest len edges
         (m:ms) = sortBy (\(Node _ x1 y1) (Node _ x2 y2) -> 

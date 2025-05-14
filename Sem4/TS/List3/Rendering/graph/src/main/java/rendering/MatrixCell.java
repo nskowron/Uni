@@ -84,7 +84,7 @@ class MatrixEdgeCell extends MatrixCell {
 
         this.setOnScroll(event -> {
             if(!diagonal) {
-                value = Math.max(0, value + (int)event.getDeltaY() / 40);
+                value = Math.max(0, value + (int)event.getDeltaY() / 4);
                 this.getChildren().removeFirst();
                 this.getChildren().add(new Text(Integer.toString(value)));
             }
