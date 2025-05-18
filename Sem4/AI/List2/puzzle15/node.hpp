@@ -15,6 +15,9 @@ struct Node {
     inline uint8_t f() const {
         return (uint8_t)(cost & 0xFF);
     }
+    inline uint8_t h() const {
+        return f() -  g();
+    }
 
     Node(uint64_t s, uint8_t g, uint8_t h, Node* f) : 
         state(s),
