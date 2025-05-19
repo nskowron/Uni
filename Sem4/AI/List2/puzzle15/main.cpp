@@ -5,8 +5,6 @@
 #include "node.hpp"
 #include "solve.hpp"
 
-extern const uint64_t TARGET_STATE;
-
 void show_path(Node* path);
 
 int main(void) {

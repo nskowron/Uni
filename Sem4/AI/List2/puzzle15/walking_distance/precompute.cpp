@@ -3,10 +3,6 @@
 #include <queue>
 #include <unordered_set>
 
-#include <iostream> //tmp
-
-#include "state_data.hpp"
-
 uint8_t get_neighbors(uint64_t state, uint64_t neighbors[8]);
 
 int main(void) {
@@ -32,7 +28,6 @@ int main(void) {
 
         uint64_t state_dist = (current << 2) >> 2;
         db.write(reinterpret_cast<const char*>(&state_dist), sizeof(state_dist));
-        std::cout << state_dist << std::endl;
 
         // search neighbors
         uint64_t neighbors[8];
@@ -44,12 +39,10 @@ int main(void) {
         }
     }
 
-    std::cout << "size: " << searched.size();
-
     return 0;
 }
 
-inline uint64_t add(uint64_t state, uint8_t z, uint8_t x, uint8_t y) {
+inline uint64_t add(uint64_t state, uint8_t z, uint8_t x, uint8_t y) { // zero col, x col, y row for both
     uint64_t new_state = ((state << 16) >> 16) | ((uint64_t)x << 62) | ((((state >> 48) & 0xFFULL) + 1) << 48);
     uint8_t added = ((state >> (z * 12 + y * 3)) & 0b111ULL) + 1;
     uint8_t subtracted = ((state >> (x * 12 + y * 3)) & 0b111ULL) - 1;

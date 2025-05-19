@@ -6,8 +6,6 @@
 #include <unordered_map>
 #include <memory>
 
-#include <iostream> //tmp
-
 #include "node.hpp"
 #include "state.hpp"
 #include "heuristics.hpp"
@@ -15,13 +13,12 @@
 extern const uint64_t TARGET_STATE;
 
 Node* solve(uint64_t start, int& length, int& visited) {
-    WD_load(); //
+    WD_load(); // walking distance database
 
     std::priority_queue<std::unique_ptr<Node>, std::vector< std::unique_ptr<Node> >, Node::Compare> to_search;
     std::unordered_map<uint64_t, std::unique_ptr<Node>> searched_path;
 
-    // to_search.emplace(std::make_unique<Node>(start, 0, manhattan_linear(start), nullptr)); //
-    to_search.emplace(std::make_unique<Node>(start, 0, walking_distance(start), nullptr)); //
+    to_search.emplace(std::make_unique<Node>(start, 0, heuristics(start), nullptr));
     Node* result = nullptr;
 
     while(!to_search.empty()) {
@@ -42,7 +39,7 @@ Node* solve(uint64_t start, int& length, int& visited) {
         // check if we've been here
         if(searched_path.find(current->state) != searched_path.end()) { // find -> avg O(1)
             delete current;
-            continue; // dont search neighbors
+            continue; // dont search neighbors - monotonic
         }
 
         // mark new path and keep searching
@@ -51,9 +48,8 @@ Node* solve(uint64_t start, int& length, int& visited) {
         uint64_t neighbors[4];
         int c = get_neighbors(current->state, neighbors);
         while(c-- > 0) {
-            if(searched_path.find(neighbors[c]) == searched_path.end()) { // not visited
-                // to_search.emplace(std::make_unique<Node>(neighbors[c], current->g() + 1, manhattan_linear(neighbors[c]), current)); // emplace -> O(log n)
-                to_search.emplace(std::make_unique<Node>(neighbors[c], current->g() + 1, walking_distance(neighbors[c]), current)); //
+            if(searched_path.find(neighbors[c]) == searched_path.end()) { // not visited 
+                to_search.emplace(std::make_unique<Node>(neighbors[c], current->g() + 1, heuristics(neighbors[c]), current)); // emplace -> O(log n)
             }
         }
     }
