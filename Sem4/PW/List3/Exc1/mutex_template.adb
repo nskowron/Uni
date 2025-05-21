@@ -20,7 +20,7 @@ procedure  Mutex_Template is
 
   protected type Max_Ticket is
     procedure Set(New_Ticket : in Integer);
-    procedure Get(Max_Ticket : out Integer);
+    procedure Get(Curr_Ticket : out Integer);
   private
     Ticket : Integer := 0;
   end Max_Ticket;
@@ -33,11 +33,13 @@ procedure  Mutex_Template is
       end if;
     end Set;
 
-    procedure Get(Max_Ticket : out Integer) is
+    procedure Get(Curr_Ticket : out Integer) is
     begin
-      Max_Ticket := Ticket;
+      Curr_Ticket := Ticket;
     end Get;
   end Max_Ticket;
+
+  Max_Ticket_Instance : Max_Ticket;
 
 -- States of a Process 
 
@@ -110,6 +112,7 @@ procedure  Mutex_Template is
   end Printer;
   
   task body Printer is 
+    Global_Max_Ticket : Integer;
   begin
   
     -- Collect and print the traces
@@ -122,6 +125,8 @@ procedure  Mutex_Template is
 
     -- Print the line with the parameters needed for display script:
 
+    Max_Ticket_Instance.Get(Global_Max_Ticket);
+
     Put(
       "-1 "&
       Integer'Image( Nr_Of_Processes ) &" "&
@@ -131,7 +136,7 @@ procedure  Mutex_Template is
     for I in Process_State'Range loop
       Put( I'Image &";" );
     end loop;
-    Put_Line("EXTRA_LABEL;"); -- Place labels with extra info here (e.g. "MAX_TICKET=...;" for Backery). 
+    Put_Line("MAX_TICKET=" & Integer'Image( Global_Max_Ticket ) & ";"); -- Place labels with extra info here (e.g. "MAX_TICKET=...;" for Backery). 
 
   end Printer;
 
@@ -164,6 +169,7 @@ procedure  Mutex_Template is
     Time_Stamp : Duration;
     Nr_of_Steps: Integer;-- implement the EXIT_PROTOCOL here ...
     Traces: Traces_Sequence_Type; 
+    Local_Max_Ticket : Integer := 0;
 
     -- Max Ticket currently waiting
     function Max return Integer is
@@ -227,6 +233,9 @@ procedure  Mutex_Template is
       Change_State( ENTRY_PROTOCOL ); -- starting ENTRY_PROTOCOL
       Choosing(Process.Id) := 1; Number(Process.Id) := 1 + Max;
       Choosing(Process.Id) := 0;
+      if Number(Process.Id) > Local_Max_Ticket then
+        Local_Max_Ticket := Number(Process.Id);
+      end if;
       for J in 0 .. Nr_Of_Processes-1 loop
         if J /= Process.Id then
           loop exit when Choosing(J) = 0; end loop;
@@ -248,6 +257,7 @@ procedure  Mutex_Template is
       Change_State( LOCAL_SECTION ); -- starting LOCAL_SECTION      
     end loop;
     
+    Max_Ticket_Instance.Set(Local_Max_Ticket);
     Printer.Report( Traces );
   end Process_Task_Type;
 
