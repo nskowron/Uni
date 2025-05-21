@@ -26,7 +26,7 @@ struct Node {
     {}
 
     struct Compare {
-        bool operator()(const std::unique_ptr<Node>& a, const std::unique_ptr<Node>& b) const {
+        bool operator()(const Node* a, const Node* b) const {
             return a->f() > b->f();
         }
     };
