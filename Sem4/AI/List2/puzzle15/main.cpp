@@ -1,5 +1,6 @@
 #include <iostream>
 #include <array>
+#include <chrono>
 
 #include "check_solvable.hpp"
 #include "node.hpp"
@@ -20,9 +21,16 @@ int main(void) {
     }
 
     int length, visited;
+    unsigned long long time;
+
+    auto start_time = std::chrono::high_resolution_clock::now();
     show_path(solve(convert(arr), length, visited));
+
+    time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time).count();
+
     std::cout << "length: " << length << std::endl;
     std::cout << "visited: " << visited << std::endl;
+    std::cout << "time: " << time << std::endl;
 }
 
 void show_path(Node* path) {
