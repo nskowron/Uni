@@ -108,7 +108,6 @@ procedure  Mutex_Template is
     for I in Process_State'Range loop
       Put( I'Image &";" );
     end loop;
-    Put_Line("EXTRA_LABEL;"); -- Place labels with extra info here (e.g. "MAX_TICKET=...;" for Backery). 
 
   end Printer;
 

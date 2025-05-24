@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	NrOfProcesses = 15
+	NrOfProcesses = 2
 	MinSteps      = 50
 	MaxSteps      = 100
 	MinDelay      = 10 * time.Millisecond
@@ -64,30 +64,6 @@ func Print_Traces(traces []Trace) {
 	}
 }
 
-type Max_ticket struct {
-	SetChannel chan int32
-	GetChannel chan (chan int32)
-	ticket int32
-}
-
-func (m* Max_ticket) Start() {
-	m.GetChannel = make(chan (chan int32))
-	m.SetChannel = make(chan int32)
-
-	go func() {
-		for {
-			select {
-			case newTicket := <-m.SetChannel:
-				if newTicket > m.ticket {
-					m.ticket = newTicket
-				}
-			case responseChan := <-m.GetChannel:
-				responseChan <- m.ticket
-			}
-		}
-	}()
-}
-
 type Printer struct {
 	traceChannel chan []Trace
 	done         chan bool
@@ -95,7 +71,6 @@ type Printer struct {
 
 var (
 	printer Printer
-	maxTicket Max_ticket
 )
 
 func (p *Printer) Start() {
@@ -108,10 +83,6 @@ func (p *Printer) Start() {
 			Print_Traces(traces)
 		}
 
-		response := make(chan int32)
-		maxTicket.GetChannel <- response
-		ticket := <-response
-
 		fmt.Printf("-1 %d %d %d ",
 			NrOfProcesses,
 			BoardWidth,
@@ -120,15 +91,14 @@ func (p *Printer) Start() {
 		for _, img := range ProcessStateImages {
 			fmt.Printf("%s;", img)
 		}
-		fmt.Printf("MAX_TICKET=%d;", ticket)
 
 		p.done <- true
 	}()
 }
 
 var (
-	Choosing = make([]int32, NrOfProcesses) // automatically 0
-	Number = make([]int32, NrOfProcesses)
+	C = make([]int32, NrOfProcesses) // automatically 0
+	Turn = int32(0)
 )
 
 type Process struct {
@@ -150,14 +120,8 @@ func (t *Process) Store_Trace() {
 	})
 }
 
-func (t* Process) Max() int32 {
-	current := int32(0)
-	for n := range Number {
-		if atomic.LoadInt32(&Number[n]) > current {
-			current = atomic.LoadInt32(&Number[n])
-		}
-	}
-	return current
+func (t* Process) OtherId() int {
+	return (t.Id + 1) % 2
 }
 
 func (t* Process) ChangeState(NewState ProcessState) {
@@ -189,28 +153,19 @@ func (t *Process) Start() {
 			
 			t.ChangeState(EntryProtocol)
 
-			atomic.StoreInt32(&Choosing[t.Id], 1)
-			atomic.StoreInt32(&Number[t.Id], 1 + t.Max())
-			atomic.StoreInt32(&Choosing[t.Id], 0)
-
-			if atomic.LoadInt32(&Number[t.Id]) > t.localMaxTicket {
-				t.localMaxTicket = atomic.LoadInt32(&Number[t.Id])
-			}
-
-			for j := 0; j < NrOfProcesses; j++ {
-				if j != t.Id {
+			atomic.StoreInt32(&C[t.Id], 0)
+			for {
+				if atomic.LoadInt32(&C[t.OtherId()]) != 0 {
+					break
+				}
+				if atomic.LoadInt32(&Turn) == int32(t.OtherId()) {
+					atomic.StoreInt32(&C[t.Id], 1)
 					for {
-						if atomic.LoadInt32(&Choosing[j]) == 0 {
+						if atomic.LoadInt32(&Turn) != int32(t.OtherId()) {
 							break
 						}
 					}
-					for {
-						if atomic.LoadInt32(&Number[j]) == 0 ||
-							atomic.LoadInt32(&Number[t.Id]) < atomic.LoadInt32(&Number[j]) ||
-							(atomic.LoadInt32(&Number[t.Id]) == atomic.LoadInt32(&Number[j]) && t.Id < j) {
-							break
-						}
-					}
+					atomic.StoreInt32(&C[t.Id], 0)
 				}
 			}
 
@@ -220,21 +175,24 @@ func (t *Process) Start() {
 
 			t.ChangeState(ExitProtocol)
 
-			atomic.StoreInt32(&Number[t.Id], 0)
+			atomic.StoreInt32(&C[t.Id], 1)
+			atomic.StoreInt32(&Turn, int32(t.OtherId()))
 
 			t.ChangeState(LocalSection)
 		}
 
-		maxTicket.SetChannel <- t.localMaxTicket
 		printer.traceChannel <- t.Traces
 	}()
 }
 
 func main() {
+	for i := range C {
+		C[i] = 1
+	}
+
 	var Processes [NrOfProcesses]Process
 
 	printer.Start()
-	maxTicket.Start()
 
 	symbol := 'A'
 	for i := 0; i < NrOfProcesses; i++ {
