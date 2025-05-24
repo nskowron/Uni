@@ -2,6 +2,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Numerics.Float_Random; use Ada.Numerics.Float_Random;
 with Random_Seeds; use Random_Seeds;
 with Ada.Real_Time; use Ada.Real_Time;
+with Ada.Strings.Fixed;
 
 procedure  Mutex_Template is
 
@@ -136,7 +137,7 @@ procedure  Mutex_Template is
     for I in Process_State'Range loop
       Put( I'Image &";" );
     end loop;
-    Put_Line("MAX_TICKET=" & Integer'Image( Global_Max_Ticket ) & ";"); -- Place labels with extra info here (e.g. "MAX_TICKET=...;" for Backery). 
+    Put_Line("MAX_TICKET=" & Ada.Strings.Fixed.Trim(Integer'Image( Global_Max_Ticket ), Ada.Strings.Left) & ";"); -- Place labels with extra info here (e.g. "MAX_TICKET=...;" for Backery). 
 
   end Printer;
 
