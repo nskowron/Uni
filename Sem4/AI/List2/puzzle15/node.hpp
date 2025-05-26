@@ -27,6 +27,9 @@ struct Node {
 
     struct Compare {
         bool operator()(const Node* a, const Node* b) const {
+            if(a->f() == b->f()) {
+                return a->g() < b->g();
+            }
             return a->f() > b->f();
         }
     };
