@@ -32,13 +32,13 @@ def split_into_chunks(bitstream, chunk_size):
     return [bitstream[i:i+chunk_size] for i in range(0, len(bitstream), chunk_size)]
 
 def main():
-    with open('Z.txt', 'r') as f:
+    with open('Z', 'r') as f:
         bitstream = f.read().strip()
 
     chunk_size = 512
     chunks = split_into_chunks(bitstream, chunk_size)
 
-    with open('W.txt', 'w') as f:
+    with open('W', 'w') as f:
         for chunk in chunks:
             frame = encode_frame(chunk)
             f.write(frame)
