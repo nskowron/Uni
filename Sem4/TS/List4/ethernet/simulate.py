@@ -4,23 +4,49 @@ import time
 
 ETHERNET_CABLE_LENGHT = 20
 
-class Signal:
-    def __init__(self, _src_, _dir_):
-        self.src = _src_
-        self.dir = _dir_
+class CableCell:
+    def __init__(self, _pos_):
+        self.pos = _pos_
+        self.left = None
+        self.right = None
 
-    def prop_left(self):
-        signal = copy(self)
-        signal.dir = -1
-        return signal
-    
-    def prop_right(self):
-        signal = copy(self)
-        signal.dir = 1
-        return signal
+    def new_signal(self, signal):
+        self.left = signal if self.left == None else '#'
+        self.right = signal if self.right == None else '#'
+
+    def propagate(self, cable, new_cable):
+        new_self = new_cable[self.pos]
+
+        if self.pos != 0: # have left neighbor
+            left = cable[self.pos-1]
+            new_left = new_cable[self.pos-1]
+            if self.left != None and left.right != None:
+                new_left.left = '#'
+                new_self.right = '#'
+            elif left.right != None:
+                new_self.right = left.right
+            elif self.left != None:
+                new_left.left = self.left
+        
+        if self.pos != ETHERNET_CABLE_LENGHT - 1: # have right neighbor
+            right = cable[self.pos+1]
+            new_right = new_cable[self.pos+1]
+            if self.right != None and right.left != None:
+                new_right.right = '#'
+                new_self.left = '#'
+            elif right.left != None:
+                new_self.left = right.left
+            elif self.right != None:
+                new_right.right = self.right
+        
+        if new_self.left != None and new_self.right != None:
+            new_self.left = '#'
+            new_self.right = '#'
     
     def __str__(self):
-        return self.src
+        if self.left == None and self.right == None:
+            return '_'
+        return self.right if self.left == None else self.left
     
 class Transmission:
     def __init__(self, _src_, _pos_, _len_):
@@ -31,7 +57,7 @@ class Transmission:
         self.wait = ETHERNET_CABLE_LENGHT       # wait to make sure there were no collisions
         self.sleep = 0                          # sleep after a collision
 
-    def transmit(self, signals):
+    def transmit(self, cable):
         if self.wait == 0:
             return True
         
@@ -39,7 +65,7 @@ class Transmission:
             self.sleep -= 1
             return False
 
-        if signals[self.pos] != None and signals[self.pos].src == '#':
+        if cable[self.pos].left == '#' or cable[self.pos].right == '#':
             self.sleep = random.choice([1, 2]) * ETHERNET_CABLE_LENGHT
             self.wait = ETHERNET_CABLE_LENGHT
             self.left = self.len
@@ -47,10 +73,8 @@ class Transmission:
 
         if self.left == 0:
             self.wait -= 1
-            if signals[self.pos] != None and signals[self.pos].src == self.src:
-                signals[self.pos] = None
-        else:
-            signals[self.pos] = Signal(self.src, 0)
+        elif cable[self.pos].left == None and cable[self.pos].right == None: #clear
+            cable[self.pos].new_signal(self.src)
             self.left -= 1
         
         return False
@@ -58,9 +82,10 @@ class Transmission:
 class Device:
     def __init__(self, _name_, _pos_, _rounds_):
         self.name = _name_
+        self.pos = _pos_
         self.round = 0
         self.transmission = None
-        self.transmissions = [[r, Transmission(_name_, _pos_, random.randint(1, 3) * (ETHERNET_CABLE_LENGHT // 2))] for r in _rounds_]
+        self.transmissions = [[r, Transmission(_name_, _pos_, random.randint(5, 10))] for r in _rounds_]
     
     def refresh(self, cable):
         self.round += 1
@@ -83,47 +108,9 @@ class Device:
 
     def __str__(self):
         return self.name
-    
-
-def propagate(signals):
-    new_signals = copy(signals)
-    for i in range(len(signals)-1):
-        left = signals[i]
-        right = signals[i+1]
-
-        if left == None and right == None:                  # [_,_] -> [_,_]
-            continue
-        if right == None:
-            if left.dir == -1:                              # [<,_] -> [_,_]
-                new_signals[i] = None
-            else:                                           # [>,_] -> [>,>]
-                new_signals[i+1] = left.prop_right()
-        elif left == None:
-            if right.dir == 1:                              # [_,>] -> [_,_]
-                new_signals[i+1] = None
-            elif new_signals[i] != None:                    # [N,<] -> [#,<]
-                new_signals[i] = Signal('#', 0)
-            else:
-                new_signals[i] = right.prop_left()          # [_,<] -> [<,<]
-        else:
-            if left.dir == -1 and right.dir == 1:           # [<,>] -> [_,_]
-                new_signals[i] = None
-                new_signals[i+1] = None
-            else:
-                if left.src == right.src:                   # [A,A] -> [A,A]
-                    continue
-                if left.dir == -1:                          # [<,<] -> [<,<]
-                    new_signals[i] = right.prop_left()
-                elif right.dir == 1:                        # [>,>] -> [>,>]
-                    new_signals[i+1] = left.prop_right()
-                else:                                       # [>,<] -> [#,#]
-                    new_signals[i] = Signal('#', -1)
-                    new_signals[i+1] = Signal('#', 1)
-    
-    return new_signals
 
 def main():
-    cable = [None] * ETHERNET_CABLE_LENGHT
+    cable = [CableCell(i) for i in range(ETHERNET_CABLE_LENGHT)]
 
     devices = [
         Device('A', 3,
@@ -139,13 +126,20 @@ def main():
     while devices:
         current_round += 1
 
-        cable = propagate(cable)
+        new_cable = [CableCell(i) for i in range(ETHERNET_CABLE_LENGHT)]
+        for cell in cable:
+            cell.propagate(cable, new_cable)
+        cable = new_cable
         devices = [d for d in devices if d.refresh(cable)]
 
-        print("\033[2J\033[H", end="")
+        # print("\033[2J\033[H", end="") # clear
         print(f"ROUND: {current_round}")
-        print("".join(str(s) if s is not None else "_" for s in cable))
-        print("".join(str(d) if d is not None else " " for d in devices))
+        print("".join([str(cell) for cell in cable]))
+
+        device_line = [' '] * ETHERNET_CABLE_LENGHT
+        for dev in devices:
+            device_line[dev.pos] = str(dev)
+        print("".join(device_line))
 
         time.sleep(0.5)
 
