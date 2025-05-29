@@ -156,15 +156,18 @@ int main(int argc, char* argv[]) {
             return -1;
         }
         msg = atoi(server_message);
-        move = msg % 100 - 11;
+        move = msg % 100;
         msg /= 100;
         if(move != 0) {
+            move -= 11;
             board[move / 10][move % 10] = 3 - player_number;
+            printBoard(board);
         }
         if((msg == 0) || (msg == 6)) {
             // Calculate minimax
             move = best_move(maximizing_player);
             board[move / 10][move % 10] = player_number;
+            printBoard(board);
 
             // Send move back to server
             player_message = std::to_string(move + 11);
@@ -175,6 +178,7 @@ int main(int argc, char* argv[]) {
         } else {
             // Game over
             game_over = true;
+            printBoard(board);
             if(msg == 1) {
                 std::cout << "You win!" << std::endl;
             } else if(msg == 2) {
