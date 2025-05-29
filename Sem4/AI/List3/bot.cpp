@@ -8,7 +8,7 @@
 
 #include "board.hpp"
 
-constexpr int DEPTH = 5;
+int DEPTH;
 
 extern short board[5][5];
 
@@ -79,7 +79,7 @@ inline short best_move(bool maximizing_player) {
     int c = get_valid_moves(moves);
 
     int best_score = maximizing_player ? std::numeric_limits<int>::min() : std::numeric_limits<int>::max();
-    short best_move = 0;
+    short best_move = moves[0];
 
     while(c-- > 0) {
         int i = moves[c] / 10;
@@ -103,10 +103,12 @@ inline short best_move(bool maximizing_player) {
 }
 
 int main(int argc, char* argv[]) {
-    if(argc != 5) {
-        std::cerr << "Usage: " << argv[0] << " <IP> <port> <nr> <nick>" << std::endl;
+    if(argc != 6) {
+        std::cerr << "Usage: " << argv[0] << " <IP> <port> <nr> <nick> <depth>" << std::endl;
         return -1;
     }
+
+    DEPTH = atoi(argv[5]);
 
     char server_message[16] = {0};
     std::string player_message;
