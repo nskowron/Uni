@@ -83,12 +83,12 @@ inline bool loseCheck(int player) {
 inline int evaluate_board() {
   int score = 0;
   for(int i = 0; i < 28; i++) {
-    bool X = false, O = false;
+    short X = 0, O = 0;
     for(int j = 0; j < 4; j++) {
-      if(board[win[i][j][0]][win[i][j][1]] == 1) X = true;
-      if(board[win[i][j][0]][win[i][j][1]] == 2) O = true;
+      if(board[win[i][j][0]][win[i][j][1]] == 1) X += 1;
+      if(board[win[i][j][0]][win[i][j][1]] == 2) O += 1;
     }
-    score += (X && !O) ? 1 : ((!X && O) ? -1 : 0);
+    score += (X && !O) ? X : ((!X && O) ? -O : 0);
   }
   return score;
 }
