@@ -93,6 +93,9 @@ inline short best_move(bool maximizing_player) {
         if ((maximizing_player && score > best_score) || (!maximizing_player && score < best_score)) {
             best_score = score;
             best_move = moves[c];
+            if( maximizing_player && score == std::numeric_limits<int>::max() || !maximizing_player && score == std::numeric_limits<int>::min()) {
+                break;
+            }
         }
     }
     
