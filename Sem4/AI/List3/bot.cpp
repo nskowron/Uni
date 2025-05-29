@@ -7,13 +7,12 @@
 #include <limits>
 
 #include "board.hpp"
-#include "winCheck.hpp"
 
-constexpr int DEPTH = 3;
+constexpr int DEPTH = 5;
 
 extern short board[5][5];
 
-int get_valid_moves(short moves[]) {
+inline int get_valid_moves(short moves[]) {
     int c = 0;
     for(int i = 0; i < 5; ++i) {
         for(int j = 0; j < 5; ++j) {
@@ -25,10 +24,12 @@ int get_valid_moves(short moves[]) {
     return c;
 }
 
-int minimax(bool maximizing, int depth, int alpha, int beta) {
-    if(winCheck(1) || loseCheck(2)) return std::numeric_limits<int>::max();
-    if(loseCheck(1) || winCheck(2)) return std::numeric_limits<int>::min();
-    if(depth == 0) return 0; // TODO: Evaluate board state
+inline int minimax(bool maximizing, int depth, int alpha, int beta) {
+    if(winCheck(1)) return std::numeric_limits<int>::max();
+    if(winCheck(2)) return std::numeric_limits<int>::min();
+    if(loseCheck(1)) return std::numeric_limits<int>::min();
+    if(loseCheck(2)) return std::numeric_limits<int>::max();
+    if(depth == 0) return evaluate_board(); // TODO: Evaluate board state
 
     short moves[25];
     int c = get_valid_moves(moves);
@@ -46,8 +47,10 @@ int minimax(bool maximizing, int depth, int alpha, int beta) {
 
             best = std::max(best, score);
             alpha = std::max(alpha, best);
-            if (beta <= alpha)
+            if (beta <= alpha) {
+                //std::cout << "Alpha-Beta cutoff at depth " << depth << " with alpha: " << alpha << " and beta: " << beta << std::endl;
                 break; // beta cutoff
+            }
         }
         return best;
     } else {
@@ -62,14 +65,16 @@ int minimax(bool maximizing, int depth, int alpha, int beta) {
 
             best = std::min(best, score);
             beta = std::min(beta, best);
-            if (beta <= alpha)
+            if (beta <= alpha) {
+                //std::cout << "Alpha-Beta cutoff at depth " << depth << " with alpha: " << alpha << " and beta: " << beta << std::endl;
                 break; // alpha cutoff
+            }
         }
         return best;
     }
 }
 
-short best_move(bool maximizing_player) {
+inline short best_move(bool maximizing_player) {
     short moves[25];
     int c = get_valid_moves(moves);
 
