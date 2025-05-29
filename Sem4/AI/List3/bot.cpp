@@ -6,13 +6,12 @@
 #include <string>
 #include <limits>
 
-short board[5][5] = {
-    {0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0}
-};
+#include "board.hpp"
+#include "winCheck.hpp"
+
+constexpr int DEPTH = 3;
+
+extern short board[5][5];
 
 int get_valid_moves(short moves[]) {
     int c = 0;
@@ -26,11 +25,73 @@ int get_valid_moves(short moves[]) {
     return c;
 }
 
+int minimax(bool maximizing, int depth, int alpha, int beta) {
+    if(winCheck(1) || loseCheck(2)) return std::numeric_limits<int>::max();
+    if(loseCheck(1) || winCheck(2)) return std::numeric_limits<int>::min();
+    if(depth == 0) return 0; // TODO: Evaluate board state
+
+    short moves[25];
+    int c = get_valid_moves(moves);
+    if (c == 0) return 0; // Draw
+
+    if(maximizing) {
+        int best = std::numeric_limits<int>::min();
+        while(c-- > 0) {
+            int i = moves[c] / 10;
+            int j = moves[c] % 10;
+            board[i][j] = 1;
+
+            int score = minimax(false, depth - 1, alpha, beta);
+            board[i][j] = 0;
+
+            best = std::max(best, score);
+            alpha = std::max(alpha, best);
+            if (beta <= alpha)
+                break; // beta cutoff
+        }
+        return best;
+    } else {
+        int best = std::numeric_limits<int>::max();
+        while(c-- > 0) {
+            int i = moves[c] / 10;
+            int j = moves[c] % 10;
+            board[i][j] = 2;
+
+            int score = minimax(true, depth - 1, alpha, beta);
+            board[i][j] = 0;
+
+            best = std::min(best, score);
+            beta = std::min(beta, best);
+            if (beta <= alpha)
+                break; // alpha cutoff
+        }
+        return best;
+    }
+}
+
 short best_move(bool maximizing_player) {
     short moves[25];
     int c = get_valid_moves(moves);
+
+    int best_score = maximizing_player ? std::numeric_limits<int>::min() : std::numeric_limits<int>::max();
+    short best_move = 0;
+
+    while(c-- > 0) {
+        int i = moves[c] / 10;
+        int j = moves[c] % 10;
+        board[i][j] = maximizing_player ? 1 : 2;
+
+        int score = minimax(!maximizing_player, DEPTH, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+
+        board[i][j] = 0;
+
+        if ((maximizing_player && score > best_score) || (!maximizing_player && score < best_score)) {
+            best_score = score;
+            best_move = moves[c];
+        }
+    }
     
-    return moves[0]; // Placeholder: return the first valid move
+    return best_move; // Placeholder: return the first valid move
 }
 
 int main(int argc, char* argv[]) {
