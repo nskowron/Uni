@@ -9,6 +9,7 @@
 #include "board.hpp"
 
 int DEPTH;
+int WIN_SCORE = 100000;
 
 extern short board[5][5];
 
@@ -25,11 +26,11 @@ inline int get_valid_moves(short moves[]) {
 }
 
 inline int minimax(bool maximizing, int depth, int alpha, int beta) {
-    if(winCheck(1)) return std::numeric_limits<int>::max() - DEPTH + depth;;
-    if(winCheck(2)) return std::numeric_limits<int>::min() + DEPTH - depth;
-    if(loseCheck(1)) return std::numeric_limits<int>::min() + DEPTH - depth;
-    if(loseCheck(2)) return std::numeric_limits<int>::max() - DEPTH + depth;
-    if(depth == 0) return evaluate_board(); // TODO: Evaluate board state
+    if(winCheck(1)) return WIN_SCORE - DEPTH + depth;
+    if(winCheck(2)) return -WIN_SCORE + DEPTH - depth;
+    if(loseCheck(1)) return -WIN_SCORE + DEPTH - depth;
+    if(loseCheck(2)) return WIN_SCORE - DEPTH + depth;
+    if(depth == 0) return evaluate_board();
 
     short moves[25];
     int c = get_valid_moves(moves);
@@ -75,31 +76,11 @@ inline short best_move(bool maximizing_player) {
     int best_score = maximizing_player ? std::numeric_limits<int>::min() : std::numeric_limits<int>::max();
     short best_move = moves[0];
 
-    // Check for immediate win to nto waste time when win is inevitable
-    // for(int d = 0; d < c; d++) {
-    //     int i = moves[d] / 10;
-    //     int j = moves[d] % 10;
-    //     board[i][j] = maximizing_player ? 1 : 2;
-
-    //     if(winCheck(maximizing_player ? 1 : 2)) {
-    //         board[i][j] = 0;
-    //         return moves[d];
-    //     }
-
-    //     board[i][j] = 0;
-    // }
-
     // If no immediate win -> minimax
     while(c-- > 0) {
         int i = moves[c] / 10;
         int j = moves[c] % 10;
         board[i][j] = maximizing_player ? 1 : 2;
-
-        // Check for immediate loss
-        // if(loseCheck(maximizing_player ? 1 : 2)) {
-        //     board[i][j] = 0;
-        //     continue;
-        // }
 
         int score = minimax(!maximizing_player, DEPTH, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
 
@@ -108,7 +89,7 @@ inline short best_move(bool maximizing_player) {
         if ((maximizing_player && score >= best_score) || (!maximizing_player && score <= best_score)) {
             best_score = score;
             best_move = moves[c];
-            if( maximizing_player && score == std::numeric_limits<int>::max() || !maximizing_player && score == std::numeric_limits<int>::min()) {
+            if( maximizing_player && score == WIN_SCORE || !maximizing_player && score == -WIN_SCORE) {
                 break;
             }
         }
