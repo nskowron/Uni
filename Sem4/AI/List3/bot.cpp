@@ -81,6 +81,21 @@ inline short best_move(bool maximizing_player) {
     int best_score = maximizing_player ? std::numeric_limits<int>::min() : std::numeric_limits<int>::max();
     short best_move = moves[0];
 
+    // Check for immediate win to nto waste time when win is inevitable
+    for(int d = 0; d < c; d++) {
+        int i = moves[d] / 10;
+        int j = moves[d] % 10;
+        board[i][j] = maximizing_player ? 1 : 2;
+
+        if(winCheck(maximizing_player ? 1 : 2)) {
+            board[i][j] = 0;
+            return moves[d];
+        }
+
+        board[i][j] = 0;
+    }
+
+    // If no immediate win -> minimax
     while(c-- > 0) {
         int i = moves[c] / 10;
         int j = moves[c] % 10;
@@ -99,7 +114,7 @@ inline short best_move(bool maximizing_player) {
         }
     }
     
-    return best_move; // Placeholder: return the first valid move
+    return best_move;
 }
 
 int main(int argc, char* argv[]) {
