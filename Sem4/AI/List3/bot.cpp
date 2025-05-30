@@ -47,10 +47,7 @@ inline int minimax(bool maximizing, int depth, int alpha, int beta) {
 
             best = std::max(best, score);
             alpha = std::max(alpha, best);
-            if (beta <= alpha) {
-                //std::cout << "Alpha-Beta cutoff at depth " << depth << " with alpha: " << alpha << " and beta: " << beta << std::endl;
-                break; // beta cutoff
-            }
+            if (beta <= alpha) break;
         }
         return best;
     } else {
@@ -65,10 +62,7 @@ inline int minimax(bool maximizing, int depth, int alpha, int beta) {
 
             best = std::min(best, score);
             beta = std::min(beta, best);
-            if (beta <= alpha) {
-                //std::cout << "Alpha-Beta cutoff at depth " << depth << " with alpha: " << alpha << " and beta: " << beta << std::endl;
-                break; // alpha cutoff
-            }
+            if (beta <= alpha) break;
         }
         return best;
     }
@@ -101,18 +95,26 @@ inline short best_move(bool maximizing_player) {
         int j = moves[c] % 10;
         board[i][j] = maximizing_player ? 1 : 2;
 
+        // Check for immediate loss
+        if(loseCheck(maximizing_player ? 1 : 2)) {
+            board[i][j] = 0;
+            continue;
+        }
+
         int score = minimax(!maximizing_player, DEPTH, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
 
         board[i][j] = 0;
 
-        if ((maximizing_player && score > best_score) || (!maximizing_player && score < best_score)) {
+        if ((maximizing_player && score >= best_score) || (!maximizing_player && score <= best_score)) {
             best_score = score;
             best_move = moves[c];
             if( maximizing_player && score == std::numeric_limits<int>::max() || !maximizing_player && score == std::numeric_limits<int>::min()) {
                 break;
             }
         }
+        std::cout << "Evaluating move: " << moves[c] << " with score: " << score << std::endl;
     }
+    std::cout << "=====================================\n";
     
     return best_move;
 }

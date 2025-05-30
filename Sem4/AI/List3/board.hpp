@@ -1,6 +1,8 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
+#include <cmath>
+
 short board[5][5] = {
     {0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0},
@@ -88,7 +90,7 @@ inline int evaluate_board() {
       if(board[win[i][j][0]][win[i][j][1]] == 1) X += 1;
       if(board[win[i][j][0]][win[i][j][1]] == 2) O += 1;
     }
-    score += (X && !O) ? X : ((!X && O) ? -O : 0);
+    score += (X && !O) ? std::pow(10, X) : ((!X && O) ? -std::pow(10, O) : 0);
   }
   return score;
 }
