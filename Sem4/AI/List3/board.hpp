@@ -84,13 +84,26 @@ inline bool loseCheck(int player) {
 
 inline int evaluate_board() {
   int score = 0;
-  for(int i = 0; i < 28; i++) {
-    short X = 0, O = 0;
+  short X, O;
+  for(int i = 0; i < 28; i++) { // possible 4s
+    X = 0; O = 0;
+    if(board[win[i][1][0]][win[i][1][1]] != 0 &&  // ignore _XX_
+       board[win[i][2][0]][win[i][2][1]] != 0) {
+      continue;
+    }
     for(int j = 0; j < 4; j++) {
       if(board[win[i][j][0]][win[i][j][1]] == 1) X += 1;
       if(board[win[i][j][0]][win[i][j][1]] == 2) O += 1;
     }
     score += (X && !O) ? std::pow(10, X) : ((!X && O) ? -std::pow(10, O) : 0);
+  }
+  for(int i = 0; i < 48; ++i) {
+    X = 0; O = 0;
+    for(int j = 0; j < 3; j++) {
+      if(board[lose[i][j][0]][lose[i][j][1]] == 1) X += 1;
+      if(board[lose[i][j][0]][lose[i][j][1]] == 2) O += 1;
+    }
+    score += (X == 2 && !O) ? -25 : ((!X && O == 2) ? 25 : 0);
   }
   return score;
 }
