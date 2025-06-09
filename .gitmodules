@@ -10,3 +10,6 @@
 [submodule "Sem1-2/PaintApp"]
 	path = Sem1-2/PaintApp
 	url = https://github.com/nskowron/PaintApp.git
+[submodule "Sem4/leMonada"]
+	path = Sem4/leMonada
+	url = https://github.com/ShrikeBin/leMonada.git
