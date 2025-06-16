@@ -1,4 +1,5 @@
 # Bot do gry w Kółko i Krzyżyk
+Nel Skowronek
 
 ## Kompilacja:
 `g++ bot.cpp`

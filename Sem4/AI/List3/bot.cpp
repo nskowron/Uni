@@ -5,6 +5,7 @@
 #include <string.h>
 #include <string>
 #include <limits>
+#include <algorithm>
 
 #include "board.hpp"
 
@@ -13,15 +14,41 @@ int WIN_SCORE = 100000;
 
 extern short board[5][5];
 
+// to check moves in a spiral from inside - help pruning
 inline int get_valid_moves(short moves[]) {
     int c = 0;
-    for(int i = 0; i < 5; ++i) {
-        for(int j = 0; j < 5; ++j) {
-            if(board[i][j] == 0) {
-                moves[c++] = i * 10 + j;
-            }
-        }
-    }
+    if (board[0][0] == 0) moves[c++] = 0;
+    if (board[0][1] == 0) moves[c++] = 1;
+    if (board[0][2] == 0) moves[c++] = 2;
+    if (board[0][3] == 0) moves[c++] = 3;
+    if (board[0][4] == 0) moves[c++] = 4;
+
+    if (board[1][4] == 0) moves[c++] = 14;
+    if (board[2][4] == 0) moves[c++] = 24;
+    if (board[3][4] == 0) moves[c++] = 34;
+    if (board[4][4] == 0) moves[c++] = 44;
+
+    if (board[4][3] == 0) moves[c++] = 43;
+    if (board[4][2] == 0) moves[c++] = 42;
+    if (board[4][1] == 0) moves[c++] = 41;
+    if (board[4][0] == 0) moves[c++] = 40;
+
+    if (board[3][0] == 0) moves[c++] = 30;
+    if (board[2][0] == 0) moves[c++] = 20;
+    if (board[1][0] == 0) moves[c++] = 10;
+
+    if (board[1][1] == 0) moves[c++] = 11;
+    if (board[1][2] == 0) moves[c++] = 12;
+    if (board[1][3] == 0) moves[c++] = 13;
+
+    if (board[2][3] == 0) moves[c++] = 23;
+    if (board[3][3] == 0) moves[c++] = 33;
+
+    if (board[3][2] == 0) moves[c++] = 32;
+    if (board[3][1] == 0) moves[c++] = 31;
+
+    if (board[2][1] == 0) moves[c++] = 21;
+    if (board[2][2] == 0) moves[c++] = 22;
     return c;
 }
 
@@ -34,7 +61,7 @@ inline int minimax(bool maximizing, int depth, int alpha, int beta) {
 
     short moves[25];
     int c = get_valid_moves(moves);
-    if (c == 0) return 0; // Draw
+    if(c == 0) return 0; // Draw
 
     if(maximizing) {
         int best = std::numeric_limits<int>::min();
@@ -48,7 +75,7 @@ inline int minimax(bool maximizing, int depth, int alpha, int beta) {
 
             best = std::max(best, score);
             alpha = std::max(alpha, best);
-            if (beta <= alpha) break;
+            if(beta <= alpha) return beta + 1;
         }
         return best;
     } else {
@@ -63,7 +90,7 @@ inline int minimax(bool maximizing, int depth, int alpha, int beta) {
 
             best = std::min(best, score);
             beta = std::min(beta, best);
-            if (beta <= alpha) break;
+            if(beta <= alpha) return alpha - 1;
         }
         return best;
     }
@@ -82,17 +109,19 @@ inline short best_move(bool maximizing_player) {
         int j = moves[c] % 10;
         board[i][j] = maximizing_player ? 1 : 2;
 
-        int score = minimax(!maximizing_player, DEPTH, std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        int score = minimax(!maximizing_player, DEPTH,
+            maximizing_player ? best_score : std::numeric_limits<int>::min(),
+            !maximizing_player ? best_score : std::numeric_limits<int>::max()
+        );
         std::cout << "Evaluating move: " << moves[c] << " with score: " << score << std::endl;
 
         board[i][j] = 0;
 
-        if ((maximizing_player && score >= best_score) || (!maximizing_player && score <= best_score)) {
+        if((maximizing_player && score >= best_score) || (!maximizing_player && score <= best_score)) {
             best_score = score;
             best_move = moves[c];
-            if( maximizing_player && score == WIN_SCORE || !maximizing_player && score == -WIN_SCORE) {
+            if((maximizing_player && score == WIN_SCORE) || (!maximizing_player && score == -WIN_SCORE))
                 break;
-            }
         }
     }
     std::cout << "=====================================\n";
