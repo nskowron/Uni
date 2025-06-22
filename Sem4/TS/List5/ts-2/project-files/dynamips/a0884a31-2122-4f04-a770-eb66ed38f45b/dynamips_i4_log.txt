@@ -1,0 +1,93 @@
+Jun 10 18:50:54.287 HYPERVISOR: Release 0.2.23-amd64/Linux (tag 2023010200)
+Jun 10 18:50:54.287 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 43071.
+Jun 10 18:50:54.295 HYPERVISOR: exec_cmd: hypervisor version 
+Jun 10 18:50:54.295 HYPERVISOR: exec_cmd: hypervisor working_dir /home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips 
+Jun 10 18:50:54.295 GENERAL: working_dir=/home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips
+Jun 10 18:50:54.295 HYPERVISOR: exec_cmd: hypervisor working_dir /home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips/29f70901-7ed4-4946-a6ad-da2cd373b15f 
+Jun 10 18:50:54.295 GENERAL: working_dir=/home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips/29f70901-7ed4-4946-a6ad-da2cd373b15f
+Jun 10 18:50:54.295 HYPERVISOR: exec_cmd: vm create R1 1 c3600 
+Jun 10 18:50:54.295 VM: VM R1 created.
+Jun 10 18:50:54.296 HYPERVISOR: exec_cmd: vm set_con_tcp_port R1 5007 
+Jun 10 18:50:54.296 HYPERVISOR: exec_cmd: c3600 get_mac_addr R1 
+Jun 10 18:50:54.296 HYPERVISOR: exec_cmd: c3600 set_chassis R1 3620 
+Jun 10 18:50:54.297 HYPERVISOR: exec_cmd: vm set_nvram R1 256 
+Jun 10 18:50:54.297 HYPERVISOR: exec_cmd: vm set_ram R1 192 
+Jun 10 18:50:54.297 HYPERVISOR: exec_cmd: vm set_ios R1 /root/GNS3/images/IOS/c3620-a3jk8s-mz.122-26c.image 
+Jun 10 18:50:54.298 HYPERVISOR: exec_cmd: vm get_status R1 
+Jun 10 18:50:54.298 HYPERVISOR: exec_cmd: vm set_idle_pc R1 0x603a8bac 
+Jun 10 18:50:54.366 HYPERVISOR: exec_cmd: vm set_ios R1 /root/GNS3/images/IOS/c3620-a3jk8s-mz.122-26c.image 
+Jun 10 18:50:55.664 HYPERVISOR: exec_cmd: vm set_ios R1 /root/GNS3/images/IOS/c3620-a3jk8s-mz.122-26c.image 
+Jun 10 18:53:14.676 HYPERVISOR: exec_cmd: vm get_status R1 
+Jun 10 18:53:14.676 HYPERVISOR: exec_cmd: vm slot_add_binding R1 0 0 NM-4E 
+Jun 10 18:53:24.377 HYPERVISOR: exec_cmd: nio create_udp udp-248d03c9-1636-46ae-8518-6153c9293b8f 10002 127.0.0.1 10003 
+Jun 10 18:53:24.585 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 0 udp-248d03c9-1636-46ae-8518-6153c9293b8f 
+Jun 10 18:53:24.585 HYPERVISOR: exec_cmd: vm get_status R1 
+Jun 10 18:53:47.944 HYPERVISOR: exec_cmd: nio create_udp udp-885c41e8-4e91-4616-812c-0b8a7ffb156f 10020 127.0.0.1 10021 
+Jun 10 18:53:47.946 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R1 0 1 udp-885c41e8-4e91-4616-812c-0b8a7ffb156f 
+Jun 10 18:53:47.946 HYPERVISOR: exec_cmd: vm get_status R1 
+Jun 10 18:53:52.794 HYPERVISOR: exec_cmd: vm set_ios R1 /root/GNS3/images/IOS/c3620-a3jk8s-mz.122-26c.image 
+Jun 10 18:53:58.270 HYPERVISOR: exec_cmd: vm set_ios R1 /root/GNS3/images/IOS/c3620-a3jk8s-mz.122-26c.image 
+Jun 10 18:53:58.271 HYPERVISOR: exec_cmd: vm rename R1 R5 
+Jun 10 18:53:58.342 HYPERVISOR: exec_cmd: vm set_ios R5 /root/GNS3/images/IOS/c3620-a3jk8s-mz.122-26c.image 
+Jun 10 18:54:06.853 HYPERVISOR: exec_cmd: vm create Ghost 0 c3600 
+Jun 10 18:54:06.853 VM: VM Ghost created.
+Jun 10 18:54:06.853 HYPERVISOR: exec_cmd: vm set_ios Ghost /root/GNS3/images/IOS/c3620-a3jk8s-mz.122-26c.image 
+Jun 10 18:54:06.853 HYPERVISOR: exec_cmd: vm set_ghost_status Ghost 1 
+Jun 10 18:54:06.854 HYPERVISOR: exec_cmd: vm set_ghost_file Ghost /home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips/c3620-a3jk8s-mz.122-26c.image-192.ghost 
+Jun 10 18:54:06.854 HYPERVISOR: exec_cmd: vm set_ram Ghost 192 
+Jun 10 18:54:06.855 HYPERVISOR: exec_cmd: vm get_status Ghost 
+Jun 10 18:54:06.855 HYPERVISOR: exec_cmd: vm set_config Ghost configs/i0_startup-config.cfg 
+Jun 10 18:54:06.855 HYPERVISOR: exec_cmd: vm start Ghost 
+Jun 10 18:54:07.138 HYPERVISOR: exec_cmd: vm get_status Ghost 
+Jun 10 18:54:07.138 HYPERVISOR: exec_cmd: vm stop Ghost 
+Jun 10 18:54:07.323 VM: VM Ghost shutdown.
+Jun 10 18:54:07.324 HYPERVISOR: exec_cmd: vm extract_config Ghost 
+Jun 10 18:54:07.325 HYPERVISOR: exec_cmd: vm clean_delete Ghost 
+Jun 10 18:54:07.325 VM: VM Ghost destroyed.
+Jun 10 18:54:07.326 HYPERVISOR: exec_cmd: vm set_ghost_status R5 2 
+Jun 10 18:54:07.326 HYPERVISOR: exec_cmd: vm set_ghost_file R5 /home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips/c3620-a3jk8s-mz.122-26c.image-192.ghost 
+Jun 10 18:54:07.327 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 18:54:07.327 HYPERVISOR: exec_cmd: vm set_config R5 configs/i1_startup-config.cfg 
+Jun 10 18:54:07.327 HYPERVISOR: exec_cmd: vm start R5 
+Jun 10 18:54:37.572 HYPERVISOR: exec_cmd: vm extract_config R5 
+Jun 10 19:04:31.521 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 19:04:31.521 HYPERVISOR: exec_cmd: vm slot_disable_nio R5 0 0 
+Jun 10 19:04:31.536 HYPERVISOR: exec_cmd: vm slot_remove_nio_binding R5 0 0 
+Jun 10 19:04:31.537 HYPERVISOR: exec_cmd: nio delete udp-248d03c9-1636-46ae-8518-6153c9293b8f 
+Jun 10 19:04:42.547 HYPERVISOR: exec_cmd: nio create_udp udp-a80b8a2c-145f-4218-8f89-95cae8dc1a02 10002 127.0.0.1 10003 
+Jun 10 19:04:42.549 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R5 0 0 udp-a80b8a2c-145f-4218-8f89-95cae8dc1a02 
+Jun 10 19:04:42.549 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 19:04:42.549 HYPERVISOR: exec_cmd: vm slot_enable_nio R5 0 0 
+Jun 10 19:12:37.629 HYPERVISOR: exec_cmd: vm extract_config R5 
+Jun 10 19:19:07.647 HYPERVISOR: exec_cmd: vm extract_config R5 
+Jun 10 19:19:13.208 HYPERVISOR: exec_cmd: vm set_ghost_status R5 2 
+Jun 10 19:19:13.217 HYPERVISOR: exec_cmd: vm set_ghost_file R5 /home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips/c3620-a3jk8s-mz.122-26c.image-192.ghost 
+Jun 10 19:19:13.226 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 19:20:44.189 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 19:20:44.189 HYPERVISOR: exec_cmd: vm slot_disable_nio R5 0 1 
+Jun 10 19:20:44.207 HYPERVISOR: exec_cmd: vm slot_remove_nio_binding R5 0 1 
+Jun 10 19:20:44.208 HYPERVISOR: exec_cmd: nio delete udp-885c41e8-4e91-4616-812c-0b8a7ffb156f 
+Jun 10 19:22:05.743 HYPERVISOR: exec_cmd: nio create_udp udp-9a5049d9-c2fd-4dce-9720-b3ba11866111 10006 127.0.0.1 10007 
+Jun 10 19:22:05.744 HYPERVISOR: exec_cmd: vm slot_add_nio_binding R5 0 1 udp-9a5049d9-c2fd-4dce-9720-b3ba11866111 
+Jun 10 19:22:05.744 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 19:22:05.745 HYPERVISOR: exec_cmd: vm slot_enable_nio R5 0 1 
+Jun 10 19:22:53.784 HYPERVISOR: exec_cmd: vm set_ghost_status R5 2 
+Jun 10 19:22:53.788 HYPERVISOR: exec_cmd: vm set_ghost_file R5 /home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips/c3620-a3jk8s-mz.122-26c.image-192.ghost 
+Jun 10 19:22:53.790 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 19:40:13.316 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 19:40:13.316 HYPERVISOR: exec_cmd: vm slot_disable_nio R5 0 1 
+Jun 10 19:40:13.333 HYPERVISOR: exec_cmd: vm slot_remove_nio_binding R5 0 1 
+Jun 10 19:40:13.333 HYPERVISOR: exec_cmd: nio delete udp-9a5049d9-c2fd-4dce-9720-b3ba11866111 
+Jun 10 19:40:17.383 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 19:40:17.383 HYPERVISOR: exec_cmd: vm slot_disable_nio R5 0 0 
+Jun 10 19:40:17.400 HYPERVISOR: exec_cmd: vm slot_remove_nio_binding R5 0 0 
+Jun 10 19:40:17.401 HYPERVISOR: exec_cmd: nio delete udp-a80b8a2c-145f-4218-8f89-95cae8dc1a02 
+Jun 10 19:40:17.480 HYPERVISOR: exec_cmd: vm get_status R5 
+Jun 10 19:40:17.480 HYPERVISOR: exec_cmd: vm stop R5 
+Jun 10 19:40:17.544 VM: VM R5 shutdown.
+Jun 10 19:40:17.544 HYPERVISOR: exec_cmd: vm extract_config R5 
+Jun 10 19:40:17.546 HYPERVISOR: exec_cmd: vm delete R5 
+Jun 10 19:40:17.546 VM: VM R5 destroyed.
+Jun 10 19:40:17.546 HYPERVISOR: exec_cmd: hypervisor stop 
+Jun 10 19:40:17.937 HYPERVISOR: Stopped.
+Jun 10 19:40:17.937 GENERAL: reset done.

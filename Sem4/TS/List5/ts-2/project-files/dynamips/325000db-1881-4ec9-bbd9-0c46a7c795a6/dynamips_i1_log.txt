@@ -1,0 +1,22 @@
+Jun 10 18:31:57.346 HYPERVISOR: Release 0.2.23-amd64/Linux (tag 2023010200)
+Jun 10 18:31:57.346 HYPERVISOR: Started on IP = 127.0.0.1, TCP port = 59627.
+Jun 10 18:31:57.347 HYPERVISOR: exec_cmd: hypervisor version 
+Jun 10 18:31:57.347 HYPERVISOR: exec_cmd: hypervisor working_dir /home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips 
+Jun 10 18:31:57.347 GENERAL: working_dir=/home/nel/Uni/Sem4/TS/List5/ts/project-files/dynamips
+Jun 10 18:31:57.347 HYPERVISOR: exec_cmd: ethsw create Switch1 
+Jun 10 18:31:57.711 HYPERVISOR: exec_cmd: nio create_udp udp-64bca403-0478-4838-9eaf-9d606e235dc4 10007 127.0.0.1 10006 
+Jun 10 18:31:57.712 HYPERVISOR: exec_cmd: ethsw add_nio Switch1 udp-64bca403-0478-4838-9eaf-9d606e235dc4 
+Jun 10 18:31:57.714 HYPERVISOR: exec_cmd: ethsw set_access_port Switch1 udp-64bca403-0478-4838-9eaf-9d606e235dc4 1 
+Jun 10 18:31:58.014 HYPERVISOR: exec_cmd: nio create_udp udp-fc92f3e0-4a9a-4d21-92c1-b75b966825a2 10016 127.0.0.1 10017 
+Jun 10 18:31:58.014 HYPERVISOR: exec_cmd: ethsw add_nio Switch1 udp-fc92f3e0-4a9a-4d21-92c1-b75b966825a2 
+Jun 10 18:31:58.015 HYPERVISOR: exec_cmd: ethsw set_access_port Switch1 udp-fc92f3e0-4a9a-4d21-92c1-b75b966825a2 1 
+Jun 10 19:20:44.140 HYPERVISOR: exec_cmd: ethsw remove_nio Switch1 udp-64bca403-0478-4838-9eaf-9d606e235dc4 
+Jun 10 19:20:44.154 HYPERVISOR: exec_cmd: nio delete udp-64bca403-0478-4838-9eaf-9d606e235dc4 
+Jun 10 19:22:20.289 HYPERVISOR: exec_cmd: nio create_udp udp-8a9f0e9f-edcb-4774-acd8-cb9d7177337b 10023 127.0.0.1 10022 
+Jun 10 19:22:20.290 HYPERVISOR: exec_cmd: ethsw add_nio Switch1 udp-8a9f0e9f-edcb-4774-acd8-cb9d7177337b 
+Jun 10 19:22:20.304 HYPERVISOR: exec_cmd: ethsw set_access_port Switch1 udp-8a9f0e9f-edcb-4774-acd8-cb9d7177337b 1 
+Jun 10 19:40:13.511 HYPERVISOR: exec_cmd: ethsw remove_nio Switch1 udp-8a9f0e9f-edcb-4774-acd8-cb9d7177337b 
+Jun 10 19:40:13.514 HYPERVISOR: exec_cmd: nio delete udp-8a9f0e9f-edcb-4774-acd8-cb9d7177337b 
+Jun 10 19:41:38.168 HYPERVISOR: exec_cmd: nio create_udp udp-5178e81d-0689-4b74-a9c3-90e361b0044e 10023 127.0.0.1 10022 
+Jun 10 19:41:38.168 HYPERVISOR: exec_cmd: ethsw add_nio Switch1 udp-5178e81d-0689-4b74-a9c3-90e361b0044e 
+Jun 10 19:41:38.187 HYPERVISOR: exec_cmd: ethsw set_access_port Switch1 udp-5178e81d-0689-4b74-a9c3-90e361b0044e 1 
