@@ -22,7 +22,7 @@
                 <configuration>
                     <mainClass>spl.Spl</mainClass>
                     <arguments>
-                        <argument>snippets/snippet2.txt</argument>
+                        <argument>snippets/file.spl</argument>
                     </arguments>
                 </configuration>
             </plugin>
