@@ -1,5 +1,7 @@
 ---
 title: Multiple Regression
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
 ---
 
 # Reading Data
