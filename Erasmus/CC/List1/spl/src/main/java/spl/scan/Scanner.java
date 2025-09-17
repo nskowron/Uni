@@ -148,6 +148,10 @@ public class Scanner {
 	// handle strings
 	private void string() {
 		while (!match('"')) {
+			if (peek() == '\n') {
+				Spl.error(line, "String ending with newline");
+				return;
+			}
 			advance();
 		}
 		tokens.add(new Token(STRING, source.substring(start, current), null, line));
