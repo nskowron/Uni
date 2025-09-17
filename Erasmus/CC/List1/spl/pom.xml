@@ -22,7 +22,7 @@
                 <configuration>
                     <mainClass>spl.Spl</mainClass>
                     <arguments>
-                        <argument>snippets/file.spl</argument>
+                        <argument>snippets/sample-errors.spl</argument>
                     </arguments>
                 </configuration>
             </plugin>
