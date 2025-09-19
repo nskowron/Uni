@@ -1,13 +1,11 @@
 ---
 title: Multiple Regression
-mainfont: Latin Modern Roman
-sansfont: Latin Modern Roman
 ---
 
 # Reading Data
 
 ```{r}
-data=(read.csv("rent99.raw", sep=" "))
+data=(read.csv("List2/rent99.raw", sep=" "))
 attach(data) # able to use location instead of data$location
 head(data) # prints data header
 data$location=as.factor(data$location) # treats location as a categorical variable (no linear correlation)
