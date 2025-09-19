@@ -1,0 +1,103 @@
+P:
+s -> expr
+
+expr -> term alt
+
+alt -> eps
+alt -> OR expr
+
+term -> value con
+
+con -> eps
+con -> AND term
+
+value -> true
+value -> false
+value -> NOT value
+value -> (expr)
+value -> identifier // we can assume we have a token for it
+
+N: s, expr, term, alt, value, con
+T: identifier, true, false, OR, AND, (, ), NOT, eps
+
+G = (N, T, P, s)
+
+--------------------
+
+test:
+
+(small OR big) OR medium AND big AND NOT small
+
+(expr)
+(term, alt)
+((value, con), alt)
+((("(", expr, ")"), con), alt)
+((("(", (term, alt), ")"), con), alt)
+((("(", ((value, con), alt), ")"), con), alt)
+((("(", (((identifier:small), con), alt), ")"), con), alt)
+((("(", (((identifier:small), (eps)), alt), ")"), con), alt)
+((("(", (((identifier:small), (eps)), (OR, expr)), ")"), con), alt)
+((("(", (((identifier:small), (eps)), (OR, (term, alt))), ")"), con), alt)
+((("(", (((identifier:small), (eps)), (OR, ((value, con), alt))), ")"), con), alt)
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), con), alt))), ")"), con), alt)
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), alt))), ")"), con), alt)
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), con), alt)
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), alt)
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, expr))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (term, alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, ((value, con), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), con), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), (AND, term)), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), (AND, (value, con))), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), (AND, ((identifier:big), con))), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), (AND, ((identifier:big), (AND term)))), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), (AND, ((identifier:big), (AND (value, con))))), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), (AND, ((identifier:big), (AND ((NOT, value), con))))), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), (AND, ((identifier:big), (AND ((NOT, (identifier:small)), con))))), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), (AND, ((identifier:big), (AND ((NOT, (identifier:small)), (eps)))))), alt)))
+((("(", (((identifier:small), (eps)), (OR, (((identifier:big), (eps)), (eps)))), ")"), (eps)), (OR, (((identifier:medium), (AND, ((identifier:big), (AND ((NOT, (identifier:small)), (eps)))))), (eps))))
+
+expr
+├─ term
+|   ├─ value
+|   |   ├─ (
+|   |   ├─ expr
+|   |   |   ├─ term
+|   |   |   |   ├─ value
+|   |   |   |   |   ├─ id:small
+|   |   |   |   ├─ con
+|   |   |   |       ├─ eps
+|   |   |   ├─ alt
+|   |   |       ├─ OR
+|   |   |       ├─ expr
+|   |   |           ├─ term
+|   |   |           |   ├─ value
+|   |   |           |   |   ├─ id:big
+|   |   |           |   ├─ con
+|   |   |           |       ├─ eps
+|   |   |           ├─ alt
+|   |   |               ├─ eps
+|   |   ├─ )
+|   ├─ con
+|       ├─ eps
+├─ alt
+    ├─ OR
+    ├─ expr
+        ├─ term
+        |   ├─ value
+        |   |   ├─ id:medium
+        |   ├─ con
+        |       ├─ AND
+        |       ├─ term
+        |           ├─ value
+        |           |   ├─id:big
+        |           ├─ con
+        |               ├─ AND
+        |               ├─ term
+        |                   ├─ value
+        |                   |   ├─ NOT
+        |                   |   ├─ value
+        |                   |       ├─ id:small
+        |                   ├─ con
+        |                       ├─ eps
+        ├─ alt
