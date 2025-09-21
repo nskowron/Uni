@@ -1,6 +1,6 @@
 package spl.scan;
 
-import static spl.scan.TokenType.*;
+import static spl.scan.Token.Type.*;
 
 import spl.Spl;
 
@@ -18,16 +18,16 @@ import java.util.Map;
  */
 public class Scanner {
 	// Keyword-map
-	private static final Map<String, TokenType> keywords;
+	private static final Map<String, Token.Type> keywords;
 	static {
 		keywords = new HashMap<>();
-		keywords.put("true", TokenType.TRUE);
-		keywords.put("false", TokenType.FALSE);
-        keywords.put("var", TokenType.VAR);
-        keywords.put("if", TokenType.IF);
-        keywords.put("else", TokenType.ELSE);
-        keywords.put("while", TokenType.WHILE);
-        keywords.put("print", TokenType.PRINT);
+		keywords.put("true", Token.Type.TRUE);
+		keywords.put("false", Token.Type.FALSE);
+        keywords.put("var", Token.Type.VAR);
+        keywords.put("if", Token.Type.IF);
+        keywords.put("else", Token.Type.ELSE);
+        keywords.put("while", Token.Type.WHILE);
+        keywords.put("print", Token.Type.PRINT);
 	}
 
 	// In and output
@@ -84,14 +84,14 @@ public class Scanner {
 				if (match('&'))
 					tokens.add(new Token(AND, "", null, line));
 				else
-					Spl.error(line, "Unexpected character: " + c);
+					error(line, "Unexpected character: " + c);
 				break;
 			
 			case '|':
 				if (match('|'))
 					tokens.add(new Token(OR, "", null, line));
 				else
-					Spl.error(line, "Unexpected character: " + c);
+					error(line, "Unexpected character: " + c);
 				break;
 
 			case '"': string();
@@ -105,7 +105,7 @@ public class Scanner {
 				else if (Character.isLetter(c) || c == '_')
 					identifier();
 				else
-					Spl.error(line, "Unexpected character: " + c);
+					error(line, "Unexpected character: " + c);
 		}
 	}
 
@@ -115,7 +115,7 @@ public class Scanner {
 			advance();
 		}
 		String lexeme = source.substring(start, current);
-		TokenType keywordToken = keywords.get(lexeme);
+		Token.Type keywordToken = keywords.get(lexeme);
 		if (keywordToken != null)
 			tokens.add(new Token(keywordToken, "", null, line));
 		else
@@ -149,7 +149,7 @@ public class Scanner {
 	private void string() {
 		while (!match('"')) {
 			if (peek() == '\n') {
-				Spl.error(line, "String ending with newline");
+				error(line, "String ending with newline");
 				return;
 			}
 			advance();
@@ -180,5 +180,9 @@ public class Scanner {
 
 	private boolean isAtEnd() {
 		return current >= source.length();
+	}
+
+	private void error(int line, String message) {
+		Spl.error(line, "Syntax error: " + message);
 	}
 }

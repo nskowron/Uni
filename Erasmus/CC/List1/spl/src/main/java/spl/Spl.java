@@ -5,10 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import spl.parse.Declaration;
+import spl.parse.Parser;
 import spl.scan.Scanner;
 import spl.scan.Token;
 
 public class Spl {
+	private static boolean error = false;
 
 	// Expects a single file that comprises a SPL program as argument
 	public static void main(String[] args) throws IOException {
@@ -28,9 +31,13 @@ public class Spl {
 		for (Token token : tokens) {
 			System.out.println(token);
 		}
+
+		Parser parser = new Parser(tokens);
+		List<Declaration> statements = parser.parse();
 	}
 
 	public static void error(int line, String message) {
+		error = true;
 		report(line, "", message);
 	}
 
