@@ -59,37 +59,37 @@ public class Scanner {
 	private void scanToken() {
 		char c = advance();
 		switch (c) {
-			case '{': tokens.add(new Token(LEFT_BRACE, "", null, line)); break;
-			case '}': tokens.add(new Token(RIGHT_BRACE, "", null, line)); break;
-			case '(': tokens.add(new Token(LEFT_PAREN, "", null, line)); break;
-			case ')': tokens.add(new Token(RIGHT_PAREN, "", null, line)); break;
-			case ';': tokens.add(new Token(SEMICOLON, "", null, line)); break;
+			case '{': tokens.add(new Token(LEFT_BRACE, "{", null, line)); break;
+			case '}': tokens.add(new Token(RIGHT_BRACE, "}", null, line)); break;
+			case '(': tokens.add(new Token(LEFT_PAREN, "(", null, line)); break;
+			case ')': tokens.add(new Token(RIGHT_PAREN, ")", null, line)); break;
+			case ';': tokens.add(new Token(SEMICOLON, ";", null, line)); break;
 
-			case '!': tokens.add(new Token(match('=') ? NOT_EQUAL : NOT, "", null, line)); break;
-			case '<': tokens.add(new Token(match('=') ? LESSER_EQUAL : LESSER_THAN, "", null, line)); break;
-			case '>': tokens.add(new Token(match('=') ? GREATER_EQUAL : GREATER_THAN, "", null, line)); break;
-			case '=': tokens.add(new Token(match('=') ? EQUAL_EQUAL : EQUAL, "", null, line)); break;
+			case '!': tokens.add(new Token(match('=') ? NOT_EQUAL : NOT, source.substring(start, current), null, line)); break;
+			case '<': tokens.add(new Token(match('=') ? LESSER_EQUAL : LESSER_THAN, source.substring(start, current), null, line)); break;
+			case '>': tokens.add(new Token(match('=') ? GREATER_EQUAL : GREATER_THAN, source.substring(start, current), null, line)); break;
+			case '=': tokens.add(new Token(match('=') ? EQUAL_EQUAL : EQUAL, source.substring(start, current), null, line)); break;
 
-			case '+': tokens.add(new Token(PLUS, "", null, line)); break;
-			case '-': tokens.add(new Token(MINUS, "", null, line)); break;
-			case '*': tokens.add(new Token(STAR, "", null, line)); break;
+			case '+': tokens.add(new Token(PLUS, "+", null, line)); break;
+			case '-': tokens.add(new Token(MINUS, "-", null, line)); break;
+			case '*': tokens.add(new Token(STAR, "*", null, line)); break;
 			case '/':
 				if (match('/'))
 					comment();
 				else
-					tokens.add(new Token(SLASH, "", null, line));
+					tokens.add(new Token(SLASH, "/", null, line));
 				break;
 
 			case '&':
 				if (match('&'))
-					tokens.add(new Token(AND, "", null, line));
+					tokens.add(new Token(AND, "&&", null, line));
 				else
 					error(line, "Unexpected character: " + c);
 				break;
 			
 			case '|':
 				if (match('|'))
-					tokens.add(new Token(OR, "", null, line));
+					tokens.add(new Token(OR, "||", null, line));
 				else
 					error(line, "Unexpected character: " + c);
 				break;
@@ -117,7 +117,7 @@ public class Scanner {
 		String lexeme = source.substring(start, current);
 		Token.Type keywordToken = keywords.get(lexeme);
 		if (keywordToken != null)
-			tokens.add(new Token(keywordToken, "", null, line));
+			tokens.add(new Token(keywordToken, lexeme, null, line));
 		else
 			tokens.add(new Token(ID, lexeme, null, line));
 	}

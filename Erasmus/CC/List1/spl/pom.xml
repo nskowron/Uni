@@ -22,7 +22,7 @@
                 <configuration>
                     <mainClass>spl.Spl</mainClass>
                     <arguments>
-                        <argument>snippets/var.spl</argument>
+                        <argument>snippets/input-sample.spl</argument>
                     </arguments>
                 </configuration>
             </plugin>

@@ -6,7 +6,7 @@ var s = "123 "; // This is a string , not a number
 i + d; // 135.3
 1 == 2; // false
 !true; // false
-true or false; // true
+true || false; // true
 var min = 0;
 var max = 10;
 var average = (min + max ) / 2;
