@@ -38,8 +38,8 @@ public abstract class Expression extends Statement {
     }
 
     public static final class Literal extends Expression {
-        public final Object value;
-        public Literal(Object value) { this.value = value; }
+        public final Token value;
+        public Literal(Token value) { this.value = value; }
         public <T> T accept(Declaration.Visitor<T> visitor) { return visitor.visitLiteralExpr(this); }
     }
 

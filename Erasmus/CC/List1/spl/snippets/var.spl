@@ -1,0 +1,6 @@
+{var x;
+print x;}
+
+if (x == 3) {
+    y = 2
+}

@@ -17,7 +17,8 @@ public class Parser {
     public List<Declaration> parse() {
         List<Declaration> statements = new ArrayList<>();
         while (!isAtEnd()) {
-            statements.add(declaration());
+            Declaration decl = declaration();
+            if (decl != null) statements.add(decl);
         }
         return statements;
     }
@@ -32,7 +33,7 @@ public class Parser {
         }
     }
 
-    private Declaration varDeclaration() {
+    private Declaration varDeclaration() throws ParseError {
         Token name = consume(Token.Type.ID, "Expected variable name.");
         Expression initializer = null;
         if (match(Token.Type.EQUAL)) initializer = expression();
@@ -40,7 +41,7 @@ public class Parser {
         return new Declaration.Var(name, initializer);
     }
 
-    private Statement statement() {
+    private Statement statement() throws ParseError {
         if (match(Token.Type.PRINT)) return printStmt();
         if (match(Token.Type.LEFT_BRACE)) return new Statement.Block(block());
         if (match(Token.Type.IF)) return ifStmt();
@@ -48,7 +49,7 @@ public class Parser {
         return expressionStmt();
     }
 
-    private Statement ifStmt() {
+    private Statement ifStmt() throws ParseError {
         consume(Token.Type.LEFT_PAREN, "Expected '(' after 'if'.");
         Expression condition = expression();
         consume(Token.Type.RIGHT_PAREN, "Expected ')' after condition.");
@@ -58,7 +59,7 @@ public class Parser {
         return new Statement.If(condition, thenBranch, elseBranch);
     }
 
-    private Statement whileStmt() {
+    private Statement whileStmt() throws ParseError {
         consume(Token.Type.LEFT_PAREN, "Expected '(' after 'while'.");
         Expression condition = expression();
         consume(Token.Type.RIGHT_PAREN, "Expected ')' after condition.");
@@ -66,13 +67,13 @@ public class Parser {
         return new Statement.While(condition, body);
     }
 
-    private Statement printStmt() {
+    private Statement printStmt() throws ParseError {
         Expression value = expression();
         consume(Token.Type.SEMICOLON, "Expected ';' after value.");
         return new Statement.Print(value);
     }
 
-    private List<Declaration> block() {
+    private List<Declaration> block() throws ParseError {
         List<Declaration> declarations = new ArrayList<>();
         while (!check(Token.Type.RIGHT_BRACE) && !isAtEnd()) {
             declarations.add(declaration());
@@ -81,16 +82,18 @@ public class Parser {
         return declarations;
     }
 
-    private Statement expressionStmt() {
+    private Statement expressionStmt() throws ParseError {
         Expression expr = expression();
         consume(Token.Type.SEMICOLON, "Expected ';' after expression.");
         return expr;
     }
 
     // Expressions: assignment -> or
-    private Expression expression() { return assignment(); }
+    private Expression expression() throws ParseError {
+        return assignment();
+    }
 
-    private Expression assignment() {
+    private Expression assignment() throws ParseError {
         if (checkAhead(Token.Type.EQUAL)) {
             Token name = consume(Token.Type.ID, "Expected identifier as left operand of assignment.");
             advance();
@@ -100,7 +103,7 @@ public class Parser {
         return or();
     }
 
-    private Expression or() {
+    private Expression or() throws ParseError {
         Expression expr = and();
         while (check(Token.Type.OR)) {
             Token operator = advance();
@@ -110,7 +113,7 @@ public class Parser {
         return expr;
     }
 
-    private Expression and() {
+    private Expression and() throws ParseError {
         Expression expr = equality();
         while (check(Token.Type.AND)) {
             Token operator = advance();
@@ -120,7 +123,7 @@ public class Parser {
         return expr;
     }
 
-    private Expression equality() {
+    private Expression equality() throws ParseError {
         Expression expr = comparison();
         while (check(Token.Type.NOT_EQUAL, Token.Type.EQUAL_EQUAL)) {
             Token op = advance();
@@ -130,7 +133,7 @@ public class Parser {
         return expr;
     }
 
-    private Expression comparison() {
+    private Expression comparison() throws ParseError {
         Expression expr = term();
         while (check(Token.Type.GREATER_THAN, Token.Type.GREATER_EQUAL, Token.Type.LESSER_THAN, Token.Type.LESSER_EQUAL)) {
             Token op = advance();
@@ -140,7 +143,7 @@ public class Parser {
         return expr;
     }
 
-    private Expression term() {
+    private Expression term() throws ParseError {
         Expression expr = factor();
         while (check(Token.Type.MINUS, Token.Type.PLUS)) {
             Token op = advance();
@@ -150,7 +153,7 @@ public class Parser {
         return expr;
     }
 
-    private Expression factor() {
+    private Expression factor() throws ParseError {
         Expression expr = unary();
         while (check(Token.Type.SLASH, Token.Type.STAR)) {
             Token op = advance();
@@ -160,7 +163,7 @@ public class Parser {
         return expr;
     }
 
-    private Expression unary() {
+    private Expression unary() throws ParseError {
         if (check(Token.Type.NOT, Token.Type.MINUS)) {
             Token op = advance();
             Expression right = unary();
@@ -169,11 +172,10 @@ public class Parser {
         return primary();
     }
 
-    private Expression primary() {
-        if (check(Token.Type.INT, Token.Type.FLOAT, Token.Type.STRING)) return new Expression.Literal(advance().literal);
+    private Expression primary() throws ParseError {
         if (check(Token.Type.ID)) return new Expression.Variable(advance());
-        if (match(Token.Type.FALSE)) return new Expression.Literal(false);
-        if (match(Token.Type.TRUE)) return new Expression.Literal(true);
+        if (check(Token.Type.INT, Token.Type.FLOAT, Token.Type.STRING, Token.Type.TRUE, Token.Type.FALSE))
+            return new Expression.Literal(advance());
         consume(Token.Type.LEFT_PAREN, "Expected expression.");
         Expression expr = expression();
         consume(Token.Type.RIGHT_PAREN, "Expected ')' after expression.");

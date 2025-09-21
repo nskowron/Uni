@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import spl.parse.ASTPrinter;
 import spl.parse.Declaration;
 import spl.parse.Parser;
 import spl.scan.Scanner;
@@ -34,6 +35,10 @@ public class Spl {
 
 		Parser parser = new Parser(tokens);
 		List<Declaration> statements = parser.parse();
+
+		// print the tree
+		ASTPrinter printer = new ASTPrinter();
+		System.out.println(printer.print(statements));
 	}
 
 	public static void error(int line, String message) {

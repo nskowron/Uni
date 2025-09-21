@@ -2,85 +2,134 @@ package spl.parse;
 
 import java.util.List;
 
+import spl.scan.Token;
+
 public class ASTPrinter implements Declaration.Visitor<Void> {
     private final StringBuilder builder = new StringBuilder();
-    private String prefix = "";
-    private boolean isLast = true;
+    private final StringBuilder prefix = new StringBuilder();
 
     public String print(List<Declaration> program) {
-        builder.setLength(0);
+        builder.append("PROGRAM\n");
         for (int i = 0; i < program.size(); i++) {
-            isLast = (i == program.size() - 1);
-            printDeclaration(program.get(i), "", isLast);
+            printDeclaration(program.get(i), i == program.size() - 1);
         }
         return builder.toString();
     }
 
-    private void printDeclaration(Declaration decl, String prefix, boolean isLast) {
-        String prevPrefix = this.prefix;
-        boolean prevIsLast = this.isLast;
-        this.prefix = prefix;
-        this.isLast = isLast;
-
-        builder.append(prefix)
-               .append(isLast ? "└── " : "├── ");
-        decl.accept(this);
-
-        this.prefix = prevPrefix;
-        this.isLast = prevIsLast;
+    @Override
+    public Void visitVarDecl(Declaration.Var decl) {
+        builder.append("VAR\n");
+        if (decl.initializer != null) {
+            printToken(decl.name, false);
+            printDeclaration(decl.initializer, true);
+        } else {
+            printToken(decl.name, true);
+        }
+        return null;
     }
 
-    private void printExpression(Expression expr, String prefix, boolean isLast) {
-        String prevPrefix = this.prefix;
-        boolean prevIsLast = this.isLast;
-        this.prefix = prefix;
-        this.isLast = isLast;
-
-        builder.append(prefix)
-               .append(isLast ? "└── " : "├── ");
-        expr.accept(this);
-
-        this.prefix = prevPrefix;
-        this.isLast = prevIsLast;
-    }
-
-    // Declaration visitor methods
     @Override
     public Void visitIfStmt(Statement.If stmt) {
-        builder.append("ifStmt\n");
-        printExpression(stmt.condition, prefix + (isLast ? "    " : "│   "), false);
-        printDeclaration(stmt.thenBranch, prefix + (isLast ? "    " : "│   "), stmt.elseBranch == null);
+        builder.append("IF\n");
+        printDeclaration(stmt.condition, false);
         if (stmt.elseBranch != null) {
-            printDeclaration(stmt.elseBranch, prefix + (isLast ? "    " : "│   "), true);
+            printDeclaration(stmt.thenBranch, false);
+            printDeclaration(stmt.elseBranch, true);
+        } else {
+            printDeclaration(stmt.thenBranch, true);
         }
         return null;
     }
 
     @Override
-    public Void visitVarDecl(Declaration.Var stmt) {
-        builder.append("varDecl(").append(stmt.name.lexeme).append(")\n");
-        if (stmt.initializer != null) {
-            printExpression(stmt.initializer, prefix + (isLast ? "    " : "│   "), true);
+    public Void visitPrintStmt(Statement.Print stmt) {
+        builder.append("PRINT\n");
+        printDeclaration(stmt.expression, true);
+        return null;
+    }
+
+    @Override
+    public Void visitBlockStmt(Statement.Block stmt) {
+        builder.append("BLOCK\n");
+        for (int i = 0; i < stmt.statements.size(); i++) {
+            printDeclaration(stmt.statements.get(i), i == stmt.statements.size() - 1);
         }
         return null;
     }
 
-    // ...implement other Declaration visitor methods...
+    @Override
+    public Void visitWhileStmt(Statement.While stmt) {
+        builder.append("WHILE\n");
+        printDeclaration(stmt.condition, false);
+        printDeclaration(stmt.body, true);
+        return null;
+    }
 
-    // Expression visitor methods
+    @Override
+    public Void visitAssignExpr(Expression.Assign expr) {
+        builder.append("ASSIGN\n");
+        printToken(expr.name, false);
+        printDeclaration(expr.value, true);
+        return null;
+    }
+
     @Override
     public Void visitBinaryExpr(Expression.Binary expr) {
-        builder.append("binaryExpr(").append(expr.operator.lexeme).append(")\n");
-        printExpression(expr.left, prefix + (isLast ? "    " : "│   "), false);
-        printExpression(expr.right, prefix + (isLast ? "    " : "│   "), true);
+        builder.append("BINARY\n");
+        printDeclaration(expr.left, false);
+        printToken(expr.operator, false);
+        printDeclaration(expr.right, true);
+        return null;
+    }
+
+    @Override
+    public Void visitLogicalExpr(Expression.Logical expr) {
+        builder.append("LOGICAL\n");
+        printDeclaration(expr.left, false);
+        printToken(expr.operator, false);
+        printDeclaration(expr.right, true);
+        return null;
+    }
+
+    @Override
+    public Void visitUnaryExpr(Expression.Unary expr) {
+        builder.append("UNARY\n");
+        printToken(expr.operator, false);
+        printDeclaration(expr.right, true);
         return null;
     }
 
     @Override
     public Void visitLiteralExpr(Expression.Literal expr) {
-        builder.append("literal(").append(expr.value).append(")\n");
+        builder.append(expr.value.lexeme)
+               .append("\n");
         return null;
     }
 
-    // ...implement other Expression visitor methods...
+    @Override
+    public Void visitVariableExpr(Expression.Variable expr) {
+        builder.append(expr.name.lexeme)
+               .append("\n");
+        return null;
+    }
+
+    private void printToken(Token token, boolean isLast) {
+        builder.append(prefix)
+               .append(isLast ? "└── " : "├── ")
+               .append(token.lexeme)
+               .append("\n");
+    }
+
+    private void printDeclaration(Declaration decl, boolean isLast) {
+        builder.append(prefix);
+        if (isLast) {
+            builder.append("└── ");
+            prefix.append("    ");
+        } else {
+            builder.append("├── ");
+            prefix.append("│   ");
+        }
+        decl.accept(this);
+        prefix.setLength(prefix.length() - 4);
+    }
 }
