@@ -1,2 +1,3 @@
 mainfont: Latin Modern Roman
 sansfont: Latin Modern Roman
+ignore-git: false

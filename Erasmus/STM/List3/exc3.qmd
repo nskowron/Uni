@@ -1,0 +1,54 @@
+---
+title: Simulations and Bias of LS estimator
+---
+
+## Loading data from previous task
+
+```{r}
+library(faraway)
+data("uswages")
+attach(uswages)
+```
+
+# Obtaining the necessary variables and parameters
+
+```{r}
+n = nrow(uswages)
+sigma = 400
+mu = -250 + 50 * educ + 10 * exper
+c = (mu - min(mu)) / (max(mu) - min(mu))
+```
+
+# The settings for residuals
+
+```{r}
+# eps have to be functions to produce different results every iteration
+eps.1 = function() rnorm(n, 0, sigma)
+eps.2 = function() rnorm(n, 0, c * sigma)
+eps.3 = function() rnorm(n, 1000 * sin(mu), sigma)
+```
+
+We expect that non-central residuals will introduce bias in the LS estimator.
+
+# Simulation
+
+```{r}
+Nsim = 1000
+simulate = function(eps) {
+    estimators = matrix(NA, nrow = Nsim, ncol = 3)
+    for(sim in 1:Nsim) {
+        Y = mu + eps()
+        fit = lm(Y ~ educ + exper)
+        estimators[sim,] = coef(fit)
+    }
+    return(colMeans(estimators))
+}
+
+simulate(eps.1)
+simulate(eps.2)
+simulate(eps.3)
+```
+
+We can see eps.3 introduces some bias though it's not that big when we take 
+into consideration the oscillating nature of sin(.) - The LS estimators are 
+biased, but in the mean they cancel out.
