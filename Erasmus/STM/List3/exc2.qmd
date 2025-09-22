@@ -1,0 +1,56 @@
+---
+title: Interpretation of Regression Coefficients, Fitted Values and Residuals
+---
+
+# Reading the data
+
+```{r}
+library(faraway)
+data("uswages")
+head(uswages)
+```
+
+# Task 1: Fitting the model
+
+```{r}
+attach(uswages)
+fit = lm(wage ~ educ + exper, data = uswages)
+S = summary(fit)
+S
+```
+
+# Task 2: Regression coefficient of education
+
+```{r}
+S$coeff["educ", "Estimate"]
+```
+
+The simple interpretation is that each one year of education corresponds to 
+increasing the weekly pay by about 51.18 dollars.
+
+# Task 3: Fitted values and residuals
+
+```{r}
+yhat = fitted(fit)
+eps = resid(fit)
+
+crossprod(yhat, eps)
+```
+
+As we can see - the dot product of the fitted values and residuals is very close to 0. 
+It will rarely be exactly 0 taking into consideration the constraints of 
+computer arithmetics. It is enough though to infer that these vectors are 
+ortogonal - as expected.
+
+# Task 4: Plotting the residuals vs fitted values
+
+```{r, fig.width=10, fig.height=6}
+plot(yhat, eps)
+```
+
+It seems like the errors are centered, but their variance might be dependant 
+on something else in our data.
+
+# Task 5: Consequences for the LS estimator
+
+If the errors were not center we might find that the LS estimator is biased.
