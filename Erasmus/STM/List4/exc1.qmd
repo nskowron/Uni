@@ -1,0 +1,55 @@
+---
+title: Confidence interval for simple linear regression
+---
+
+# The Data
+
+```{r, fig.width=10, fig.height=6}
+library(faraway)
+data(corrosion)
+help(corrosion)
+plot(corrosion)
+```
+
+# Simple Linear Model
+
+```{r}
+fit = lm(loss ~ Fe, data = corrosion)
+summary(fit)
+```
+
+Iron prevents corrosion.
+For 1.5% of iron we would expect 129.8 - 1.5 * 24.0 weight loss.
+
+```{r}
+129.8 - 1.5 * 24
+```
+
+\newpage
+
+# Hypothesis testing
+
+We want to test
+
+$$
+\psi\left(\beta\right) = c^T\beta
+$$
+
+for
+
+$$
+c^T = (1, 1.5)
+$$
+
+The test statistics is
+
+$$
+\frac{\widehat{\psi} - 95}{\widehat{SE}_{\widehat{\psi}}}
+$$
+
+```{r}
+library(car)
+predict(fit, data.frame(Fe = 1.5), interval = 'confidence')
+c = c(1, 1.5)
+linearHypothesis(fit, c, 95)
+```
