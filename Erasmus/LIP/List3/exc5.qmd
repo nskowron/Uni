@@ -5,8 +5,9 @@ title: Testing Edgecases
 # Infeasible Start
 
 ```{python}
-from mip import Model, maximize
-
+from mip import Model, maximize, xsum
+```
+```{python}
 m = Model()
 
 x1 = m.add_var(lb = 0) # variables
@@ -100,8 +101,67 @@ b =
 60 \cr
 40
 \end{bmatrix}, 
-x = 
+c = 
 \begin{bmatrix}
-{x[0]}
+1 \cr
+1
 \end{bmatrix}
 $$
+
+$$
+\begin{matrix}
+max & z = c^Tx \cr
+s.t. & Ax <= b \cr
+& x >= 0
+\end{matrix}
+$$
+
+All necessary variables and initial tableau for the problem:
+
+```{python}
+import numpy as np
+from util import tableau
+
+A = [
+    [5, 10],
+    [4, 4]
+]
+b = [[60], [40]]
+c = [[1], [1]]
+
+T = np.concatenate((
+    np.concatenate((A, np.identity(2), [[0], [0]], b), axis = 1),
+    np.concatenate((np.transpose(c), [[0, 0, 1, 0]]), axis = 1)
+    ), axis = 0
+)
+
+tableau(T)
+```
+
+Now another way we can specify the model is:
+
+```{python}
+m = Model()
+
+x = [m.add_var(lb = 0) for i in range(2)]
+
+for j in range(2):
+    m += xsum(A[j][i] * x[i] for i in range(2)) <= b[j][0]
+
+m.objective = maximize(xsum(c[i][0] * x[i] for i in range(2)))
+
+m.optimize()
+```
+
+Which is a bit more open-close if we have the problem in 
+standard form. \\
+
+We get again:
+
+```{python}
+#| echo: false
+from IPython.display import Markdown, display
+
+solution = [x[0].x, x[1].x]
+display(Markdown(f"$$x = {solution}$$"))
+```
