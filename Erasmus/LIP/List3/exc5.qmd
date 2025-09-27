@@ -1,0 +1,107 @@
+---
+title: Testing Edgecases
+---
+
+# Infeasible Start
+
+```{python}
+from mip import Model, maximize
+
+m = Model()
+
+x1 = m.add_var(lb = 0) # variables
+x2 = m.add_var(lb = 0)
+
+m += x1 + x2 <= 2
+m += 2 * x1 + 2 * x2 >= 2 # constraints
+
+m.objective = maximize(x1 - x2)
+
+m.optimize()
+```
+
+We notice no errors which looks promising.
+
+```{python}
+x = [x1.x, x2.x] # get values, not objects
+print(f"x: {x}")
+```
+
+This is a correct solution which brings us to a conclusion that
+pythonmip correctly handles infeasible start edgecase.
+
+# Unboudedness
+
+```{python}
+m = Model()
+
+x1 = m.add_var(lb = 0)
+x2 = m.add_var(lb = 0)
+
+m += -x1 + x2 <= 1
+m += x2 <= 5
+
+m.objective = maximize(2 * x1 + x2)
+
+m.optimize()
+```
+
+Pythonmip correctly finds that a problem is unbounded.Let's 
+see if the variables have been changed.
+
+```{python}
+x = [x1.x, x2.x]
+print(f"x: {x}")
+```
+
+Worth noting: variables get set to None whenever pythonmip 
+identifies an unbounded problem.
+
+# Infinite Solutions
+
+```{python}
+m = Model()
+
+x1 = m.add_var(lb = 0)
+x2 = m.add_var(lb = 0)
+
+m += 5 * x1 + 10 * x2 <= 60
+m += 4 * x1 + 4 * x2 <= 40
+
+m.objective = maximize(x1 + x2)
+```
+
+We can already see that one of the constraints is a multiple 
+of the objective function, so there's a big chance to have 
+an entire face of solutions. We're interested in seeing which 
+solution the algorithm will give us.
+
+```{python}
+m.optimize()
+
+x = [x1.x, x2.x]
+print(f"x: {x}")
+```
+
+So pythonmip just gives us the first seen solution.
+
+# The model in matrix standard form
+
+Let's take the previous problem
+
+$$
+A =
+\begin{bmatrix}
+5 & 10 \cr
+4 & 4
+\end{bmatrix}, 
+b = 
+\begin{bmatrix}
+60 \cr
+40
+\end{bmatrix}, 
+x = 
+\begin{bmatrix}
+{x[0]}
+\end{bmatrix}
+$$

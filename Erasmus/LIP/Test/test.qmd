@@ -1,0 +1,61 @@
+---
+title: Test assignment
+---
+
+# Code snippet
+
+```{python}
+print("Hello World!")
+```
+
+# venv libraries check
+
+```{python}
+import numpy as np
+from mip import *
+```
+
+# Mip test
+
+### Class example
+
+```{python}
+m = Model()
+x = [m.add_var(lb = 0) for i in range(2)]
+A = [
+    [5, 10],
+    [4, 4]
+]
+b = [60, 40]
+c = [6, 8]
+
+for j in range(2):
+    m += xsum(A[j][i] * x[i] for i in range(2)) <= b[j]
+
+m.objective = maximize(xsum(c[i] * x[i] for i in range(2)))
+
+m.optimize()
+
+solution = list(map(lambda y: y.x, x))
+print(f"x: {solution}")
+```
+
+# Plotting
+
+```{python}
+import matplotlib.pyplot as plt
+
+X = np.array([0, min((b[j] / A[j][0] if A[j][0] != 0 else float('inf')) for j in range(2))])
+Y1 = (b[0] - A[0][0] * X) / A[0][1] # constraint 1
+Y2 = (b[1] - A[1][0] * X) / A[1][1] # constraint 2
+
+plt.figure()
+
+plt.fill_between(X, 0, Y1, color='skyblue', alpha=0.3, label='constraint 1')
+plt.fill_between(X, 0, Y2, color='lightgreen', alpha=0.3, label='constraint 2')
+
+plt.plot(X, Y1, color='blue')
+plt.plot(X, Y2, color='green')
+
+plt.scatter(solution[0], solution[1])
+```
