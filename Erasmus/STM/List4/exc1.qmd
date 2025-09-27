@@ -53,3 +53,18 @@ predict(fit, data.frame(Fe = 1.5), interval = 'confidence')
 c = c(1, 1.5)
 linearHypothesis(fit, c, 95)
 ```
+
+# Test by hand
+
+```{r}
+n = nrow(corrosion)
+df = n - ncol(model.matrix(fit))
+target = 95
+estimate = predict(fit, data.frame(Fe = 1.5))
+sigma = sigma(fit)
+
+test = (estimate - target) / sigma
+
+alpha = 0.05
+ifelse(abs(test) > qt(1 - alpha / 2, df), "Reject", "Don't reject")
+```

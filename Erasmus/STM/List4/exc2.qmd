@@ -1,0 +1,7 @@
+```{r}
+library(faraway)
+data(fat)
+head(fat)
+help(fat)
+pairs(fat[,"siri"])
+```
