@@ -1,0 +1,112 @@
+---
+title: Application of F-tests
+---
+
+Signif. codes - how significant a predictor is (more stars - more signif.)
+
+# 6.1 - Data and model
+
+```{r}
+library(faraway)
+data(savings)
+attach(savings)
+head(savings)
+nrow(savings)
+pairs(savings)
+
+fit = lm(sr ~ pop15 + pop75 + dpi + ddpi, data = savings)
+summary(fit)
+```
+
+# 6.2 - Testing all the predictors
+
+```{r}
+fit0 = lm(sr ~ 1, data = savings)
+
+X = model.matrix(fit)
+n = nrow(X)
+p = ncol(X)
+
+RSS = deviance(fit)
+RSS0 = deviance(fit0)
+
+F = ((RSS0 - RSS) / (p - 1)) / (RSS / (n - p))
+F
+
+quantile = qf(0.95, p - 1, n - p)
+quantile
+
+p_val = 1 - pf(F, p - 1, n - p)
+p_val
+```
+
+# 6.3 - F test for single predictor
+
+```{r}
+fit1 = lm(sr ~ pop75 + dpi + ddpi)
+
+p1 = 4
+RSS1 = deviance(fit1)
+
+F = ((RSS1 - RSS) / (p - p1)) / (RSS / (n - p))
+F
+
+p_val = 1 - pf(F, p - p1, n - p)
+p_val
+```
+
+## t - test
+
+```{r}
+X = model.matrix(fit)
+beta = coefficients(fit)
+c = c(0, 1, 0, 0, 0)
+
+SEpsi = sigma(fit) * sqrt(t(c) %*% solve(t(X) %*% X) %*% c)
+
+t = (t(c) %*% beta) / SEpsi
+t
+
+p_val = 2 * (1 - pt(abs(t), n - p))
+p_val
+```
+
+## anova
+
+```{r}
+anova(fit1, fit)
+```
+
+# 6.4 - excluding pop75 and ddpi
+
+```{r}
+fit2 = lm(sr ~ pop15 + dpi, data = savings)
+anova(fit2, fit)
+```
+
+# 6.5 - same coefficients
+
+```{r}
+fit3 = lm(sr ~ I(pop15 + pop75) + dpi + ddpi, data = savings)
+anova(fit3, fit)
+```
+
+# 6.6 - testing concrete value of coefficient
+
+```{r}
+fit4 = lm(sr ~ pop15 + pop75 + dpi + offset(0.5 * ddpi), data = savings)
+anova(fit4, fit)
+
+X = model.matrix(fit)
+beta = coefficients(fit)
+c = c(0, 0, 0, 0, 1)
+psi = 0.5
+SEpsi = sigma(fit) * sqrt(t(c) %*% solve(t(X) %*% X) %*% c)
+
+t = (t(c) %*% beta - psi) / SEpsi
+t
+t ^ 2
+
+p_val = 2 * (1 - pt(abs(t), n - p))
+p_val
+```
