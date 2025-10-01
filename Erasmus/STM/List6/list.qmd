@@ -110,3 +110,23 @@ t ^ 2
 p_val = 2 * (1 - pt(abs(t), n - p))
 p_val
 ```
+
+# 6.7 - Factor Variables
+
+Consider model:
+
+$$
+Y_{ij} = \beta_0 + \beta_j + \epsilon_{ij}
+$$
+
+### first category baseline model matrix
+
+$$
+X = 
+\begin{bmatrix}
+\textbf{1}_{n_1} & 0 & \cdots & 0 \cr
+\textbf{1}_{n_2} & \textbf{1}_{n_2} & \cdots & \vdots \cr
+\vdots & \vdots & \ddots & \vdots \cr
+\textbf{1}_{n_k} & 
+\end{bmatrix}
+$$
