@@ -13,3 +13,6 @@
 [submodule "Sem4/leMonada"]
 	path = Sem4/leMonada
 	url = https://github.com/ShrikeBin/leMonada.git
+[submodule "Sem4/TS/NetworkGraph"]
+	path = Sem4/TS/NetworkGraph
+	url = https://github.com/nskowron/NetworkGraph.git
