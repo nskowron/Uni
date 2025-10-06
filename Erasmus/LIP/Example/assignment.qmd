@@ -3,6 +3,9 @@ title: Sensitivity Analysis and Revised Simplex
 author: nesko25
 mainfont: Latin Modern Roman
 sansfont: Latin Modern Roman
+format:
+  pdf:
+    keep-tex: true
 ---
 
 # 1 - Mathematical Formulation
@@ -157,11 +160,72 @@ therefore we found the optimal solution - again.
 
 \newpage
 
-# 3 - Sensitivity Analysis
+# 3 - Reduced Cost
 
-### TODO:
+What's the increase in price that would make $x_2$ worth being produced? \newline
+We remember that:
 
-3) at least 1
-4) 2, 1, 3
-5) yes, bc all dual vars are non-zero (no slack)
-6) there is slack in dual constraint
+$$
+\bar{c}_2 = c_2 - \sum_{i}{y_i a_{i2}}
+$$
+
+where $\bar{c}_2$ is the reduced cost of $x_2$ after last iteration. \newline
+To make $x_2$ worth producing the reduced cost should be positive, and from the 
+above formula we see that the increase in price will correspond to the same 
+increase in the reduced cost. As the reduced cost of $x_2$ is equal to $-1$ 
+after the last iteration, the increase in price that would make $x_2$ worth 
+being produced is any amount $> 1$.
+
+\newpage
+
+# 4 - Shadow Price
+
+Shadow prices can be read directly from the last tableau:
+
+$$
+\begin{aligned}
+2 \ & - for \ an \ hour \ of \ work \\
+1 \ & - for \ a \ unit \ of \ metal \\
+3 \ & - for \ a \ unit \ of \ wood
+\end{aligned}
+$$
+
+\newpage
+
+# 5 - Complementary Slackness Theorem
+
+Are all the constraints binding? \newline
+The Complementary Slackness Theorem implies for $x*$ and $y*$ - optimal 
+solutions of the Primal and Dual problems respectively:
+
+$$
+\forall_{j}{\ (b_j - \sum_{i}{a_{ji}x*_i})y*_j = 0}
+$$
+
+Which means that for each constraint it's either binding, or it's shadow price 
+is $0$. Seeing that all of the shadow prices are non-zero (previous subtask) 
+we can conclude that all constraint of the Primal problem are binding (active). \newline
+On a side note: We can also observe that none of the slack variables are in 
+basis in the optimal solution, which means there is no slack capacity, which 
+is yet another way of concluding the above.
+
+\newpage
+
+# 6 - Economical Interpretation
+
+The imputed (reduced) cost of $x_2$ is:
+
+$$
+\bar{c}_2 = c_2 - \sum_{i}{y*_i a_{i2}} = -1 < 0
+$$
+
+Which means that the cost of resources needed to produce a unit of product $x_2$ 
+is significantly higher than the price of the product itself, making it not 
+a viable option to produce. \newline
+In other words: there is slack in the $2^{nd}$ constraint of the Dual.
+
+\newpage
+
+# 7 - Sensitivity analysis - increase desk net profit
+
+### TODO
