@@ -16,3 +16,6 @@
 [submodule "Sem4/TS/NetworkGraph"]
 	path = Sem4/TS/NetworkGraph
 	url = https://github.com/nskowron/NetworkGraph.git
+[submodule "Erasmus/CC/interpreter"]
+	path = Erasmus/CC/interpreter
+	url = https://gitlab.sdu.dk/25-compiler-construction-teams/team-12/interpreter.git
