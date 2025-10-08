@@ -72,22 +72,22 @@ Choose variable to bring to the basis
 
 ```{python}
 def ratio_test():
-    enter = np.argmax(T[-1][:n + m])
+    enter = np.argmax(T[-1][:n + m]) # index of biggest reduced cost
     if T[-1][enter] <= 0:
-        return [None, None] # optimal
+        return [None, None] # no positive rc - optimal
 
     ratios = [
-        T[j][-1] / T[j][enter]
+        T[j][-1] / T[j][enter] # b term / entering column term
         if T[j][enter] > 0
         else float('inf')
         for j in range(m)
     ]
 
-    leave = np.argmin(ratios)
+    leave = np.argmin(ratios) # index of smallest ratio
     if ratios[leave] == float('inf'):
-        return [None, None] # unbounded
+        return [None, None] # all ratio terms are <= 0 - unbounded
 
-    return [enter, leave]
+    return [enter, leave] # indices in T
 
 enter, leave = ratio_test()
 print(f"pivot: ({enter}, {leave})")
@@ -98,10 +98,10 @@ and $x_5$ should leave
 
 ```{python}
 def update_tableau(enter, leave):
-    T[leave] /= T[leave][enter]
+    T[leave] /= T[leave][enter] # normalize row to get 1 in entering col
     for j in range(m + 1):
         if j != leave:
-            T[j] -= T[leave] * T[j][enter]
+            T[j] -= T[leave] * T[j][enter] # all other rows set to 0 in entering col
 
 update_tableau(enter, leave)
 tableau(T)
@@ -144,7 +144,7 @@ T[-1, N] = c[N] - c[B] @ T[:m, N]
 
 # b and d
 T[:m, -1] = A_Binv @ b
-T[-1, -1] = - c[B] @ (T[:m, -1])
+T[-1, -1] = - c[B] @ T[:m, -1]
 
 # make it pretty again
 T = np.array(T, dtype = object)
@@ -226,6 +226,166 @@ In other words: there is slack in the $2^{nd}$ constraint of the Dual.
 
 \newpage
 
-# 7 - Sensitivity analysis - increase desk net profit
+# 7 - Increased Net Profit
 
-### TODO
+As mentioned previously - the increase in the reduced cost is equal to the increase 
+in the original net profit. So change in desk net profit from 13 to 15 would cause 
+the increase in the reduced cost of $x_2$ of 2, which is more than 1, so we will be able to do one more iteration of the simplex and bring $x_2$ in the basis.
+
+```{python}
+#| include: false
+T_orig = T.copy()
+```
+```{python}
+T[-1][1] += 2 # increase x2 reduced cost
+tableau(T)
+```
+
+```{python}
+pivot()
+```
+
+We reach a new optimal solution with an even higher objective function.
+
+\newpage
+
+# 8 - Increased Material Availability
+
+We need to recalculate the final b - column of the tableau.
+
+```{python}
+#| include: false
+T = T_orig.copy()
+```
+```{python}
+# b and d
+T[:m, -1] = A_Binv @ (b + [0, 125 - 117, 0]) # new b
+T[-1, -1] = - c[B] @ T[:m, -1]
+
+# make pretty again
+for j in range(m + 1):
+    T[j][-1] = Fraction(round(T[j][-1]))
+
+tableau(T)
+```
+
+We get an infeasible solution. We would need to apply the dual simplex 
+in order to retrieve feasibility.
+
+### TODO: apply the dual here?
+
+\newpage
+
+# 9 - New Product
+
+We need to insert a new column into our tableau, calculate it for the current 
+iteration and check wether we should bring the new variable into the basis or not.
+
+```{python}
+#| include: false
+T = T_orig.copy()
+```
+
+\small
+```{python}
+T = np.column_stack([
+    T[:, :n + m],
+    np.zeros(m + 1), # insert new column after the slacks as x8
+    T[:, n + m:]
+])
+
+n += 1
+
+# new column updated
+T[:m, 7] = A_Binv @ [3, 1, 2]
+T[-1, 7] = 14 - c[B] @ T[:m, 7]
+
+# make pretty again
+for j in range(m + 1):
+    T[j][7] = Fraction(round(T[j][7]))
+
+tableau(T)
+```
+\normalsize
+
+We observe that new variable's reduced cost is positive.
+
+\small
+```{python}
+pivot()
+```
+\normalsize
+
+Turns out coffee tables are worth producing.
+
+```{python}
+#| include: false
+n -= 1
+```
+
+\newpage
+
+# 10 - New Constraint
+
+We need to introduce a new row, but also a new slack column. The new constraint is: 
+$$
+x_3 \le 5x_2 \implies 0x_1 - 5x_2 + x_3 + 0x_4 \le 0
+$$
+
+Since each Simplex iteration is just elementary row operations, we can simply add 
+the new constraint to the final tableau without having to recalculate anything.
+
+```{python}
+#| include: false
+T = T_orig.copy()
+```
+
+\small
+```{python}
+T = np.column_stack([
+    T[:, :n + m],
+    np.zeros(m + 1), # new slack
+    T[:, n + m:]
+])
+
+T = np.vstack([
+    T[:m, :],
+    [0, -5, 1, 0, 0, 0, 0, 1, 0, 0], # new constraint
+    T[-1, :]
+])
+
+m += 1
+
+# make pretty again
+for j in range(m + 1):
+    T[j][7] = Fraction(T[j][7])
+for i in range(n + m + 2):
+    T[3][i] = Fraction(T[3][i])
+
+tableau(T)
+```
+\normalsize
+
+Now we just need to bring the tableau into the canonical form. We can already make 
+some assumpions about what will happen after we do that. In current solution 
+we aren't producing any desks, because they're less valuable than chairs. So after 
+we introduce the new constraint on chair production their production will have 
+to go down - or the desk production will have to go up instead of something more 
+valuable. Either way we expect a loss in our income, which means the solution that 
+we have right now will become infeasible.
+
+\small
+```{python}
+update_tableau(2, 1) # pivot of the column that breaks the canonical form
+tableau(T)
+```
+\normalsize
+
+As expected - we reached the canonical form and our solution became infeasible. 
+Similarly as with increasing material availability - we would have to apply 
+the dual simplex.
+
+```{python}
+#| include: false
+m -= 1
+```
