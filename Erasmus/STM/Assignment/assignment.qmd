@@ -1,0 +1,323 @@
+---
+title: Assignment
+author: Nel Skowronek
+---
+
+# Exercise 1
+
+## 1. Exploring the Dataset
+
+```{r, fig.width=10, fig.height=10}
+load("Data ST523 813 E2025 Exam.rdata")
+dim(Data)
+summary(Data)
+pairs(Data)
+```
+
+So we have 9 non-categorical variables and a total of 300 observations.
+
+## 2. Linear Model
+
+```{r}
+fit = lm(CO ~ AT + AP + AH + GTEP + TIT + TAT + TEY + CDP, data = Data)
+summary(fit)
+```
+
+$$
+\begin{matrix}
+    n = 300 & p = 9
+\end{matrix}
+$$
+
+We can see the estimated intercept and other 8 parameters in the 
+"Estimate" column above. We have $300 - 9 = 291$ degrees of freedom. \newline
+Judging by the coefficient of Ambient Temperature predictor we can 
+expect a $0.021611$ decrease in CO-level for every $1^\circ C$ 
+increase in Ambient Temperature.
+
+## 3. F - test
+
+- Hypothesis:
+
+$$
+\begin{matrix}
+    H_0 : \beta_2 = \beta_3 = ... = \beta_p = 0 & H_1 : \exists_{j \in {2...p}} \beta_j \neq 0
+\end{matrix}
+$$
+
+```{r}
+fit.0 = lm(CO ~ 1, data = Data)
+anova(fit.0, fit)
+```
+
+As we can see the RSS drastically dropped in the wider model, compared 
+to the null, which already gives us an indication that it might explain 
+the data much better. \newline
+
+- The observed test statistic can be read from the table: $F = 102.77$
+- The probability of getting such a high value is very small: $p_{val} < 2.2 \cdot 10^{-16}$
+- Under the Null Hypothesis $F$ should follow the $F_{8, 291}$ distribution.
+
+(Because the difference in parameters / degrees of freedom is 8, and the 
+wider model has 291 degrees of freedom, which we've shown before) \newline
+
+The p-value is much smaller than the significance level therefore we can 
+definitely reject the null hypothesis - we know that our test 
+statistic must be much higher than the 0.95th quantile of the 
+null distribution.
+
+## 4. Reduced Models
+
+### Model A
+
+Similarly as before, we state the hypothesis:
+
+$$
+\begin{matrix}
+    H_0 : \beta_5 = \beta_6 = ... = \beta_p = 0 & H_1 : \exists_{j \in {5...p}} \beta_j \neq 0
+\end{matrix}
+$$
+
+```{r}
+fit.A = lm(CO ~ AT + AP + AH, data = Data)
+anova(fit.A, fit)
+```
+
+And similarly as before we can see that the test statistic is very high ($146.4$), 
+while the p-value is very low (close to $0$) - which strongly speaks against the null 
+hypothesis. \newline
+The conclusion is - we cannot reduce the full model to Model A.
+
+### Model B
+
+$$
+\begin{matrix}
+    H_0 : \beta_2 = \beta_3 = \beta_4 = \beta_9 = 0 & H_1 : \exists_{j \in {2, 3, 4, 9}} \beta_j \neq 0
+\end{matrix}
+$$
+
+```{r}
+fit.B = lm(CO ~ GTEP + TIT + TAT + TEY, data = Data)
+anova(fit.B, fit)
+```
+
+Here the situation is slightly different. The test statistic is much lower ($2.5844$), 
+and the p-value is much higher than with the previous 2 models ($0.0373$) - but it's 
+still quite low. Depending on our significance level we might reject the null 
+hypothesis or not. For signif. level $\alpha = 0.05$ we would reject the null and 
+say that the model can't be reduced. For signif. level $\alpha = 0.01$ however we 
+would be able to say that the full model can be reduced to Model B.
+
+# Exercise 2
+
+### Model:
+
+$$
+\begin{matrix}
+    Y_i = \mu + \alpha_{j(i)} + \beta' \cdot X_i + \epsilon_i \\
+    i \in [1...n] \\
+    n = 45 
+\end{matrix}
+$$
+
+### Model Matrix and Coefficients
+
+$$
+\begin{matrix}
+    \begin{matrix}
+        \textbf{X} = 
+            \begin{bmatrix}
+                1 & \textbf{0} & \textbf{0} & \textbf{0} & X_1 \\
+                \vdots & \textbf{1} & \textbf{0} & \textbf{0} & \vdots \\
+                \vdots & \textbf{0} & \textbf{1} & \textbf{0} & \vdots \\
+                1 & \textbf{0} & \textbf{0} & \textbf{1} & X_n
+            \end{bmatrix}
+        & \beta = 
+            \begin{bmatrix}
+                \mu \\
+                \alpha_{TempResearch} \\
+                \alpha_{TempPrivate} \\
+                \alpha_{Freelance} \\
+                \beta'
+            \end{bmatrix}
+    \end{matrix} \\
+    p = 5 
+\end{matrix}
+$$
+
+## 1. Confidence Interval
+
+$$
+\begin{matrix}
+    c^T = 
+        \begin{bmatrix}
+            0 & 1 & -1 & 0 & 0
+        \end{bmatrix} \\
+    c^T\beta = \alpha_{TempResearch} - \alpha_{TempPrivate} \\
+    CI = c^T\widehat{\beta} \pm \widehat{SE}_{c^T\widehat{\beta}} \cdot t_{n - p;1 - \frac{\alpha}{2}}
+\end{matrix}
+$$
+
+The only thing in the above formula that we don't have is the $\widehat{SE}_{c^T\widehat{\beta}}$. 
+We usually used RSS to get it, but since we don't have access neither to the 
+predictors nor responses we can use the output of the program to calculate it 
+differently:
+
+$$
+\begin{matrix}
+    \widehat{SE}_{c^T\widehat{\beta}} = \sqrt{Var(c^T\widehat{\beta})} \\
+    Var(c^T\widehat{\beta}) = Var(\widehat{\alpha}_{TempResearch} - \widehat{\alpha}_{TempPrivate}) =\\
+    = Var(\widehat{\alpha}_{TempResearch}) + Var(\widehat{\alpha}_{TempPrivate}) - 2Cov(\widehat{\alpha}_{TempResearch},\ \widehat{\alpha}_{TempPrivate}) =\\
+    = \widehat{SE}^2_{\widehat{\alpha}_{TempResearch}} + \widehat{SE}^2_{\widehat{\alpha}_{TempPrivate}} - 2Cov(\widehat{\alpha}_{TempResearch},\ \widehat{\alpha}_{TempPrivate})
+\end{matrix}
+$$
+
+Now we have everything we need to calculate the confidence interval.
+
+```{r}
+n = 45
+p = 5
+
+a.re = -40000
+a.pr = -10000
+
+psi = a.re - a.pr
+
+SE.re = 24000
+SE.pr = 23000
+COV.re.pr = 22000000
+
+SE = sqrt(SE.re ^ 2 + SE.pr ^ 2 - 2 * COV.re.pr)
+
+CI.lower = psi - SE * qt(0.95, n - p)
+CI.upper = psi + SE * qt(0.95, n - p)
+
+c(CI.lower, CI.upper)
+```
+
+## 2. Hypothesis Testing
+
+$$
+\begin{matrix}
+    H_0 : 
+        \begin{matrix}
+            \alpha_{TempResearch} \ge \alpha_{TempPrivate} \\ 
+            \implies -c^T\beta \le 0
+        \end{matrix}
+    & H_1 : -c^T\beta > 0 \cr
+\end{matrix}
+$$
+
+We've shown on the lecture that if $H_0$ holds then:
+
+$$
+\begin{matrix}
+    T = \frac{-c^T\widehat{\beta} - 0}{\widehat{SE}_{c^T\widehat{\beta}}} \\
+    P(T > t_{n - p;1 - \alpha}) \le \alpha
+\end{matrix}
+$$
+
+Which means we will have statistical evidence to reject $H_0$ 
+if the test statistic is bigger than the 0.95 quantile of the 
+given above $t_{n - p}$ - distribution.
+
+```{r}
+T = -psi / SE
+t.95 = qt(0.95, n - p)
+
+c(T, t.95)
+```
+
+As we can see, the test statistic - even though it's positive - 
+is not bigger than the quantile, therefore we don't have sufficient 
+statistical evidence to reject the null hypothesis and say that 
+temporary researches are earning less than temporary private 
+consultants.
+
+# Exercise 3
+
+### Model Matrix and Coefficients
+
+For a simple linear relationship we have the model matrix and the parameter 
+vector as so:
+
+$$
+\begin{matrix}
+    X = 
+        \begin{bmatrix}
+            1 & x_1 \\
+            1 & x_2 \\
+            \vdots & \vdots \\
+            1 & x_n
+        \end{bmatrix}
+    & \beta = 
+        \begin{bmatrix}
+            \beta_{intercept} \\
+            \beta_{slope}
+        \end{bmatrix}
+\end{matrix}
+$$
+
+Since we want to estimate $\beta_{slope}$ as precisely as possible, 
+we would like to minimize $Var(\widehat{\beta}_{slope}) = Var(\widehat{\beta})_{22}$. \newline
+
+We know that for the Least Square Estimator $\widehat{\beta}$ 
+$Var(\widehat{\beta}) = \sigma^2 (X^TX)^{-1}$
+
+$$
+(X^TX)^{-1} = \left(
+    \begin{bmatrix}
+        1 & 1 & \dots & 1 \\
+        x_1 & x_2 & \dots & x_n
+    \end{bmatrix}
+    \begin{bmatrix}
+        1 & x_1 \\
+        1 & x_2 \\
+        \vdots & \vdots \\
+        1 & x_n
+    \end{bmatrix}
+    \right)^{-1}
+    =
+    \begin{bmatrix}
+        n & \sum{x_i} \\
+        \sum{x_1} & \sum{x^2_i}
+    \end{bmatrix}
+    ^{-1}
+$$
+
+We can find it's reverse using any method.
+
+$$
+\left[\begin{array}{cc|cc}
+    n & \sum{x_i} & 1 & 0 \\
+    \sum{x_i} & \sum{x^2_i} & 0 & 1
+\end{array}\right]
+$$
+$$
+\left[\begin{array}{cc|cc}
+    1 & \bar{x} & \frac{1}{n} & 0 \\
+    \sum{x_i} & \sum{x^2_i} & 0 & 1
+\end{array}\right]
+$$
+$$
+\left[\begin{array}{cc|cc}
+    1 & \bar{x} & \frac{1}{n} & 0 \\
+    0 & \sum{x^2_i} - \bar{x}\sum{x_i} & -\bar{x} & 1
+\end{array}\right]
+$$
+$$
+\left[\begin{array}{cc|cc}
+    1 & \bar{x} & \frac{1}{n} & 0 \\
+    0 & \sum{x_i(x_i - \bar{x})} & -\bar{x} & 1
+\end{array}\right]
+$$
+$$
+\left[\begin{array}{cc|cc}
+    1 & \bar{x} & \frac{1}{n} & 0 \\
+    0 & 1 & \frac{-\bar{x}}{\sum{x_i(x_i - \bar{x})}} & \frac{1}{\sum{x_i(x_i - \bar{x})}}
+\end{array}\right]
+$$
+
+At this point we don't even need to calculate further, because we only want 
+$Var(\widehat{\beta})_{22}$ which we can see is equal to 
+$\frac{\sigma^2}{\sum{x_i(x_i - \bar{x})}}$
