@@ -41,7 +41,7 @@ increase in Ambient Temperature.
 
 $$
 \begin{matrix}
-    H_0 : \beta_2 = \beta_3 = ... = \beta_p = 0 & H_1 : \exists_{j \in {2...p}} \beta_j \neq 0
+    H_0 : \beta_2 = \beta_3 = ... = \beta_p = 0 & H_1 : \exists_{j \in \{2...p\}} \beta_j \neq 0
 \end{matrix}
 $$
 
@@ -74,7 +74,7 @@ Similarly as before, we state the hypothesis:
 
 $$
 \begin{matrix}
-    H_0 : \beta_5 = \beta_6 = ... = \beta_p = 0 & H_1 : \exists_{j \in {5...p}} \beta_j \neq 0
+    H_0 : \beta_5 = \beta_6 = ... = \beta_p = 0 & H_1 : \exists_{j \in \{5...p\}} \beta_j \neq 0
 \end{matrix}
 $$
 
@@ -92,7 +92,7 @@ The conclusion is - we cannot reduce the full model to Model A.
 
 $$
 \begin{matrix}
-    H_0 : \beta_2 = \beta_3 = \beta_4 = \beta_9 = 0 & H_1 : \exists_{j \in {2, 3, 4, 9}} \beta_j \neq 0
+    H_0 : \beta_2 = \beta_3 = \beta_4 = \beta_9 = 0 & H_1 : \exists_{j \in \{2, 3, 4, 9\}} \beta_j \neq 0
 \end{matrix}
 $$
 
@@ -108,6 +108,35 @@ hypothesis or not. For signif. level $\alpha = 0.05$ we would reject the null an
 say that the model can't be reduced. For signif. level $\alpha = 0.01$ however we 
 would be able to say that the full model can be reduced to Model B.
 
+## 5. Explained Variation
+
+Since I'm choosing to work with significance level of $0.05$ and therefore rejecting 
+the hypothesis that the full model can be reduced to either of the above - I must 
+assume that my "final model" is the full one. \newline
+
+- The amount of variation explained is $\frac{SS_{tot} - RSS}{SS_{tot}} = \frac{RSS_0 - RSS}{RSS_0}$ which is the $R^2$ value.
+
+We can see it already in the full model summary at the beginning - it's around $0.74$, 
+but we can make a quick sanity check:
+
+```{r}
+RSS = sum(residuals(fit) ^ 2)
+RSS.0 = sum(residuals(fit.0) ^ 2)
+R.2 = (RSS.0 - RSS) / RSS.0
+
+c(RSS, RSS.0, R.2)
+```
+
+Now we can clearly see:
+
+- Variation explained by the model: $\sim0.74$
+- Residual Sum of Squares: $\sim276$
+- Total Sum of Squares: $1057$
+- Absolute reduction: $1057 - 276 = 781$
+
+which agrees with the output of our first `anova` test, where we can also find 
+all this information.
+
 # Exercise 2
 
 ### Model:
@@ -115,7 +144,7 @@ would be able to say that the full model can be reduced to Model B.
 $$
 \begin{matrix}
     Y_i = \mu + \alpha_{j(i)} + \beta' \cdot X_i + \epsilon_i \\
-    i \in [1...n] \\
+    i \in \{1\dots n\} \\
     n = 45 
 \end{matrix}
 $$
@@ -154,14 +183,15 @@ $$
             0 & 1 & -1 & 0 & 0
         \end{bmatrix} \\
     c^T\beta = \alpha_{TempResearch} - \alpha_{TempPrivate} \\
-    CI = c^T\widehat{\beta} \pm \widehat{SE}_{c^T\widehat{\beta}} \cdot t_{n - p;1 - \frac{\alpha}{2}}
+     \\
+    \implies CI = c^T\widehat{\beta} \pm \widehat{SE}_{c^T\widehat{\beta}} \cdot t_{n - p;1 - \frac{\alpha}{2}}
 \end{matrix}
 $$
 
 The only thing in the above formula that we don't have is the $\widehat{SE}_{c^T\widehat{\beta}}$. 
 We usually used RSS to get it, but since we don't have access neither to the 
-predictors nor responses we can use the output of the program to calculate it 
-differently:
+predictors nor responses we can use the output of the statistical software 
+to calculate it differently:
 
 $$
 \begin{matrix}
@@ -194,6 +224,8 @@ CI.upper = psi + SE * qt(0.95, n - p)
 
 c(CI.lower, CI.upper)
 ```
+
+So the confidence interval for $\alpha_{TempResearch} - \alpha_{TempPrivate}$ is $[-84848.07, \ 24848.07]$.
 
 ## 2. Hypothesis Testing
 
@@ -308,16 +340,26 @@ $$
 $$
 \left[\begin{array}{cc|cc}
     1 & \bar{x} & \frac{1}{n} & 0 \\
-    0 & \sum{x_i(x_i - \bar{x})} & -\bar{x} & 1
+    0 & \sum{(x^2_i - \bar{x}x_i)} & -\bar{x} & 1
 \end{array}\right]
 $$
 $$
 \left[\begin{array}{cc|cc}
     1 & \bar{x} & \frac{1}{n} & 0 \\
-    0 & 1 & \frac{-\bar{x}}{\sum{x_i(x_i - \bar{x})}} & \frac{1}{\sum{x_i(x_i - \bar{x})}}
+    0 & 1 & \frac{-\bar{x}}{\sum{(x^2_i - \bar{x}x_i)}} & \frac{1}{\sum{(x^2_i - \bar{x}x_i)}}
 \end{array}\right]
 $$
 
 At this point we don't even need to calculate further, because we only want 
 $Var(\widehat{\beta})_{22}$ which we can see is equal to 
-$\frac{\sigma^2}{\sum{x_i(x_i - \bar{x})}}$
+
+$$
+\frac{\sigma^2}{\sum{(x^2_i - \bar{x}x_i)}} = 
+\frac{\sigma^2}{\sum{x^2_i} - \bar{x}\sum{x_i}} = 
+\frac{\sigma^2}{\sum{x^2_i} - n\bar{x}^2} = 
+\frac{\sigma^2}{\sum{(x^2_i - \bar{x}^2)}}
+$$
+
+$\sigma^2$ is a constant, so to minimize this value we need to maximize $\sum{(x^2_i - \bar{x}^2)}$. 
+In order to do that we need to take half of the observations for $x = -2$ and the 
+other half for $x = 2$.
