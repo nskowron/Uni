@@ -101,41 +101,41 @@ fit.B = lm(CO ~ GTEP + TIT + TAT + TEY, data = Data)
 anova(fit.B, fit)
 ```
 
-Here the situation is slightly different. The test statistic is much lower ($2.5844$), 
+Here the situation is slightly different. There's little change in RSS, 
+the test statistic is much lower ($2.5844$) 
 and the p-value is much higher than with the previous 2 models ($0.0373$) - but it's 
 still quite low. Depending on our significance level we might reject the null 
 hypothesis or not. For signif. level $\alpha = 0.05$ we would reject the null and 
 say that the model can't be reduced. For signif. level $\alpha = 0.01$ however we 
-would be able to say that the full model can be reduced to Model B.
+would be more careful with rejecting and we could say that the full model can be 
+reduced to Model B.
 
 ## 5. Explained Variation
 
-Since I'm choosing to work with significance level of $0.05$ and therefore rejecting 
-the hypothesis that the full model can be reduced to either of the above - I must 
-assume that my "final model" is the full one. \newline
+Since I'm not looking for perfect accuracy in my model I can assume the significance 
+level to be lower - $0.01$ and therefore my "final model" is Model B. \newline
 
 - The amount of variation explained is $\frac{SS_{tot} - RSS}{SS_{tot}} = \frac{RSS_0 - RSS}{RSS_0}$ which is the $R^2$ value.
 
-We can see it already in the full model summary at the beginning - it's around $0.74$, 
-but we can make a quick sanity check:
+As the change in RSS between the full model and Model B is quite small, 
+we can expect the $R^2$ value to be similar - slightly smaller - than the full 
+model's $R^2$ - which can be read from the summary at the beginning 
+(around $0.73$).
 
 ```{r}
-RSS = sum(residuals(fit) ^ 2)
+RSS.B = sum(residuals(fit.B) ^ 2)
 RSS.0 = sum(residuals(fit.0) ^ 2)
-R.2 = (RSS.0 - RSS) / RSS.0
+R.2 = (RSS.0 - RSS.B) / RSS.0
 
-c(RSS, RSS.0, R.2)
+c(RSS.B, RSS.0, R.2)
 ```
 
 Now we can clearly see:
 
-- Variation explained by the model: $\sim0.74$
-- Residual Sum of Squares: $\sim276$
+- Variation explained by the model: $\sim0.73$
+- Residual Sum of Squares: $\sim286$
 - Total Sum of Squares: $1057$
-- Absolute reduction: $1057 - 276 = 781$
-
-which agrees with the output of our first `anova` test, where we can also find 
-all this information.
+- Absolute reduction: $1057 - 286 = 771$
 
 # Exercise 2
 
@@ -145,6 +145,7 @@ $$
 \begin{matrix}
     Y_i = \mu + \alpha_{j(i)} + \beta' \cdot X_i + \epsilon_i \\
     i \in \{1\dots n\} \\
+    j(i) \in \{TempResearch, TempPrivate, Freelance\} \\
     n = 45 
 \end{matrix}
 $$
@@ -156,10 +157,10 @@ $$
     \begin{matrix}
         \textbf{X} = 
             \begin{bmatrix}
-                1 & \textbf{0} & \textbf{0} & \textbf{0} & X_1 \\
-                \vdots & \textbf{1} & \textbf{0} & \textbf{0} & \vdots \\
-                \vdots & \textbf{0} & \textbf{1} & \textbf{0} & \vdots \\
-                1 & \textbf{0} & \textbf{0} & \textbf{1} & X_n
+                1 & \mathbb{1}_{\{TempResearch\}}(j(1)) & \mathbb{1}_{\{TempPrivate\}}(j(1)) & \mathbb{1}_{\{Freelance\}}(j(1)) & X_1 \\
+                1 & \mathbb{1}_{\{TempResearch\}}(j(2)) & \mathbb{1}_{\{TempPrivate\}}(j(2)) & \mathbb{1}_{\{Freelance\}}(j(2)) & X_2 \\
+                \vdots & \vdots & \vdots & \vdots & \vdots \\
+                1 & \mathbb{1}_{\{TempResearch\}}(j(n)) & \mathbb{1}_{\{TempPrivate\}}(j(n)) & \mathbb{1}_{\{Freelance\}}(j(n)) & X_n
             \end{bmatrix}
         & \beta = 
             \begin{bmatrix}
@@ -293,7 +294,7 @@ $$
 Since we want to estimate $\beta_{slope}$ as precisely as possible, 
 we would like to minimize $Var(\widehat{\beta}_{slope}) = Var(\widehat{\beta})_{22}$. \newline
 
-We know that for the Least Square Estimator $\widehat{\beta}$ 
+We know that for the Least Square Estimator $\widehat{\beta}$:  
 $Var(\widehat{\beta}) = \sigma^2 (X^TX)^{-1}$
 
 $$
@@ -361,5 +362,10 @@ $$
 $$
 
 $\sigma^2$ is a constant, so to minimize this value we need to maximize $\sum{(x^2_i - \bar{x}^2)}$. 
-In order to do that we need to take half of the observations for $x = -2$ and the 
-other half for $x = 2$.
+Which means we want to have $abs(\bar{x})$ as low as possible and $abs(x_i)$ as high as possible. 
+For $x_i \in [-2, 2]$ that can be achieved by placing half of the observations in $-2$ 
+and the other half in $2$. \newline
+
+Placing observations closer to $0$ will lower $abs(x_i)$ and possibly increase $abs(\bar{x})$, 
+and changing the ratio of observations placed in $-2$ and $2$ will only increase $abs(\bar{x})$ \newline
+$\implies$ The proposed above placement maximizes $\sum{(x^2_i - \bar{x}^2)}$ for $x_i \in [-2, 2]$.
