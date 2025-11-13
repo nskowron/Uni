@@ -7,7 +7,7 @@ import spl.Spl;
 import spl.scan.Token;
 
 public class Parser {
-    private static class ParseError extends RuntimeException {}
+    private static final class ParseError extends RuntimeException {}
 
     private final List<Token> tokens;
     private int current = 0;
