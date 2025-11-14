@@ -241,41 +241,51 @@ $$
 \end{matrix}
 $$
 
-Now we want the objective function of $PR(\alpha, \beta, \gamma)$ 
-to be always $\le$ than the original objective function. 
-For that we need:
-
-- $\alpha \le \mathbf{0}$
-- $\beta \in \mathbf{R}^m$
-- $\gamma \le \mathbf{0}$
-
-Because then:
+Because of the original constraints we have:
 
 $$
 \begin{matrix}
     \begin{matrix}
-        & \sum\limits_i\alpha_i (by_i - \sum\limits_j a_j x_{ij}) \le 0 \\
-        \land & \sum\limits_j\beta_j (1 - \sum\limits_i x_{ij}) = 0 \\
-        \land & \sum\limits_i\gamma_i (1 - y_i) \le 0
+        (\mathbf{x}, \mathbf{y}) = \arg \min_{x, y} & \left\{
+        \begin{matrix}
+            \sum\limits_i c_i y_i \\
+            + \sum\limits_i\alpha_i (by_i - \sum\limits_j a_j x_{ij}) \\
+            + \sum\limits_j\beta_j (1 - \sum\limits_i x_{ij}) \\
+            + \sum\limits_i\gamma_i (1 - y_i)
+        \end{matrix}\right\} \\
+        \land\forall_{ij} & \sum\limits_j a_j \mathbf{x}_{ij} \le b\mathbf{y}_i \\
+        \land\forall_{ij} & \sum\limits_i \mathbf{x}_{ij} = 1 \\
+        \land\forall_i & \mathbf{y}_i \le 1
     \end{matrix}
     & \implies &
     \begin{matrix}
-        \sum\limits_i c_i y_i \\
-        + \sum\limits_i\alpha_i (by_i - \sum\limits_j a_j x_{ij}) \\
-        + \sum\limits_j\beta_j (1 - \sum\limits_i x_{ij}) \\
-        + \sum\limits_i\gamma_i (1 - y_i)
+        (\mathbf{x}, \mathbf{y}) = \arg \min_{x, y} & \left\{
+        \begin{matrix}
+            \sum\limits_i c_i y_i \\
+            + \sum\limits_i\alpha_i (by_i - \sum\limits_j a_j x_{ij}) \\
+            + \sum\limits_j\beta_j (1 - \sum\limits_i x_{ij}) \\
+            + \sum\limits_i\gamma_i (1 - y_i)
+        \end{matrix}\right\} \\
+        \land\forall_i & \alpha_i \le 0 \\
+        \land\forall_j & \beta_j \in \mathbb{R} \\
+        \land\forall_i & \gamma_i \le 0
     \end{matrix}
-    & \le \sum\limits_i c_i y_i
 \end{matrix}
 $$
+
+Which yields the bounds for the dual problem:
+
+- $\alpha \le \mathbb{0}$
+- $\beta \in \mathbb{R}^m$
+- $\gamma \le \mathbb{0}$
+
+And also implies:
+
 $$
 \implies opt(PR(\alpha, \beta, \gamma)) \le opt(P)
 $$
 
-Which means that the maximum value (with respect to $\alpha, \beta, \gamma$ 
-like stated above) of $opt(PR(\alpha, \beta, \gamma))$ is also $\le opt(P)$, 
-therefore we can try maximizing $opt(PR(\alpha, \beta, \gamma))$ to "approximate" 
-$opt(P)$ from below.
+So to best "approximate" $opt(P)$ we maximize $opt(PR(\alpha, \beta, \gamma))$:
 
 $$
 \max_{\alpha, \beta, \gamma}\left\{opt(PR(\alpha, \beta, \gamma))\right\} =
@@ -332,7 +342,7 @@ $$
         + \sum\limits_i(c_i + \alpha_ib - \gamma_i)y_i
     \end{matrix}
     \right\}
-    = (\mathbf{0}, \mathbf{0})
+    = (\mathbb{0}, \mathbb{0})
 \end{matrix}
 $$
 $$
@@ -350,7 +360,7 @@ $$
         \forall_{ij} & \alpha_ia_j + \beta_j \le 0 \\
         \forall_i & -\alpha_ib + \gamma_i \le c_i \\
         \forall_i & \alpha_i \le 0 \\
-        \forall_j & \beta_j \in \mathbf{R} \\
+        \forall_j & \beta_j \in \mathbb{R} \\
         \forall_i & \gamma_i \le 0
     \end{matrix}
 \end{matrix}
@@ -434,7 +444,7 @@ basis $B = \{1, 2\}$ is optimal.
 ## Subtask 5.b
 
 To make life easier I will print the tableau corresponding to 
-the solution, using some variables defined in the previous subtask:
+the solution, using revised simplex:
 
 ```{python}
 #| include: false
@@ -483,6 +493,8 @@ $$
 -\bar{b}_i + \lfloor\bar{b}_i\rfloor
 $$
 
+\vspace{2cm}
+
 ```{python}
 def gomory(T, i):
     T = np.column_stack([ # new column for slack
@@ -510,26 +522,31 @@ tableau(T)
 ```
 
 And here we have the updated tableau with the Chvatal-Gomory 
-cuts. As expected - it is infeasible.
+cuts. As expected - it is infeasible. \newline
+
+Now we can extract the cuts' inequalities on original variables 
+by bringing the tableau into the initial basis:
+
+\vspace{2cm}
+
+```{python}
+pivot(T, 0, 2) # row 1 col 3 - slack 1
+pivot(T, 1, 3) # row 2 col 4 - slack 2
+tableau(T)
+```
+
+So the Gomory cuts are:
+
+$$
+\begin{matrix}
+    -x_2 \le -2 \\
+    -2x_1 + 4x_2 \le -16
+\end{matrix}
+$$
 
 \clearpage\newpage
 
 ## Subtask 5.c
-
-We can easily extract the inequalities corresponding 
-to the Gomory cuts by bringing the full tableau from 
-the previous subtask into the initial form, where only 
-the slack variables are in the basis:
-
-```{python}
-tableau(T)
-pivot(T, 0, 2)
-pivot(T, 1, 3)
-tableau(T)
-```
-
-Now we can clearly see the original constraints and the 
-new ones, and we can plot them using any tool.
 
 | Without Gomory Cuts | With Gomory Cuts |
 |------------------|-----------------|
@@ -541,11 +558,38 @@ new ones, and we can plot them using any tool.
 
 ## Subtask 6.a
 
+```{dot}
+digraph {
+    size="6,4";
+    ratio=fill;
+    nodesep=0.05;
+    ranksep=0.05;
+
+    node [shape=record, fontname="Latin Modern Roman" ,fontsize=14]
+    edge [arrowhead=none, fontname="Latin Modern Roman", fontsize=12]
+
+    A [label="{A | db: -3,5 | x = 1,5 \n y = 2,5}"]
+    B [label="{B | db: -3,33... | x = 1 \n y = 2,166...}"]
+    C [label="{C | db / sol: -2 | x = 2 \n y = 2}", style=dashed]
+    D [label="{D | db: -3,25 | x = 0,75 \n y = 2}"]
+    E [label="{E | infeasible}", style=dashed]
+    F [label="{F | db = -3 | x = 0 \n y = 1,5}", style=dashed]
+    G [label="{G | db / sol: -3 | x = 1 \n y = 2}", style=bold]
+
+    A -> B [label="x ≤ 1"]
+    A -> C [label="x ≥ 2"]
+    B -> D [label="y ≤ 2"]
+    B -> E [label="y ≥ 3"]
+    D -> F [label="x = 0"]
+    D -> G [label="x = 1"]
+}
+```
+
 Code I used to solve linear programming problems 
 at the nodes:
 
 ```{python}
-#| execute: false
+#| eval: false
 from mip import Model # mip solver
 
 m = Model()
@@ -565,26 +609,4 @@ m += y <= 2
 m.optimize()
 
 print(f"x = {x.x}, y = {y.x}")
-```
-
-```{dot}
-digraph {
-    node [shape=record, fontname="Latin Modern Roman" ,fontsize=12]
-    edge [arrowhead=none, fontname="Latin Modern Roman", fontsize=12]
-
-    A [label="{A | db: -3,5 | x = 1,5 \n y = 2,5}"]
-    B [label="{B | db: -3,33... | x = 1 \n y = 2,166...}"]
-    C [label="{C | db / sol: -2 | x = 2 \n y = 2}"]
-    D [label="{D | db: -3,25 | x = 0,75 \n y = 2}"]
-    E [label="{E | infeasible}"]
-    F [label="{F | db = -3 | x = 0 \n y = 1,5}"]
-    G [label="{G | db / sol: -3 | x = 1 \n y = 2}"]
-
-    A -> B [label="x ≤ 1"]
-    A -> C [label="x ≥ 2"]
-    B -> D [label="y ≤ 2"]
-    B -> E [label="y ≥ 3"]
-    D -> F [label="x = 0"]
-    D -> G [label="x = 1"]
-}
 ```
