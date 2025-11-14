@@ -1,0 +1,590 @@
+---
+format:
+    pdf:
+        include-in-header: ../template_answers.tex
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+---
+
+\maketitle
+
+In this assignment I'm sometimes using functions that I've 
+defined in previous subtasks. I'm mentioning it because of 
+the split-assignments-by-subtask rule. I try to indicate when 
+I do that, but I am not defining them again, as I think it 
+would make the assignment unnecessearly lengthy. \newline
+
+Additionally, I'm using the tableau function from the course 
+github files.
+
+\clearpage\newpage
+
+# Task 1
+
+## Subtask 1.a
+
+We notice that the variables are bounded on both sides, so 
+as the first inspection we can put those variables - whose 
+coefficients in the objective function are positive - to 
+their maximum value, and vice-versa for the negative ones, 
+and check if the constraints are satisfied.
+
+$$
+x_1 = 5, x_2 = 1, x_3 = -2
+$$
+$$
+\begin{matrix}
+    4 \cdot 5 + 5 \cdot 1 - 7 \cdot (-2) = 39 \\
+    -5 - 1 + (-2) = -8 \le 2 \\
+    -5 \cdot 5 + 10 \cdot (-2) = -45 \le 10
+\end{matrix}
+$$
+
+As we can see - all constraints are satisfied and the objective 
+function is maximized for all possible values of $\mathbf{x}$, 
+therefore $x_1 = 5, x_2 = 1, x_3 = -2$ is a feasible and optimal 
+solution for this problem.
+
+\clearpage\newpage
+
+## Subtask 1.b
+
+\begin{enumerate}
+    \item $s = 2, t = 1$
+    \item $s = 1, t = 1$
+    \item impossible
+    \item $s = 0, t = 0$
+\end{enumerate}
+
+The three examples can be easily checked, but I suspect a few 
+more words should be said about the third point. \newline
+
+For positive values $s$ and $t$ - $x$'s can just be put to $0$ 
+which gives a feasible solution. \newline
+For negative values $s$ and $t$ - the constraint will be satisfied 
+by any pair of non-negative $x$'s. \newline
+For one positive and one negative - similarly, the $x$ with the 
+positive coefficient can be put to $0$ and the other can be anything.
+
+\clearpage\newpage
+
+# Task 2
+
+## Subtask 2.a
+
+In order to write the tableau, we need to bring the problem into 
+the equational standard form:
+
+$$
+\begin{matrix}
+    \begin{matrix}
+        \min & z = 3x_1 + 2x_2 + 7x_3 \\
+        s.t. & -x_1 + x_2 = 10 \\
+        & 2x_1 - x_2 + x_3 \ge 10 \\
+        & x_1, x_2, x_3 \ge 0
+    \end{matrix}
+    &
+    \to
+    &
+    \begin{matrix}
+        \max & w = -3x_1 - 2x_2 - 7x_3 \\
+        s.t. & -x_1 + x_2 + 0x_3 = 10 \\
+        & -2x_1 + x_2 - x_3 + s_1 = -10 \\
+        & x_1, x_2, x_3, s_1 \ge 0
+    \end{matrix}
+\end{matrix}
+$$
+
+```{python}
+import numpy as np
+
+T = np.array([
+    [-1, 1, 0, 0, 0, 10],
+    [-2, 1, -1, 1, 0, -10],
+    [-3, -2, -7, 0, 1, 0]
+])
+```
+```{python}
+#| include: false
+from fractions import Fraction
+
+def prettify(T):
+    pretty = np.array(T, dtype = object)
+    for j in range(T.shape[0]):
+        for i in range(T.shape[1]):
+            pretty[j][i] = Fraction(T[j][i]).limit_denominator()
+    return pretty
+
+T = prettify(T)
+```
+```{python}
+from util import tableau
+tableau(T)
+```
+
+However, to be able to say anything about the optimality 
+the tableau needs to be in canonical form - we can 
+achieve that by bringing eg. $x_2$ in the basis:
+
+```{python}
+def pivot(T, row, col):
+    T[row] /= T[row][col] # normalize to 1
+    for j in range(len(T)):
+        if j != row:
+            T[j] -= T[row] * T[j][col] # all other rows in col -> 0
+
+pivot(T, 0, 1) # row 1 col 2
+tableau(T)
+```
+
+For a maximization problem (which it is in this form) 
+the optimality condition is that all reduced costs must be 
+negative (no further improvement). We can see that it is 
+the case. \newline
+
+However, the current tableau is clearly not optimal 
+(negative b-term) - we would need to apply dual simplex 
+(basically just pivot on row 2 column 1) and check 
+if the feasibility has been retrieved.
+
+\clearpage\newpage
+
+## Subtask 2.b
+
+According to the largest pivoting rule $x_6$ would have to be 
+brought in the basis, however - it turns out that there is 
+no most constraining constraint for the new value of $x_6$. \newline
+
+More formally:
+
+$$
+\max_\theta \{\bar{b} - a_{.6}\theta \ge 0\} = \infty
+$$
+
+Which means that the problem is unbounded.
+
+No matter what other pivoting rules we might apply, the 
+conclusion will either be the same, or to bring $x_3$ 
+in the basis (as it is the only other non-basic variable with a 
+positive reduced cost) - so let's see what happens then: \newline
+
+For the iteration I will use the pivot function, which I've 
+defined in the previous subtask.
+
+```{python}
+T = np.array([
+    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 1, 1, 2, 0, -1, 0, 30],
+    [1, 0, 1, 1, 0, -1, 0, 20],
+    [0, 0, 2, -7, 0, 5, 1, -120]
+])
+```
+```{python}
+#| include: false
+T = prettify(T)
+```
+```{python}
+pivot(T, 2, 2) # column 3 row 3 because of ratio test
+tableau(T)
+```
+
+And the conclusion is the same - The only variable 
+left with a positive reduced cost is $x_6$ and it's 
+value upon bringing into the basis is unconstrained.
+
+\clearpage\newpage
+
+# Task 3
+
+## Subtask 3.a
+
+- solution: $x_1 = 5, x_2 = 15$, objective value: $110$
+- reduced costs: $\bar{c} = [0, 0, -2, -2]^T$
+- dual variables: $y_1 = 2, y_2 = 2$
+- shadow prices: equal to the dual variables - $[2, 2]^T$
+- no slack-capacity (as all slack variables are not in the basis, 
+or because the dual variables are non-zero $\implies$ from the 
+complementary slackness theorem all constraints are binding)
+
+\clearpage\newpage
+
+# Task 4
+
+## Subtask 4.a
+
+Integrate the constraints into the objective function:
+
+$$
+\begin{matrix}
+    P = &
+    \begin{matrix}
+        \min & \sum\limits_i c_i y_i \\
+        \forall_i & \sum\limits_j a_j x_{ij} \le by_i \\
+        \forall_j & \sum\limits_i x_{ij} = 1 \\
+        \forall_i & y_i \le 1 \\
+        \forall_{ij} & x_{ij} \ge 0 \\
+        \forall_i & y_i \ge 0
+    \end{matrix}
+    & \to &
+    PR(\alpha, \beta, \gamma) = &
+    \begin{matrix}
+        \min_{x, y} &
+        \left\{\begin{matrix}
+            \sum\limits_i c_i y_i \\
+            + \sum\limits_i\alpha_i (by_i - \sum\limits_j a_j x_{ij}) \\
+            + \sum\limits_j\beta_j (1 - \sum\limits_i x_{ij}) \\
+            + \sum\limits_i\gamma_i (1 - y_i)
+        \end{matrix}\right\} \\
+        \forall_{ij} & x_{ij} \ge 0 \\
+        \forall_i & y_i \ge 0
+    \end{matrix}
+\end{matrix}
+$$
+
+Now we want the objective function of $PR(\alpha, \beta, \gamma)$ 
+to be always $\le$ than the original objective function. 
+For that we need:
+
+- $\alpha \le \mathbf{0}$
+- $\beta \in \mathbf{R}^m$
+- $\gamma \le \mathbf{0}$
+
+Because then:
+
+$$
+\begin{matrix}
+    \begin{matrix}
+        & \sum\limits_i\alpha_i (by_i - \sum\limits_j a_j x_{ij}) \le 0 \\
+        \land & \sum\limits_j\beta_j (1 - \sum\limits_i x_{ij}) = 0 \\
+        \land & \sum\limits_i\gamma_i (1 - y_i) \le 0
+    \end{matrix}
+    & \implies &
+    \begin{matrix}
+        \sum\limits_i c_i y_i \\
+        + \sum\limits_i\alpha_i (by_i - \sum\limits_j a_j x_{ij}) \\
+        + \sum\limits_j\beta_j (1 - \sum\limits_i x_{ij}) \\
+        + \sum\limits_i\gamma_i (1 - y_i)
+    \end{matrix}
+    & \le \sum\limits_i c_i y_i
+\end{matrix}
+$$
+$$
+\implies opt(PR(\alpha, \beta, \gamma)) \le opt(P)
+$$
+
+Which means that the maximum value (with respect to $\alpha, \beta, \gamma$ 
+like stated above) of $opt(PR(\alpha, \beta, \gamma))$ is also $\le opt(P)$, 
+therefore we can try maximizing $opt(PR(\alpha, \beta, \gamma))$ to "approximate" 
+$opt(P)$ from below.
+
+$$
+\max_{\alpha, \beta, \gamma}\left\{opt(PR(\alpha, \beta, \gamma))\right\} =
+$$
+
+$$
+= \max_{\alpha, \beta, \gamma}\left\{\min_{x, y}\left\{
+    \begin{matrix}
+        \sum\limits_i c_i y_i \\
+        + \sum\limits_i\alpha_i (by_i - \sum\limits_j a_j x_{ij}) \\
+        + \sum\limits_j\beta_j (1 - \sum\limits_i x_{ij}) \\
+        + \sum\limits_i\gamma_i (1 - y_i)
+    \end{matrix}
+\right\}\right\}
+= \max_{\alpha, \beta, \gamma}\left\{\min_{x, y}\left\{
+    \begin{matrix}
+        \sum\limits_j\beta_j + \sum\limits_i\gamma_i \\
+        + \sum\limits_i\sum\limits_j(-\alpha_ia_j - \beta_j)x_{ij} \\
+        + \sum\limits_i(c_i + \alpha_ib - \gamma_i)y_i
+    \end{matrix}
+\right\}\right\}
+$$
+
+In order to maximize this quantity we need:
+
+- $\forall_{ij} (-\alpha_ia_j - \beta_j \ge 0)$
+- $\forall_i (c_i + \alpha_ib - \gamma_i \ge 0)$
+
+Because else:
+
+$$
+\begin{matrix}
+    \exists_i (c_i + \alpha_ib - \gamma_i < 0) \\
+    \implies \min_{x, y}\{(c_i + \alpha_ib - \gamma_i)y_i + ...\} = -\infty \\
+    \implies \max_{\alpha, \beta, \gamma}\{\min_{x, y}\{...\}\} = -\infty
+\end{matrix}
+$$
+
+For $y_i = \infty$, and vice-versa for the coefficient next to $x_{ij}$. \newline
+
+Now we can observe that with these additional constraints:
+
+$$
+\begin{matrix}
+    \begin{matrix}
+        \forall_{ij} (-\alpha_ia_j - \beta_j \ge 0) \\
+        \land \forall_i (c_i + \alpha_ib - \gamma_i \ge 0)
+    \end{matrix}
+    & \implies &
+    \arg \min_{x, y}\left\{
+    \begin{matrix}
+        \sum\limits_j\beta_j + \sum\limits_i\gamma_i \\
+        + \sum\limits_i\sum\limits_j(-\alpha_ia_j - \beta_j)x_{ij} \\
+        + \sum\limits_i(c_i + \alpha_ib - \gamma_i)y_i
+    \end{matrix}
+    \right\}
+    = (\mathbf{0}, \mathbf{0})
+\end{matrix}
+$$
+$$
+\implies \max_{\alpha, \beta, \gamma}\left\{opt(PR(\alpha, \beta, \gamma))\right\} = 
+\max_{\alpha, \beta, \gamma}\left\{\sum\limits_j\beta_j + \sum\limits_i\gamma_i\right\}
+$$
+
+And therefore we're left with the final dual problem:
+
+$$
+\begin{matrix}
+    D = &
+    \begin{matrix}
+        \max & \sum\limits_j\beta_j + \sum\limits_i\gamma_i \\
+        \forall_{ij} & \alpha_ia_j + \beta_j \le 0 \\
+        \forall_i & -\alpha_ib + \gamma_i \le c_i \\
+        \forall_i & \alpha_i \le 0 \\
+        \forall_j & \beta_j \in \mathbf{R} \\
+        \forall_i & \gamma_i \le 0
+    \end{matrix}
+\end{matrix}
+$$
+
+$Q.E.D.$
+
+\clearpage\newpage
+
+# Task 5
+
+## Subtask 5.a
+
+To determine if the solution is optimal, we need to calculate 
+the reduced costs corresponding to given non-basis variables. 
+For that we can use the formula from the lecture:
+
+$$
+\bar{c}^T_N = c^T_N - c^T_BA^{-1}_BA_N
+$$
+
+And first let's bring the problem into maximization equational 
+standard form for it's relaxation:
+
+$$
+\begin{matrix}
+    \begin{matrix}
+        \min & x_1 + x_2 \\
+        & -3x_1 + 7x_2 \le -21 \\
+        & x_1 -4x_2 \le 4 \\
+        & x_1, x_2 \in \mathbf{Z}^+
+    \end{matrix}
+    & \to &
+    \begin{matrix}
+        \max & -x_1 - x_2 \\
+        & -3x_1 + 7x_2 + s_1 = -21 \\
+        & x_1 -4x_2 + s_2 = 4 \\
+        & x_1, x_2, s_1, s_2 \ge 0 
+    \end{matrix}
+\end{matrix}
+$$
+
+```{python}
+n = 2
+m = 2
+
+# model in standard form
+A = np.array([
+    [-3, 7],
+    [1, -4]
+])
+b = np.array([-21, 4])
+c = np.array([-1, -1])
+
+# equational standard form - add slacks
+A = np.hstack([A, np.identity(m)])
+c = np.hstack([c, np.zeros(m)])
+
+# new basis
+B = [0, 1] # 1, 2
+N = [2, 3] # 3, 4
+
+# not perfectly efficient, but correct way to calculate c_bar
+A_Binv = np.linalg.inv(A[:, B])
+c_bar = c[N] - c[B] @ A_Binv @ A[:, N] # c bar
+```
+```{python}
+#| include: false
+c_bar = [str(Fraction(c).limit_denominator()) for c in c_bar]
+```
+```{python}
+c_bar
+```
+
+Since this is a maximization problem and all non-basic 
+reduced costs are negative, the solution associated with 
+basis $B = \{1, 2\}$ is optimal.
+
+\clearpage\newpage
+
+## Subtask 5.b
+
+To make life easier I will print the tableau corresponding to 
+the solution, using some variables defined in the previous subtask:
+
+```{python}
+#| include: false
+T = np.column_stack([
+    np.vstack([A, c]),
+    np.append(np.zeros(m), [1]),
+    np.append(b, [0])
+])
+```
+```{python}
+# A and c - basic
+T[:m, B] = np.identity(m)
+T[-1, B] = np.zeros(m)
+
+# A and c - nonbasic
+T[:m, N] = A_Binv @ A[:, N]
+T[-1, N] = c[N] - c[B] @ T[:m, N]
+
+# b and d
+T[:m, -1] = A_Binv @ b
+T[-1, -1] = - c[B] @ T[:m, -1]
+```
+```{python}
+#| include: false
+T = prettify(T)
+```
+```{python}
+tableau(T)
+```
+
+Now we have a clear view at what's going on. We're in 
+a basic optimal solution, but infeasible for the integer 
+problem and both basic variables are fractional. \newline
+
+The Gomory cuts are of form:
+
+$$
+\sum\limits_{j \in N} (\bar{a}_{ij} - \lfloor\bar{a}_{ij}\rfloor)x_i \ge 
+\bar{b}_i - \lfloor\bar{b}_i\rfloor
+$$
+
+Which in the equational standard form will become:
+
+$$
+\sum\limits_{j \in N} (-\bar{a}_{ij} + \lfloor\bar{a}_{ij}\rfloor)x_i + s_{m + i} = 
+-\bar{b}_i + \lfloor\bar{b}_i\rfloor
+$$
+
+```{python}
+def gomory(T, i):
+    T = np.column_stack([ # new column for slack
+        T[:, :-2],
+        np.zeros_like(T[:, 0]),
+        T[:, -2:]
+    ])
+    
+    cut = -T[i, :] + np.floor(T[i, :]) # gomory cut row
+    cut[-3] = 1 # for slack
+    
+    T = np.vstack([ # insert row as last
+        T[:-1, :],
+        cut,
+        T[-1, :]
+    ])
+    return T
+
+T = gomory(T, 0)
+T = gomory(T, 1)
+m += 2
+```
+```{python}
+tableau(T)
+```
+
+And here we have the updated tableau with the Chvatal-Gomory 
+cuts. As expected - it is infeasible.
+
+\clearpage\newpage
+
+## Subtask 5.c
+
+We can easily extract the inequalities corresponding 
+to the Gomory cuts by bringing the full tableau from 
+the previous subtask into the initial form, where only 
+the slack variables are in the basis:
+
+```{python}
+tableau(T)
+pivot(T, 0, 2)
+pivot(T, 1, 3)
+tableau(T)
+```
+
+Now we can clearly see the original constraints and the 
+new ones, and we can plot them using any tool.
+
+| Without Gomory Cuts | With Gomory Cuts |
+|------------------|-----------------|
+| ![](before.png){width=45%} | ![](after.png){width=45%} |
+
+\clearpage\newpage
+
+# Task 6
+
+## Subtask 6.a
+
+Code I used to solve linear programming problems 
+at the nodes:
+
+```{python}
+#| execute: false
+from mip import Model # mip solver
+
+m = Model()
+
+x = m.add_var(lb = 0) # variables
+y = m.add_var(lb = 0)
+
+m.objective = x - 2 * y # objective (min)
+
+# === Changed For Each Node ===
+m += -4 * x + 6 * y <= 9 # constraints
+m += x + y <= 4
+m += x == 1
+m += y <= 2
+# =============================
+
+m.optimize()
+
+print(f"x = {x.x}, y = {y.x}")
+```
+
+```{dot}
+digraph {
+    node [shape=record, fontname="Latin Modern Roman" ,fontsize=12]
+    edge [arrowhead=none, fontname="Latin Modern Roman", fontsize=12]
+
+    A [label="{A | db: -3,5 | x = 1,5 \n y = 2,5}"]
+    B [label="{B | db: -3,33... | x = 1 \n y = 2,166...}"]
+    C [label="{C | db / sol: -2 | x = 2 \n y = 2}"]
+    D [label="{D | db: -3,25 | x = 0,75 \n y = 2}"]
+    E [label="{E | infeasible}"]
+    F [label="{F | db = -3 | x = 0 \n y = 1,5}"]
+    G [label="{G | db / sol: -3 | x = 1 \n y = 2}"]
+
+    A -> B [label="x ≤ 1"]
+    A -> C [label="x ≥ 2"]
+    B -> D [label="y ≤ 2"]
+    B -> E [label="y ≥ 3"]
+    D -> F [label="x = 0"]
+    D -> G [label="x = 1"]
+}
+```
