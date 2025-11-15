@@ -610,3 +610,115 @@ m.optimize()
 
 print(f"x = {x.x}, y = {y.x}")
 ```
+
+\clearpage\newpage
+
+# Task 7
+
+## Subtask 7.a
+
+Let:
+
+- $x_{ik} \in \{0, 1\}$ - k-th letter of i-th string
+- $i \in \{1...N\}$
+- $k \in \{1...D\}$
+
+Then the first model arising straight from the definition of 
+Hamming distance would be:
+
+$$
+\max_x \min_{i \neq j} \sum\limits_k x_{ik} \operatorname{xor} x_{jk}
+$$
+
+But it's kind of useless and I doubt it would give me maximum 
+points for this task, so let's try and bring it into a 
+linear programming problem. \newline
+
+Firstly, we can introduce a variable that will represent the 
+Hamming distance between all strings, to get rid of the $\min$ 
+expression in the model. This will become the value that we 
+want to maximize, and we need to make sure it actually is the 
+smallest distance between any pair of strings - which yields 
+such constraints:
+
+$$
+\begin{matrix}
+    \max & t \\
+    \forall_{i \neq j} & \sum\limits_k x_{ik} \operatorname{xor} x_{jk} \ge t \\
+    \forall_{ik} & x_{ik} \in \{0, 1\} \\
+    & t \in \mathbb{Z}
+\end{matrix}
+$$
+
+Now for the $\operatorname{xor}$ we will also need to introduce 
+an auxilary variable for each $k, i \neq j$, which can be reduced 
+to $k, i < j$ because Hamming distance is symmetrical, but it's 
+still quite a lot - $\Theta(DN^2)$ additional variables. \newline
+
+But the additional challenge is to constrain each of them to correctly 
+represent the $\operatorname{xor}$ operator.
+
+| $z = x \operatorname{xor} y$ | Formulation of $z = x \operatorname{xor} y$ |
+|---------------|---------------|
+| ![](points.png) | ![](polytope.png) |
+
+A correct set of constraints should make the points, marked above 
+as red, infeasible. Unfortunattely as we can see for $\operatorname{xor}$ 
+there is no way to "cut away" the infeasible points with less than $4$ 
+linear constraints per one $\operatorname{xor}$ auxilary variable. 
+So we can use the $4$ halfspaces describing the formulation, or - 
+instead - we can use the convex hull description of the formulation, 
+which will introduce more variables but less constraints and additionally 
+will yield the constraints in an equational form which would eliminate 
+the need for any slack variables when solving the problem.
+
+- $u_{ijk} \in \{0, 1\}$ - auxilary variable representing $x_{ik} \operatorname{xor} x_{jk}$
+
+$$
+(x_{ik}, x_{jk}, u_{ijk}) \in \left\{
+    \begin{matrix}
+        \mathbb{0} + \alpha_{ijk}(1, 1, 0) \\
+        + \beta_{ijk}(1, 0, 1) \\
+        + \gamma_{ijk}(0, 1, 1) 
+    \end{matrix}
+    \ \ \left| \ \ 
+    \begin{matrix}
+        \alpha_{ijk}, \beta_{ijk}, \gamma_{ijk} \ge 0 \\
+        \alpha_{ijk} + \beta_{ijk} + \gamma_{ijk} = 1
+    \end{matrix}
+    \right.
+\right\}
+$$
+
+So we have:
+
+$$
+\begin{matrix}
+    x_{ik} = \alpha_{ijk} + \beta_{ijk} \\
+    x_{jk} = \alpha_{ijk} + \gamma_{ijk} \\
+    u_{ijk} = \beta_{ijk} + \gamma_{ijk} \\
+    \alpha_{ijk} + \beta_{ijk} + \gamma_{ijk} = 1 \\
+    \alpha_{ijk}, \beta_{ijk}, \gamma_{ijk} \ge 0 \\
+\end{matrix}
+$$
+
+Where $\alpha_{ijk} + \beta_{ijk} + \gamma_{ijk}$ "choose" which vertex 
+of the formulation we're in, so they should be binary, but don't have to be 
+since the $x$'s are. \newline
+
+We notice that the variable $u_{ijk}$ can now be completely ommited:
+
+$$
+\begin{matrix}
+    \max & t \\
+    \forall_{i<j} & \sum\limits_k (\beta_{ijk} + \gamma_{ijk}) \ge t \\
+    \forall_{i<j,k} & x_{ik} = \alpha_{ijk} + \beta_{ijk} \\
+    \forall_{l<i,k} & x_{ik} = \alpha_{lik} + \gamma_{lik} \\
+    \forall_{i<j,k} & \alpha_{ijk} + \beta_{ijk} + \gamma_{ijk} = 1 \\
+    & t \in \mathbb{Z} \\
+    \forall_{ik} & x_{ik} \in \{0, 1\} \\
+    \forall_{i<j,k} & \alpha_{ijk}, \beta_{ijk}, \gamma_{ijk} \ge 0
+\end{matrix}
+$$
+
+
