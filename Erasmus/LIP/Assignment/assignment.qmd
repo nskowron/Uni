@@ -703,10 +703,10 @@ $$
 $$
 
 Where $\alpha_{ijk} + \beta_{ijk} + \gamma_{ijk}$ "choose" which vertex 
-of the formulation we're in, so they should be binary, but don't have to be 
-since the $x$'s are. \newline
+of the formulation we're in, so they can either be continuous or binary.
 
-We notice that the variable $u_{ijk}$ can now be completely ommited:
+We notice that the variable $u_{ijk}$ can now be completely ommited. 
+And we're left with the final model for the problem:
 
 $$
 \begin{matrix}
@@ -717,8 +717,83 @@ $$
     \forall_{i<j,k} & \alpha_{ijk} + \beta_{ijk} + \gamma_{ijk} = 1 \\
     & t \in \mathbb{Z} \\
     \forall_{ik} & x_{ik} \in \{0, 1\} \\
-    \forall_{i<j,k} & \alpha_{ijk}, \beta_{ijk}, \gamma_{ijk} \ge 0
+    \forall_{i<j,k} & \alpha_{ijk}, \beta_{ijk}, \gamma_{ijk} \in \{0, 1\}
 \end{matrix}
 $$
+
+\clearpage\newpage
+
+## Subtask 7.b
+
+My model classifies as an Integer Linear Programming Problem, 
+but could also be made into a fully Binary Linear Programming Problem 
+if we (without loss of generality) substituted $t$ with the distance 
+between first two strings (so with $\sum\limits_k (\beta_{12k} + \gamma_{12k})$ 
+assuming of course $N \ge 2$) which would reduce the only non-binary 
+integer variable and could potentially work better with branching.
+
+\clearpage\newpage
+
+# Task 8
+
+## Subtask 8.a
+
+I will be using same notation as in the task:
+
+- $x_{j} \ge 0$ - fraction of investment put into asset $j$ (decision)
+- $r_{jt}$ - historical return of investment $j$ in moths $t$ - $t + 1$
+- $\hat{R}_j = \frac{1}{T}\sum\limits_t r_{jt}$ - estimated average return of asset j
+- $a = \max\{0, \min_j \hat{R}_j\}$ - minimum estimated return over all assets or $0$
+- $b = \max_j \hat{R}_j$ - maximum estimated return over all assets
+- $B = a + \epsilon (b - a)$ - minimum desired reward
+- $j \in \{1...N\}$
+- $t \in \{1...T\}$
+
+$$
+\begin{matrix}
+    \min & \sum\limits_t \left[\left|\sum\limits_j x_j (r_{jt} - \hat{R}_j)\right|\right] \\
+    & \sum\limits_j x_j \hat{R}_j \ge B \\
+    & \sum\limits_j x_j = 1 \\
+    \forall_j & \ x_j \ge 0
+\end{matrix}
+$$
+
+This would be the first, non-linear model that we could write, coming 
+straight from the definitions of risk and reward given in the task and 
+I think it needs no further explanation. \newline
+
+Now the goal is to linearize it. \newline
+
+Since the values $B, \hat{R}_j, r_{jt}$ are given and are not to be decided 
+upon in any way - the above model is almost linear. The only thing that 
+needs to be taken care of is the absolute value in the objective function. 
+But since it's in a minimization term, we can use the classic trick:
+
+- $d_t \ge 0$ - absolute deviation from the expected mean return in months $t$ - $t + 1$
+
+$$
+\forall_t \ d_t \ge \sum\limits_j x_j (r_{jt} - \hat{R}_j)
+$$
+$$
+\forall_t \ d_t \ge -\sum\limits_j x_j (r_{jt} - \hat{R}_j)
+$$
+
+Which yields the Linear Programming Model:
+
+$$
+\begin{matrix}
+    \min & \sum\limits_t d_t \\
+    & \sum\limits_j x_j \hat{R}_j \ge B \\
+    & \sum\limits_j x_j = 1 \\
+    \forall_t & d_t \ge \sum\limits_j x_j (r_{jt} - \hat{R}_j) \\ 
+    \forall_t & d_t \ge -\sum\limits_j x_j (r_{jt} - \hat{R}_j) \\
+    \forall_j & \ x_j \ge 0 \\
+    \forall_t & d_t \ge 0
+\end{matrix}
+$$
+
+\clearpage\newpage
+
+## Subtask 8.b
 
 
