@@ -1,7 +1,7 @@
 ---
 format:
     pdf:
-        include-in-header: ../template_answers.tex
+        include-in-header: template_answers.tex
 mainfont: Latin Modern Roman
 sansfont: Latin Modern Roman
 ---
@@ -14,7 +14,7 @@ the split-assignments-by-subtask rule. I try to indicate when
 I do that, but I am not defining them again, as I think it 
 would make the assignment unnecessearly lengthy. \newline
 
-Additionally, I'm using the tableau function from the course 
+Additionally, I'm using the `tableau` function from the course 
 github files.
 
 \clearpage\newpage
@@ -134,6 +134,11 @@ def pivot(T, row, col):
             T[j] -= T[row] * T[j][col] # all other rows in col -> 0
 
 pivot(T, 0, 1) # row 1 col 2
+```
+
+\vspace{2cm}
+
+```{python}
 tableau(T)
 ```
 
@@ -142,7 +147,7 @@ the optimality condition is that all reduced costs must be
 negative (no further improvement). We can see that it is 
 the case. \newline
 
-However, the current tableau is clearly not optimal 
+However, the current tableau is clearly not feasible 
 (negative b-term) - we would need to apply dual simplex 
 (basically just pivot on row 2 column 1) and check 
 if the feasibility has been retrieved.
@@ -284,6 +289,8 @@ And also implies:
 $$
 \implies opt(PR(\alpha, \beta, \gamma)) \le opt(P)
 $$
+
+\vspace{5cm}
 
 So to best "approximate" $opt(P)$ we maximize $opt(PR(\alpha, \beta, \gamma))$:
 
@@ -702,8 +709,9 @@ $$
 \end{matrix}
 $$
 
-Where $\alpha_{ijk} + \beta_{ijk} + \gamma_{ijk}$ "choose" which vertex 
-of the formulation we're in, so they can either be continuous or binary.
+Where $\alpha_{ijk}$, $\beta_{ijk}$, $\gamma_{ijk}$ "choose" which vertex 
+of the formulation we're in, so they can either be binary or continuous, 
+as long as $x_{ik}$ are binary. \newline
 
 We notice that the variable $u_{ijk}$ can now be completely ommited. 
 And we're left with the final model for the problem:
@@ -725,6 +733,21 @@ $$
 
 ## Subtask 7.b
 
+The model:
+
+$$
+\begin{matrix}
+    \max & t \\
+    \forall_{i<j} & \sum\limits_k (\beta_{ijk} + \gamma_{ijk}) \ge t \\
+    \forall_{i<j,k} & x_{ik} = \alpha_{ijk} + \beta_{ijk} \\
+    \forall_{l<i,k} & x_{ik} = \alpha_{lik} + \gamma_{lik} \\
+    \forall_{i<j,k} & \alpha_{ijk} + \beta_{ijk} + \gamma_{ijk} = 1 \\
+    & t \in \mathbb{Z} \\
+    \forall_{ik} & x_{ik} \in \{0, 1\} \\
+    \forall_{i<j,k} & \alpha_{ijk}, \beta_{ijk}, \gamma_{ijk} \in \{0, 1\}
+\end{matrix}
+$$
+
 My model classifies as an Integer Linear Programming Problem, 
 but could also be made into a fully Binary Linear Programming Problem 
 if we (without loss of generality) substituted $t$ with the distance 
@@ -740,12 +763,13 @@ integer variable and could potentially work better with branching.
 
 I will be using same notation as in the task:
 
-- $x_{j} \ge 0$ - fraction of investment put into asset $j$ (decision)
-- $r_{jt}$ - historical return of investment $j$ in moths $t$ - $t + 1$
+- $x_{j} \ge 0$ - fraction of investment put into asset $j$ (decision variables)
+- $r_{jt}$ - historical return of investment $j$ in moths $t$ - $t + 1$ (parameters)
 - $\hat{R}_j = \frac{1}{T}\sum\limits_t r_{jt}$ - estimated average return of asset j
 - $a = \max\{0, \min_j \hat{R}_j\}$ - minimum estimated return over all assets or $0$
 - $b = \max_j \hat{R}_j$ - maximum estimated return over all assets
 - $B = a + \epsilon (b - a)$ - minimum desired reward
+- $\epsilon \in [0, 1]$ - (parameter)
 - $j \in \{1...N\}$
 - $t \in \{1...T\}$
 
@@ -765,11 +789,11 @@ I think it needs no further explanation. \newline
 Now the goal is to linearize it. \newline
 
 Since the values $B, \hat{R}_j, r_{jt}$ are given and are not to be decided 
-upon in any way - the above model is almost linear. The only thing that 
-needs to be taken care of is the absolute value in the objective function. 
-But since it's in a minimization term, we can use the classic trick:
+upon in any way - the above model is almost linear in the decision variables. 
+The only thing that needs to be taken care of is the absolute value in the 
+objective function. But since it's in a minimization term, we can use the classic trick:
 
-- $d_t \ge 0$ - absolute deviation from the expected mean return in months $t$ - $t + 1$
+- $d_t \ge 0$ - absolute deviation from the expected mean return in months $t$ - $t + 1$ (auxillary variable)
 
 $$
 \forall_t \ d_t \ge \sum\limits_j x_j (r_{jt} - \hat{R}_j)
@@ -777,6 +801,9 @@ $$
 $$
 \forall_t \ d_t \ge -\sum\limits_j x_j (r_{jt} - \hat{R}_j)
 $$
+
+Which means that after minimization each $d_t$ will become equal to the 
+higher one of those values. \newline
 
 Which yields the Linear Programming Model:
 
@@ -796,4 +823,190 @@ $$
 
 ## Subtask 8.b
 
+- variables: $N + T$
+- constraints: $2T + 2$
 
+\clearpage\newpage
+
+## Subtask 8.c
+
+In the file I added the following lines:
+
+```{python}
+#| eval: false
+
+######### BEGIN: Write here your model
+x = m.addVars(data.N, lb=0, vtype=gb.GRB.CONTINUOUS)
+d = m.addVars(data.T, lb=0, vtype=gb.GRB.CONTINUOUS)
+
+m.addConstr(gb.quicksum(x[j] * data.av_r[j] for j in range(data.N)) >= B)
+m.addConstr(gb.quicksum(x) == 1)
+m.addConstrs(
+    d[t] >= gb.quicksum(
+        x[j] * (data.r[j,t] - data.av_r[j]) 
+        for j in range(data.N)
+    ) 
+    for t in range(data.T)
+)
+m.addConstrs(
+    d[t] >= -gb.quicksum(
+        x[j] * (data.r[j,t] - data.av_r[j]) 
+        for j in range(data.N)
+    ) 
+    for t in range(data.T)
+)
+
+m.setObjective(gb.quicksum(d), gb.GRB.MINIMIZE)
+
+m.optimize()
+
+investments = sum(x_j.X > 0 for x_j in x.values())
+######### END
+```
+
+And also I added an additional plot of the `investments` variable 
+to report the necessary number of investments for each $\epsilon$.
+
+```{python}
+#| results: false
+
+import portfolio
+
+portfolio.main(["indtrack6.dat"])
+```
+
+As expected - the higher the risk the higher the rewards. And also 
+as expected - the more diversified the investments the lower the risk. 
+Where (for $\epsilon = 1$) to get the highest reward one would 
+need to invest everything into the one asset with the highest estimated 
+mean return.
+
+\clearpage\newpage
+
+## Subtask 8.d
+
+- $\max \min_t \sum\limits_j x_j r_{jt}$ - this can be linearized in a similar 
+way we handled the Hamming distance problem. \newline
+
+We introduce a variable that will represent the minimum return of the portfolio:
+
+- $m = \min_t \sum\limits_j x_j r_{jt} \ge 0$ - because we're probably not 
+interested in negative returns
+
+And now we can maximize it in the objective function and add constraints 
+to ensure that it actually is the minimum (smaller or equal than any other return) 
+and that it satisfies the reward requirement ($m \ge B$).
+
+$$
+\begin{matrix}
+    \max & m \\
+    \forall_t & m \le \sum\limits_j x_j r_{jt} \\
+    & m \ge B \\
+    & \sum\limits_j x_j = 1 \\
+    \forall_j & \ x_j \ge 0 \\
+    & m \ge 0
+\end{matrix}
+$$
+
+- $\min \hat{\sigma}^2 = \sum\limits_i \sum\limits_j x_i x_j \hat{\sigma}_i \hat{\sigma}_j \rho_{ij}$
+
+I don't see a way to linearize this, because of the $x_i x_j$ term. 
+If $x$'s were binary then some tricks could be used, but not in this case.
+
+\clearpage\newpage
+
+## Subtask 8.e
+
+When we're talking about whether or not a certain asset can be bought, 
+we're unfortunattely stepping into binary variables. The easiest way 
+to model such a situation is to introduce a variable:
+
+- $y_j \in \{0, 1\}$ - is asset $j$ invested in (yes or no)
+
+And then add a constraint to make sure that we can't invest in too many assets:
+
+$$
+\sum\limits_j y_j \le M
+$$
+
+And we also need to make sure that we cannot invest anything 
+into unchosen assets:
+
+$$
+\forall_j x_j \le y_j
+$$
+
+So eg. the model from subtask 8.d would change like so:
+
+$$
+\begin{matrix}
+    \begin{matrix}
+        \max & m \\
+        \forall_t & m \le \sum\limits_j x_j r_{jt} \\
+        & m \ge B \\
+        & \sum\limits_j x_j = 1 \\
+        \forall_j & \ x_j \ge 0 \\
+        & m \ge 0
+    \end{matrix}
+    & \to &
+    \begin{matrix}
+        \max & m \\
+        \forall_t & m \le \sum\limits_j x_j r_{jt} \\
+        & m \ge B \\
+        & \sum\limits_j y_j \le M \\
+        & \sum\limits_j x_j = 1 \\
+        \forall_j & x_j \le y_j \\
+        \forall_j & \ x_j \ge 0 \\
+        \forall_j & y_j \in \{0, 1\} \\
+        & m \ge 0
+    \end{matrix}
+\end{matrix}
+$$
+
+\clearpage\newpage
+
+## Subtask 8.f
+
+The "indicator" variables added in te previous subtask make this 
+additional feature very easy to implement as they can be used to 
+"choose" which $x$'s should be constrained by the lower bound, so 
+I will keep them. I've already explained in the previous subtask how 
+to get to this model, so now I will only focus on the lower bound. \newline
+
+All we need is to add a constraint which "turns off" for unchosen 
+assets - eg.:
+
+$$
+\forall_j x_j \ge v y_j
+$$
+
+For $y_j = 0$ it's the same as the bound on $x_j$ and for $y_j = 1$ it's 
+exactly what we're aiming for. \newline
+
+So finally, to model this feature, the model from eg. subtask 8.d 
+would change like this:
+
+$$
+\begin{matrix}
+    \begin{matrix}
+        \max & m \\
+        \forall_t & m \le \sum\limits_j x_j r_{jt} \\
+        & m \ge B \\
+        & \sum\limits_j x_j = 1 \\
+        \forall_j & \ x_j \ge 0 \\
+        & m \ge 0
+    \end{matrix}
+    & \to &
+    \begin{matrix}
+        \max & m \\
+        \forall_j & x_j \ge v y_j \\
+        \forall_t & m \le \sum\limits_j x_j r_{jt} \\
+        & m \ge B \\
+        & \sum\limits_j x_j = 1 \\
+        \forall_j & x_j \le y_j \\
+        \forall_j & \ x_j \ge 0 \\
+        \forall_j & y_j \in \{0, 1\} \\
+        & m \ge 0
+    \end{matrix}
+\end{matrix}
+$$
