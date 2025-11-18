@@ -19,3 +19,6 @@
 [submodule "Erasmus/CC/interpreter"]
 	path = Erasmus/CC/interpreter
 	url = https://gitlab.sdu.dk/25-compiler-construction-teams/team-12/interpreter.git
+[submodule "Erasmus/Native-Language-Identification-Author-Profiling"]
+	path = Erasmus/Native-Language-Identification-Author-Profiling
+	url = https://github.com/ShrikeBin/Native-Language-Identification-Author-Profiling.git
