@@ -1,0 +1,9 @@
+---
+title: TPI - Zadanie 15
+author: Nel Skowronek
+date: today
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+---
+
+Aby pokazać, że Maszyna Kolejkowa ma moc Maszyny Turinga zasymulujemy dowolny ruch Maszyny Turinga za pomocą Maszyny Kolejkowej.
