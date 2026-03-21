@@ -1,0 +1,54 @@
+---
+title: "Sprawozdanie z listy 0"
+author: "Nel Skowronek"
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+---
+
+# Zadanie 1-2
+
+### Graficzne przedstawienie rozwiązań problemu komiwojażera dla różnych danych:
+
+| Minimum co 10 losowań | Minimum co 50 losowań | Minimum z 1000 |
+|:--------:|:--------:|:--------:|
+| ![](plots/dj38_100_groups.png) | ![](plots/dj38_20_groups.png) | ![](plots/dj38_1_groups.png) |
+| Średnia: 24914.4 | Średnia: 23886.0 | Waga: 22764.0 |
+: Dijbouti
+
+| Minimum co 10 losowań | Minimum co 50 losowań | Minimum z 1000 |
+|:--------:|:--------:|:--------:|
+| ![](plots/qa194_100_groups.png) | ![](plots/qa194_20_groups.png) | ![](plots/qa194_1_groups.png) |
+| Średnia: 87954.4 | Średnia: 85413.6 | Waga: 83475.0 |
+: Quatar
+
+| Minimum co 10 losowań | Minimum co 50 losowań | Minimum z 1000 |
+|:--------:|:--------:|:--------:|
+| ![](plots/uy734_100_groups.png) | ![](plots/uy734_20_groups.png) | ![](plots/uy734_1_groups.png) |
+| Średnia: 1596760.4 | Średnia: 1582217.0 | Waga: 1554774.0 |
+: Uruguay
+
+| Minimum co 10 losowań | Minimum co 50 losowań | Minimum z 1000 |
+|:--------:|:--------:|:--------:|
+| ![](plots/wi29_100_groups.png) | ![](plots/wi29_20_groups.png) | ![](plots/wi29_1_groups.png) |
+| Średnia: 93604.5 | Średnia: 84765.5 | Waga: 75448.0 |
+: Western Sahara
+
+| Minimum co 10 losowań | Minimum co 50 losowań | Minimum z 1000 |
+|:--------:|:--------:|:--------:|
+| ![](plots/zi929_100_groups.png) | ![](plots/zi929_20_groups.png) | ![](plots/zi929_1_groups.png) |
+| Średnia: 2310339.2 | Średnia: 2280617.5 | Waga: 2254775.0 |
+: Zimbabwe
+
+# Zadanie 3-4
+
+| Dijbouti | Quatar |
+|:--------:|:--------:|
+| ![](plots/approx-2/dj38.png){ width=100% } | ![](plots/approx-2/qa194.png){ width=100% } |
+| Waga MST: 5828 | Waga MST: 8026 |
+| Waga TSP: 8718 | Waga TSP: 12237 |
+
+| Uruguay | Western Sahara | Zimbabwe |
+|:--------:|:--------:|:--------:|
+| ![](plots/approx-2/uy734.png){ width=100% } | ![](plots/approx-2/wi29.png){ width=100% } | ![](plots/approx-2/zi929.png){ width=100% } |
+| Waga MST: 69873 | Waga MST: 21753 | Waga MST: 82863 |
+| Waga TSP: 108140 | Waga TSP: 35609 | Waga TSP: 130424 |

@@ -1,4 +1,3 @@
-import sys
 import tsplib95 as tsp
 import random
 import matplotlib.pyplot as plt
@@ -7,12 +6,12 @@ import matplotlib.pyplot as plt
 PERMUTATIONS = 1000
 GROUP_SIZES = [10, 50, 1000]
 
-filenames = sys.argv[1:]
+filenames = ["dj38.tsp", "qa194.tsp", "uy734.tsp", "wi29.tsp", "zi929.tsp"]
 
 for filename in filenames:
     # load data
     print(f"Processing file: {filename}")
-    problem = tsp.load(filename)
+    problem = tsp.load("data/" + filename)
     
     # shuffle nodes for routes
     n = len(list(problem.get_nodes()))
@@ -46,4 +45,4 @@ for filename in filenames:
             plt.plot(xs, ys)
 
         plt.title(f"Minimum circuits for each group ({PERMUTATIONS // group_size} groups)")
-        plt.show()
+        plt.savefig(f"plots/{filename.replace(".tsp", "")}_{PERMUTATIONS // group_size}_groups.png")
