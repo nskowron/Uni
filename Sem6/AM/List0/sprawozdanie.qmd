@@ -39,6 +39,8 @@ sansfont: Latin Modern Roman
 | Średnia: 2310339.2 | Średnia: 2280617.5 | Waga: 2254775.0 |
 : Zimbabwe
 
+Jak widać, tak uzyskane rozwiązania są daleko od optymalnego. Minimum z 1000 losowań permutacji jest prawie tak samo złe jak średnie minimum z 10 losowań permutacji. Wynikałoby z tego że prawdopodobieństwo wylosowania "na ślepo" "sensownej" trasy jest bardzo małe, więc nie jest to najlepsza metoda na przybliżenie optymalnego rozwiązania.
+
 # Zadanie 3-4
 
 | Dijbouti | Quatar |
@@ -52,3 +54,7 @@ sansfont: Latin Modern Roman
 | ![](plots/approx-2/uy734.png){ width=100% } | ![](plots/approx-2/wi29.png){ width=100% } | ![](plots/approx-2/zi929.png){ width=100% } |
 | Waga MST: 69873 | Waga MST: 21753 | Waga MST: 82863 |
 | Waga TSP: 108140 | Waga TSP: 35609 | Waga TSP: 130424 |
+
+Minimalne Drzewo Rozpinające jest zbiorem krawędzi łączących wszystkie wierzchołki o minimalnej wadze, więc na pewno będzie ważyło mniej niż optymalny cykl komiwojażera, który w najlepszym możliwym przypadku jest Minimalnym Drzewem Rozpinającym z jedną dodatkową krawędzią.
+
+Przejście po MST zgodnie z DFS idąc wyłącznie po krawędziach należących do MST jest 2 razy dłuższe niż waga MST (każdą krawędzią idziemy 2 razy). Z nierówności trójkąta wynika, że ominięcie już odwiedzonych krawędzi i wierzchołków i przejście bezpośrednio do kolejnego wierzchołka w kolejności DFS będzie jeszcze krótsze (idziemy "na skróty"). A więc w najgorszym wypadku otrzymaliśmy rozwiązanie 2 razy gorsze od optymalnego.
