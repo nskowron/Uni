@@ -7,3 +7,27 @@ sansfont: Latin Modern Roman
 ---
 
 Aby pokazać, że Maszyna Kolejkowa ma moc Maszyny Turinga zasymulujemy dowolny ruch Maszyny Turinga za pomocą Maszyny Kolejkowej.
+
+# Stan Maszyny - Idea
+
+Pierwszy element w kolejce będzie odpowiadał elementowi wskazywanemu przez głowicę. Za nim, kolejne litery odpowiadają kolejnym literom po prawo od głowicy na taśmie Maszyny Turinga. W miejscu pierwszego \textit{blanka} na Maszynie Turinga jest symbol #, który rozdziela prawą stronę taśmy od lewej. Elementy po # odpowiadają lewej stronie taśmy, tak więc # odpowiada zarówno blankowi z lewej strony jak i z prawej.
+
+$$
+\begin{matrix}
+    \text{Maszyna Turinga:} & a_1 a_2 \dots a_{i-1} \mathbf{a}_i a_{i+1} \dots a_n \\
+    \text{Maszyna Kolejkowa:} & \mathbf{a}_i a_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-1}
+\end{matrix}
+$$
+
+# Symulowanie Ruchów
+
+## Ruch w prawo
+
+Przy tej implementacji ruch w prawo jest bardzo prosty, ponieważ głowica Maszyny Turinga powinna znaleźć się na elemencie $a_{i+1}$, a litera na którą zmieni się $a_i$ znajdzie się po lewej stronie, czyli na końcu kolejki. Tak więc jeden ruch w prawo będzie odpowiadał ściągnięciu pierwszej litery z kolejki i dodaniu jej zamiennika na koniec kolejki.
+
+$$
+\begin{matrix}
+    \text{Maszyna Turinga:} & a_1 a_2 \dots a_{i-1} \mathbf{a}_i a_{i+1} \dots a_n & \xrightarrow{\delta} & a_1 a_2 \dots a_{i-1} b \ \mathbf{a}_{i+1} \dots a_n \\
+    \text{Maszyna Kolejkowa:} & \mathbf{a}_i a_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-1} & \xrightarrow{\delta} & \mathbf{a}_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-1} b
+\end{matrix}
+$$
