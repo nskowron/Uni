@@ -4,6 +4,11 @@ author: Nel Skowronek
 date: today
 mainfont: Latin Modern Roman
 sansfont: Latin Modern Roman
+geometry:
+    - top=3cm
+    - bottom=2cm
+    - left=1.5cm
+    - right=1.5cm
 ---
 
 Aby pokazać, że Maszyna Kolejkowa ma moc Maszyny Turinga zasymulujemy dowolny ruch Maszyny Turinga za pomocą Maszyny Kolejkowej.
@@ -19,15 +24,99 @@ $$
 \end{matrix}
 $$
 
+## Stan Początkowy
+
+Jeśli Maszyna Turinga zaczyna z głowicą na pierwszej literze od lewej, to z treści zadania wynika, że stan początkowy automatycznie tłumaczy się zgodnie z powyższym opisem.
+
 # Symulowanie Ruchów
 
-## Ruch w prawo
+## Ruch w Prawo
 
 Przy tej implementacji ruch w prawo jest bardzo prosty, ponieważ głowica Maszyny Turinga powinna znaleźć się na elemencie $a_{i+1}$, a litera na którą zmieni się $a_i$ znajdzie się po lewej stronie, czyli na końcu kolejki. Tak więc jeden ruch w prawo będzie odpowiadał ściągnięciu pierwszej litery z kolejki i dodaniu jej zamiennika na koniec kolejki.
 
 $$
 \begin{matrix}
-    \text{Maszyna Turinga:} & a_1 a_2 \dots a_{i-1} \mathbf{a}_i a_{i+1} \dots a_n & \xrightarrow{\delta} & a_1 a_2 \dots a_{i-1} b \ \mathbf{a}_{i+1} \dots a_n \\
+    \text{Maszyna Turinga:} & a_1 a_2 \dots a_{i-1} \mathbf{a}_i a_{i+1} \dots a_n & \xrightarrow{\delta} & a_1 a_2 \dots a_{i-1} b \mathbf{a}_{i+1} \dots a_n \\
     \text{Maszyna Kolejkowa:} & \mathbf{a}_i a_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-1} & \xrightarrow{\delta} & \mathbf{a}_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-1} b
 \end{matrix}
 $$
+
+### Formalnie
+
+$$
+\begin{matrix}
+    \delta_{TM}(q_i, a) = (q_j, b, \rightarrow) & \\
+    \equiv & \\
+    \delta_{MK}(q_i, a) = (q_j, b) & \textit{Zdejmij a i dopisz słowo b}
+\end{matrix}
+$$
+
+## Postój w Miejscu
+
+Tutaj sprawa jest nieco bardziej skomplikowana, ponieważ zamiennik litery, na której jest aktualnie ustawiona głowica musi być dodany na koniec, tak więc aby odzyskać pożadany stan Maszyny Kolejkowej, trzeba będzie przepisać całą kolejkę. Aby zaznaczyć miejsce, w którym kończy się stara kolejka a zaczyna przepisywana, wprowadzimy nowy specjalny symbol: \$.
+
+$$
+\begin{matrix}
+    \text{Maszyna Turinga:} & a_1 a_2 \dots a_{i-1} \mathbf{a}_i a_{i+1} \dots a_n & \xrightarrow{\delta} & a_1 a_2 \dots a_{i-1} \mathbf{b} a_{i+1} \dots a_n \\
+    \text{Maszyna Kolejkowa:} & \mathbf{a}_i a_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-1} & \xrightarrow{\delta} & \mathbf{a}_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-1} \$ b & \xrightarrow{\delta} & \mathbf{b} a_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-1}
+\end{matrix}
+$$
+
+### Formalnie
+
+Podczas przepisywania kolejki maszyna musi pamiętać stan, do którego ma wrócić po skończeniu przepisywania i symulacji obecnego ruchu. W tym celu, dla każdego stanu $q_i$ Maszyny Turinga wprowadzimy dodatkowy stan $r_i$ w Maszynie Kolejkowej:
+
+$$
+\begin{matrix}
+    \delta_{TM}(q_i, a) = (q_j, b, -) \\
+    \equiv \\
+    \left\{\begin{matrix}
+        \delta_{MK}(q_i, a) = (r_j, \$b) \\
+        \delta_{MK}(r_i, a) = (r_i, a) \\
+        \delta_{MK}(r_i, \$) = (q_i, \epsilon)
+    \end{matrix}\right. &
+    \begin{matrix}
+        \textit{Rozpocznij przepisywanie} \\
+        \textit{Przepisuj aż nie napotkasz \$} \\
+        \textit{Zdejmij \$ i wróć do stanu przed}
+    \end{matrix}
+\end{matrix}
+$$
+
+## Ruch w Lewo
+
+Tutaj sprawa staje się jeszcze bardziej skomplikowana, ponieważ stan, który chcemy osiągnąć, jest w pewnym sensie równoważny ze ściągnięciem elementu z końca kolejki i umieszczeniem go na początek. Taka operacja jest dla nas niedostępna, więc znowu trzeba będzie przepisywać kolejkę. Problem jest w tym, że nie mamy mechanizmu "spojrzenia jeden element za" obecnym elementem, aby się dowiedzieć że już jesteśmy na ostatniej literze przed \$ i że już możemy zacząć od niej przepisywanie. W tym celu musimy przepisywać "z opóźnieniem" i mieć sposób na zapamiętanie poprzedniej litery do przepisania w stanie maszyny. Wymaga to niestety wprowadzenia wielu ($\textit{rozmiar alfabetu \times liczba stanów TM}$) nowych stanów.
+
+$$
+\begin{matrix}
+    \text{Maszyna Turinga:} & a_1 a_2 \dots a_{i-1} \mathbf{a}_i a_{i+1} \dots a_n & \xrightarrow{\delta} & a_1 a_2 \dots \mathbf{a}_{i-1} b a_{i+1} \dots a_n \\
+    \text{Maszyna Kolejkowa:} & \mathbf{a}_i a_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-1} & \xrightarrow{\delta} & \$ \mathbf{b} a_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-2} & \xrightarrow{\delta} & \mathbf{a}_{i-1} b a_{i+1} \dots a_n \# a_1 a_2 \dots a_{i-2}
+\end{matrix}
+$$
+
+### Formalnie
+
+$$
+\begin{matrix}
+    \delta_{TM}(q_i, a) = (q_j, b, \leftarrow) \\
+    \equiv \\
+    \left\{\begin{matrix}
+        \delta_{MK}(q_i, a) = (s_{bj}, \$) \\
+        \delta_{MK}(s_{ai}, b) = (s_{bi}, a) \\
+        \delta_{MK}(s_{ai}, \$) = (r_i, \$a)
+    \end{matrix}\right. &
+    \begin{matrix}
+        \textit{Zapisz literę i docelowy stan} \\
+        \textit{Przepisuj z opóźnieniem} \\
+        \textit{Dotarliśmy do } a_{i-1} \textit{ - przepisz resztę}
+    \end{matrix}
+\end{matrix}
+$$
+
+# Kilka Słów o Złożoności
+
+W najgorszym wypadku symulacja jednego ruchu wymaga przepisania całej kolejki dwukrotnie. Tak więc jeśli Maszyna Turinga, dla wejścia $x$ zwraca wynik w czasie $f(|x|)$, to Maszyna Kolejkowa zwróci wynik w czasie $O(|x|f(|x|))$. Dodatkowo Maszyna Kolejkowa wymaga dodania $O(|\Sigma|\cdot|Q|)$ nowych stanów (gdzie $Q$ - stany TM).
+
+\vspace{1cm}
+
+Wesołych Świąt:)
