@@ -21,4 +21,9 @@ namespace LocalSearch {
         std::vector<int>& solution, 
         int k // number of neighbors to consider at each step
     );
+
+    int getSolutionCost(
+        const std::vector<std::vector<int>>& weights, 
+        const std::vector<int>& solution
+    );
 };

@@ -75,3 +75,16 @@ int LocalSearch::invertLocalSearch(
 
     return steps;
 }
+
+int LocalSearch::getSolutionCost(
+    const std::vector<std::vector<int>>& weights, 
+    const std::vector<int>& solution
+) {
+    int cost = 0;
+    int n = solution.size();
+    for (int i = 0; i < n - 1; ++i) {
+        cost += weights[solution[i]][solution[i + 1]];
+    }
+    cost += weights[solution[n - 1]][solution[0]]; // close the cycle
+    return cost;
+}

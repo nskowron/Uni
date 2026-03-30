@@ -13,7 +13,7 @@ for filename in filenames:
 
     # open cpp process
     p = subprocess.Popen(
-        ["./local_search"],
+        ["./cpp/build/bin/exc1"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         text=True
@@ -28,6 +28,23 @@ for filename in filenames:
 
     print("Data sent to C++ process.")
 
-    # receive ACK
-    ack = p.stdout.readline()
-    print(ack)
+    # receive results from cpp
+    results = p.stdout.readline().strip().split()
+    best_cost = int(results[0])
+    avg_steps = float(results[1])
+    best_solution = [int(x) for x in p.stdout.readline().strip().split()]
+
+    # present results
+    print(f"Best cost: {best_cost}")
+    print(f"Average steps: {avg_steps}")
+    print(f"Best solution: {best_solution}")
+
+    plt.figure()
+    plt.scatter(*zip(*problem.node_coords.values()), color='black')
+
+    xs = [problem.node_coords[node][0] for node in best_solution]
+    ys = [problem.node_coords[node][1] for node in best_solution]
+    plt.plot(xs, ys)
+
+    plt.title(f"{filename} - Best Solution Graphical Representation")
+    plt.savefig(f"plots/{filename.replace(".tsp", ".png")}")
