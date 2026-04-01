@@ -1,16 +1,14 @@
-#include "Wheels.h"
+#include "Car.h"
 
-byte LCDAddress = 0x27;
-
-Wheels w;
+Car* c;
 volatile char cmd;
 
 void setup() {
   // put your setup code here, to run once:
-  w.attach(4,3,5,2,7,6,LCDAddress);
-  
   Serial.begin(9600);
-  Serial.setTimeout(200);
+  Serial.print("sanity check0");
+
+  c = new Car{0x27,4,3,5,2,7,6};
 }
 
 void loop() {
@@ -33,12 +31,16 @@ void loop() {
   //     case '5': w.setSpeed(200); break;
   //   }
   // }
-  w.setSpeedLeft(100);
-  w.setSpeedRight(200);
+  Serial.write("sanity check");
 
-  w.goForward(10);
+  c->getWheels().setSpeedLeft(100);
+  c->getWheels().setSpeedRight(200);
+
+  Serial.println(c->getWheels().speed_left);
+       
+  c->getWheels().goForward(10);
   delay(1000);
 
-  w.goBack(10);
+  c->getWheels().goBack(10);
   delay(1000);
 }

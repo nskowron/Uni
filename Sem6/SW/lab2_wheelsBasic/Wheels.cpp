@@ -19,7 +19,6 @@ void Wheels::attachRight(int pF, int pB, int pS)
     this->pinsRight[0] = pF;
     this->pinsRight[1] = pB;
     this->pinsRight[2] = pS;
-    this->setSpeedRight(0);
 }
 
 
@@ -31,7 +30,6 @@ void Wheels::attachLeft(int pF, int pB, int pS)
     this->pinsLeft[0] = pF;
     this->pinsLeft[1] = pB;
     this->pinsLeft[2] = pS;
-    this->setSpeedLeft(0);
 }
 
 void Wheels::setSpeedRight(uint8_t s)
@@ -52,13 +50,13 @@ void Wheels::setSpeed(uint8_t s)
     setSpeedRight(s);
 }
 
-void Wheels::attach(int pRF, int pRB, int pRS, int pLF, int pLB, int pLS, uint8_t LCD_addr)
+void Wheels::attach(int pRF, int pRB, int pRS, int pLF, int pLB, int pLS)
 {
     this->attachRight(pRF, pRB, pRS);
     this->attachLeft(pLF, pLB, pLS);
-    this->lcd = new LiquidCrystal_I2C(LCD_addr, 16, 2);
-    this->lcd->init();
-    this->lcd->backlight();
+
+    this->setSpeed(0);
+    this->stop();
 }
 
 void Wheels::forwardLeft() 
@@ -118,13 +116,9 @@ void Wheels::goForward(int cm) {
   this->setSpeed(speed);
 
   // go forward
-  this->lcd->clear();
-  this->lcd->print(cm);
   this->forward();
   delay(DELAY_PER_CM_PER_SPEED / speed * cm);
   this->stop();
-  this->lcd->clear();
-  this->lcd->print(0);
 }
 
 void Wheels::goBack(int cm) {
@@ -139,6 +133,22 @@ void Wheels::goBack(int cm) {
   this->back();
   delay(DELAY_PER_CM_PER_SPEED / speed * cm);
   this->stop();
+}
+
+uint8_t Wheels::getSpeedLeft() {
+  return speed_left;
+}
+
+uint8_t Wheels::getSpeedRight() {
+  return speed_right;
+}
+
+uint8_t Wheels::getDirectionLeft() {
+  return direction_left;
+}
+
+uint8_t Wheels::getDirectionRight() {
+  return direction_right;
 }
 
 

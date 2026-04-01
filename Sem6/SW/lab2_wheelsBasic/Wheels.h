@@ -33,8 +33,7 @@ class Wheels {
         void attachRight(int pinForward, int pinBack, int pinSpeed);
         void attachLeft(int pinForward, int pinBack, int pinSpeed);
         void attach(int pinRightForward, int pinRightBack, int pinRightSpeed,
-                    int pinLeftForward, int pinLeftBack, int pinLeftSpeed,
-                    uint8_t LCD_addr);
+                    int pinLeftForward, int pinLeftBack, int pinLeftSpeed);
         /*
          *  funkcje ruchu
          */
@@ -60,11 +59,19 @@ class Wheels {
          */
         void goForward(int cm);
         void goBack(int cm);
+        /*
+         * gettery
+         */
+         uint8_t getSpeedLeft();
+         uint8_t getSpeedRight();
+         uint8_t getDirectionLeft();
+         uint8_t getDirectionRight();
 
-    private: 
-        LiquidCrystal_I2C* lcd;
+    public:
         uint8_t speed_left;
         uint8_t speed_right;
+        uint8_t direction_left; // -1, 0, 1
+        uint8_t direction_right;
         int pinsRight[3];
         int pinsLeft[3];
 };
