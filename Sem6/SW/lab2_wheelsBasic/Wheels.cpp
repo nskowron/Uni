@@ -6,6 +6,7 @@
 #define SET_MOVEMENT(side,f,b) digitalWrite( side[0], f);\
                                digitalWrite( side[1], b)
 
+#define MAX_SPEED 255
 #define DELAY_PER_CM_PER_SPEED 5000
 
 Wheels::Wheels() 
@@ -111,7 +112,7 @@ void Wheels::goForward(int cm) {
   // equalize speed
   uint8_t speed = this->speed_left > this->speed_right ? this->speed_left : this->speed_right;
   if(speed == 0) { // set max speed bc why not
-    speed = 255;
+    speed = MAX_SPEED;
   }
   this->setSpeed(speed);
 
@@ -125,7 +126,7 @@ void Wheels::goBack(int cm) {
   // equalize speed
   uint8_t speed = this->speed_left > this->speed_right ? this->speed_left : this->speed_right;
   if(speed == 0) { // set max speed bc why not
-    speed = 255;
+    speed = MAX_SPEED;
   }
   this->setSpeed(speed);
 
