@@ -17,6 +17,7 @@ class Car {
     );
 
     void update();
+    bool busy();
 
     // controls
     void goForward(int cm);

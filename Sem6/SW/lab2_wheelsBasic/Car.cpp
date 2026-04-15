@@ -27,6 +27,10 @@ void Car::update() {
     }
 }
 
+bool Car::busy() {
+    return !tasks.empty();
+}
+
 void Car::goForward(int cm) {
     forward();
     tasks.push([&this, =cm, =last_update_time] () {

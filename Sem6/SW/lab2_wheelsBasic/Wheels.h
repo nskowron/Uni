@@ -70,8 +70,8 @@ class Wheels {
     public:
         uint8_t speed_left;
         uint8_t speed_right;
-        uint8_t direction_left;
-        uint8_t direction_right;
+        short direction_left;
+        short direction_right;
 
     private:
         int pinsRight[3];
