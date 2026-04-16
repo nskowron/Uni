@@ -1,16 +1,15 @@
 #include <Arduino.h>
-#include <thread>
 
 #include "Car.h"
 
 #define DELAY_PER_CM_PER_SPEED 5000
+#define MAX_SPEED 255
 
 Car::Car(uint8_t LCD_addr,
     int rF, int rB, int rS,
     int lF, int lB, int lS
 )   : lcd{LCD_addr, 16, 2}
-    , dashboard{&wheels}
-    , last_update_time{millis()}
+    , dashboard{&wheels, &lcd}
 {
     lcd.init();
     lcd.backlight();
@@ -19,41 +18,46 @@ Car::Car(uint8_t LCD_addr,
 
 void Car::update() {
     dashboard.update();
-    if(!tasks.empty()) {
-        auto task = tasks.front();
-        if(task()) {
-            tasks.pop();
+    if(!commands.empty()) {
+        Command* command = commands.top();
+        if(command->call(&command->context)) {
+            commands.pop();
         }
     }
 }
 
 bool Car::busy() {
-    return !tasks.empty();
+    return !commands.empty();
 }
 
 void Car::goForward(int cm) {
     forward();
-    tasks.push([&this, =cm, =last_update_time] () {
+    commands.push(new Command{
+        Context{this, 0, cm, last_update_time},
+        [](Context* c){
         // check speed
-        uint8_t speed = this->speed_left > this->speed_right ? this->speed_left : this->speed_right;
+        auto& [car, t1, cm, last_update_time] = *c;
+        auto& wheels = car->wheels;
+
+        uint8_t speed = wheels.speed_left > wheels.speed_right ? wheels.speed_left : wheels.speed_right;
         if(speed == 0) { // set max speed bc why not
             speed = MAX_SPEED;
         }
         wheels.setSpeed(speed);
 
         // calculate delay
-        int goal_delay = DELAY_PER_CM_PER_SPEED / speed * cm;
+        int goal_delay = DELAY_PER_CM_PER_SPEED / speed * c->cm;
         int elapsed_delay = millis() - last_update_time;
         
         // calculate distance to go
-        int distance_to_go = std::max(cm - cm * elapsed_delay / goal_delay, 0);
+        int distance_to_go = std::max(c->cm - c->cm * elapsed_delay / goal_delay, 0);
 
         // update dashboard
-        dashboard.update(distance_to_go);
+        car->dashboard.update(distance_to_go);
 
         // check if done
         return elapsed_delay >= goal_delay;
-    });
+    }});
 }
 
 void Car::goBack(int cm) {

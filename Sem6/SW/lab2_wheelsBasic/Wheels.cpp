@@ -108,34 +108,6 @@ void Wheels::stop()
     this->stopRight();
 }
 
-void Wheels::goForward(int cm) {
-  // equalize speed
-  uint8_t speed = this->speed_left > this->speed_right ? this->speed_left : this->speed_right;
-  if(speed == 0) { // set max speed bc why not
-    speed = MAX_SPEED;
-  }
-  this->setSpeed(speed);
-
-  // go forward
-  this->forward();
-  delay(DELAY_PER_CM_PER_SPEED / speed * cm);
-  this->stop();
-}
-
-void Wheels::goBack(int cm) {
-  // equalize speed
-  uint8_t speed = this->speed_left > this->speed_right ? this->speed_left : this->speed_right;
-  if(speed == 0) { // set max speed bc why not
-    speed = MAX_SPEED;
-  }
-  this->setSpeed(speed);
-
-  // go back
-  this->back();
-  delay(DELAY_PER_CM_PER_SPEED / speed * cm);
-  this->stop();
-}
-
 uint8_t Wheels::getSpeedLeft() {
   return speed_left;
 }
@@ -151,5 +123,3 @@ uint8_t Wheels::getDirectionLeft() {
 uint8_t Wheels::getDirectionRight() {
   return direction_right;
 }
-
-

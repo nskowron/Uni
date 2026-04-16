@@ -55,11 +55,6 @@ class Wheels {
         void setSpeedRight(uint8_t);
         void setSpeedLeft(uint8_t);
         /*
-         *  automatyczne wyznaczanie odleglosci
-         */
-        void goForward(int cm);
-        void goBack(int cm);
-        /*
          * gettery
          */
          uint8_t getSpeedLeft();

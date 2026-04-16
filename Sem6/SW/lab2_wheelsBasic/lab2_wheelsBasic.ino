@@ -14,8 +14,8 @@ void setup() {
 }
 
 void loop() {
-  c.update();
-  if (!c.busy()) {
+  c->update();
+  if (!c->busy()) {
     c->goForward(10);
     c->goBack(10);
   }

@@ -20,7 +20,7 @@ uint8_t arr_up_2[8] = {
     0b01110,
     0b11011,
     0b10001
-}
+};
 
 uint8_t arr_down_2[8] = {
     0b10001,
@@ -76,10 +76,9 @@ char* animation_frame_2[2] = {
     "/ | \\"
 };
 
-Dashboard::Dashboard(Wheels* wheels, LiquidCrystal_I2C* lcd) 
+Dashboard::Dashboard(const Wheels* wheels, LiquidCrystal_I2C* lcd) 
     : wheels{wheels}
     , lcd{lcd}
-    , last_update_time{millis()}
     , animation_frame_time{100}
     , animation_frame{0}
 {

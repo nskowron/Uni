@@ -15,7 +15,7 @@ class Dashboard {
   private:
     Wheels* wheels;
     LiquidCrystal_I2C* lcd;
-    unsigned long last_update_time;
+    unsigned long last_update_time = millis();
     unsigned long animation_frame_time;
     bool animation_frame;
 };

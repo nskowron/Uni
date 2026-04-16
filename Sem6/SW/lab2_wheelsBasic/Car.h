@@ -1,13 +1,26 @@
 #include <Arduino.h>
-#include <queue>
-#include <functional>
 
+#include "Queue.h"
 #include "Wheels.h"
 #include "Dashboard.h"
 #include "LiquidCrystal_I2C.h"
 
 #ifndef Car_h
 #define Car_h
+
+class Car;
+
+struct Context {
+    Car* car;
+    uint8_t speed;
+    int cm;
+    unsigned long last_update_time;
+};
+
+struct Command {
+    Context context;
+    bool (*call)(Context*); 
+};
 
 class Car {
   public:
@@ -34,8 +47,8 @@ class Car {
     LiquidCrystal_I2C lcd;
     Wheels wheels;
     Dashboard dashboard;
-    std::queue<std::function<bool()>> tasks;
-    unsigned long last_update_time;
+    Queue<Command*> commands;
+    unsigned long last_update_time = millis();
 };
 
 #endif
