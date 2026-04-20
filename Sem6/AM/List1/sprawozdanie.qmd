@@ -1,0 +1,60 @@
+---
+title: "Sprawozdanie z listy 1"
+author: "Nel Skowronek"
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+---
+
+# Zadanie 1 i 2
+
+### Local Search z pełnym sąsiedztwem:
+
+| Data | Avg. Steps | Avg. Solution | Best Solution |
+|:------:|:------:|:------:|:------:|
+| wi29.tsp | 26.8 | 29663.8 | 28044 |
+| dj38.tsp | 32.4 | 7581.6 | 6790 |
+| qa194.tsp | 212.2 | 10684.2 | 10451 |
+| uy734.tsp | 935.6 | 88670.8 | 86555 |
+| zi929.tsp | 1171.8 | 107098.0 | 105816 |
+| mu1979.tsp |   2793.8  |   94045.4   |  92228   |
+| ca4663.tsp |   6776.4  |  1428915.2  |  1406307  |
+| tz6117.tsp |   8003.2  |   454060.2  |  446993  |
+| eg7146.tsp |   9574.2  |   194600.2  | 190220  |
+| ei8246.tsp |    11443.4   |   235919.0  |  232691    |
+
+
+### Local Search dla n losowych sąsiadów:
+
+|    Data   | Avg. Steps | Avg. Solution | Best Solution |
+| :-------: | :--------: | :-------: | :-----------: |
+|  wi29.tsp |    19.4    |  41357.2  |     35888     |
+|  dj38.tsp |    28.8    |  10871.0  |      8964     |
+| qa194.tsp |    195.8   |  16537.2  |     14764     |
+| uy734.tsp |    818.8   |  169186.0 |     150656    |
+| zi929.tsp |   1284.8   |  152686.0 |     148934    |
+| mu1979.tsp |   2644.6  |   174016.2  |   147399   |
+| ca4663.tsp |   6659.4  |  2671409.8  |  2335573  |
+| tz6117.tsp |   8644.6  |   1010459.8  |  837136   |
+| eg7146.tsp |   9806.2  |   460963.2  |   367739  |
+| ei8246.tsp |   10922.6  |   520394.2  |   435965  |
+
+Jak widać, wybór n sąsiadów nie zmniejsza średniej liczby kroków jednocześnie pogarszając rozwiązania nawet dwukrotnie. Z tego powodu lepiej jest raczej używać pełnej wersji. Dodatkowo, średnia liczba kroków wydaje się być liniowa w zależności od liczby wierzchołków.
+
+# Zadanie 3
+
+### Local Search na MST:
+
+|    Data   | Avg. Steps | Avg. Solution | Best Solution | MST Weight
+| :-------: | :--------: | :--------: | :-------: | :-----------: |
+|  wi29.tsp |     7.0    |  29400.6  |     28789     | 21753
+|  dj38.tsp |     9.2    |   7323.4  |      7053     | 5828
+| qa194.tsp |    45.2    |  10156.0  |     10088     | 8026 
+| uy734.tsp |    174.8   |  84340.0  |     83925     | 69873
+| zi929.tsp |    203.0   |  100578.0 |     99558     | 82863
+| mu1979.tsp |   420.6  |   92978.6   |  92284  |    74109 
+| ca4663.tsp |   985.0  |  1369259.0  |   1364420  |   1118421 
+| tz6117.tsp |   1311.8  |   454066.8  |  445111  |   348447 
+| eg7146.tsp |   1596.4  |   195387.8  |  190324   |   147304 
+| ei8246.tsp |   1795.4  |   235855.0  |  233043   |   185353 
+
+Używanie ścieżek przez MST jako początkowych rozwiązań dla Local Search zdecydowanie przyśpieszyło algorytm (5x mniej kroków) jednocześnie otrzymując lekko lepsze wyniki niż dla pełnej wersji.

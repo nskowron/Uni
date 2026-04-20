@@ -33,9 +33,10 @@ int main() {
 
         // run local search for n random permutations
         for (int i = 0; i < 5; ++i) {
-            // new permutation
-            solution = nodes;
-            std::shuffle(solution.begin(), solution.end(), std::mt19937{std::random_device{}()});
+            // read new permutation
+            for (int j = 0; j < n; ++j) {
+                std::cin >> solution[j];
+            }
 
             // local search
             int steps = LocalSearch::invertLocalSearch(weights, solution, n * n);

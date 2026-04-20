@@ -1,5 +1,8 @@
 import tsplib95 as tsp
 import subprocess
+import random
+
+from prim import prim, dfs
 
 filenames = ["wi29.tsp", "dj38.tsp", "qa194.tsp", "uy734.tsp", "zi929.tsp"]
 
@@ -12,7 +15,7 @@ for filename in filenames:
 
     # open cpp process
     p = subprocess.Popen(
-        ["./cpp/build/bin/exc2"],
+        ["./cpp/build/bin/exc3"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         text=True
@@ -26,6 +29,19 @@ for filename in filenames:
     p.stdin.flush()
 
     print("Data sent to C++ process.")
+
+    # make mst
+    mst = prim(problem.get_graph())
+    print(f"mst weight: {sum(data['weight'] for _, _, data in mst.edges(data=True))}")
+
+    # stream dfs route
+    for i in range(5):
+        v = random.randint(1, n)
+        route = []
+        dfs(mst, v, route)
+        for j in range(len(route)):
+            p.stdin.write(f"{route[j] - 1}\n")
+        p.stdin.flush()
 
     # receive results from cpp
     results = p.stdout.readline().strip().split()

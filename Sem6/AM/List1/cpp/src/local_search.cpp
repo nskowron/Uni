@@ -5,10 +5,12 @@
 #include <algorithm>
 #include <memory>
 
+// #include <iostream> // logs --- IGNORE ---
+
 std::vector<LocalSearch::InvertPair> LocalSearch::getInvertNeighbors(int n) {
     std::vector<InvertPair> neighbors;
-    for (int i = 0; i < n; ++i) {
-        for (int j = i + 1; j < n; ++j) {
+    for (int i = 1; i < n - 1; ++i) {
+        for (int j = i + 1; j < n - 1; ++j) {
             neighbors.push_back({i, j});
         }
     }
@@ -26,10 +28,10 @@ LocalSearch::InvertPair LocalSearch::getBestInvertNeighbor(
     
     for (const auto& [i, j] : neighbors) {
         int cost_reduction = 
-            weights[solution[i]][solution[(i - 1 + n) % n]] + 
-            weights[solution[j]][solution[(j + 1) % n]] - 
-            weights[solution[j]][solution[(i - 1 + n) % n]] -
-            weights[solution[i]][solution[(j + 1) % n]];
+            weights[solution[i]][solution[i - 1]] + 
+            weights[solution[j]][solution[j + 1]] - 
+            weights[solution[j]][solution[i - 1]] -
+            weights[solution[i]][solution[j + 1]];
 
         if (cost_reduction > best_cost_reduction) {
             best_cost_reduction = cost_reduction;
@@ -48,29 +50,35 @@ int LocalSearch::invertLocalSearch(
     int n = solution.size();
     auto all_neighbors = LocalSearch::getInvertNeighbors(n);
     int steps = 0;
+
+    // std::cerr << "total neighbors: " << all_neighbors.size() << std::endl; // logs --- IGNORE ---
     
     while (true) {
         ++steps;
 
         auto* neighbors = &all_neighbors;
-        if (k < solution.size()) { // consider only k random neighbors
+        if (k < all_neighbors.size()) { // consider only k random neighbors
             std::shuffle(all_neighbors.begin(), all_neighbors.end(), std::mt19937{std::random_device{}()});
             neighbors = new std::vector<InvertPair>(k);
             std::copy(all_neighbors.begin(), all_neighbors.begin() + k, neighbors->begin());
-        }
-        
-        InvertPair best_neighbor = getBestInvertNeighbor(weights, solution, *neighbors);
 
-        if (k < solution.size()) {
-            delete neighbors;
+            // std::cerr << "dupa1"; // logs --- IGNORE ---
         }
         
-        if (best_neighbor.i == best_neighbor.j) { // no improvement
+        auto [i, j] = getBestInvertNeighbor(weights, solution, *neighbors);
+
+        if (k < all_neighbors.size()) {
+            delete neighbors;
+
+            // std::cerr << "dupa2"; // logs --- IGNORE ---
+        }
+        
+        if (i == j) { // no improvement
             break;
         }
         
         // perform the inversion
-        std::reverse(solution.begin() + best_neighbor.i, solution.begin() + best_neighbor.j + 1);
+        std::reverse(solution.begin() + i, solution.begin() + j + 1);
     }
 
     return steps;
