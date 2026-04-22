@@ -1,29 +1,29 @@
 #include <Arduino.h>
 
+#include "LiquidCrystal_I2C.h"
 #include "Queue.h"
 #include "Wheels.h"
 #include "Dashboard.h"
 #include "Beeper.h"
-#include "LiquidCrystal_I2C.h"
+#include "Speedometer.h"
 
 #ifndef Car_h
 #define Car_h
 
-class Car;
-
-struct Context {
-    Car* car;
-    uint8_t speed;
-    int cm;
-    unsigned long timestamp;
-};
-
-struct Command {
-    Context context;
-    bool (*call)(Context*); 
-};
-
 class Car {
+private:
+    struct Context {
+        Car* car;
+        uint8_t speed;
+        int cm;
+        unsigned long timestamp;
+    };
+
+    struct Command {
+        Context context;
+        bool (*call)(Context*); 
+    };
+
 public:
     Car(uint8_t LCD_addr, int beep_pin,
         int pinRightForward, int pinRightBack, int pinRightSpeed,
@@ -44,6 +44,8 @@ public:
     void keepGoing(int time_ms);
     void setSpeed(uint8_t speed);
 
+public:
+    Speedometer speedometer;
 private:
     LiquidCrystal_I2C lcd;
     Wheels wheels;

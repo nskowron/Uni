@@ -7,7 +7,9 @@
 Beeper::Beeper(const Wheels* wheels, int beep_pin = 13)
     : wheels{wheels}
     , beep_pin(beep_pin)
-{}
+{
+    update();
+}
 
 void Beeper::update() {
     short total_speed = (wheels->speed_left * wheels->direction_left + wheels->speed_right * wheels->direction_right) / 2;

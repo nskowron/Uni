@@ -52,13 +52,6 @@ class Wheels {
         void setSpeed(uint8_t);
         void setSpeedRight(uint8_t);
         void setSpeedLeft(uint8_t);
-        /*
-         * gettery
-         */
-         uint8_t getSpeedLeft();
-         uint8_t getSpeedRight();
-         uint8_t getDirectionLeft();
-         uint8_t getDirectionRight();
 
     public:
         uint8_t speed_left;

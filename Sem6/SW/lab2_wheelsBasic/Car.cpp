@@ -20,6 +20,7 @@ Car::Car(uint8_t LCD_addr, int beep,
 void Car::update() {
     dashboard.update();
     beeper.update();
+    speedometer.update();
     if (!commands.empty()) {
         Command* command = commands.top();
         if(command->call(&command->context)) {

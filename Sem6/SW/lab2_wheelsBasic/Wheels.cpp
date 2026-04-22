@@ -107,19 +107,3 @@ void Wheels::stop()
     this->stopLeft();
     this->stopRight();
 }
-
-uint8_t Wheels::getSpeedLeft() {
-  return speed_left;
-}
-
-uint8_t Wheels::getSpeedRight() {
-  return speed_right;
-}
-
-uint8_t Wheels::getDirectionLeft() {
-  return direction_left;
-}
-
-uint8_t Wheels::getDirectionRight() {
-  return direction_right;
-}
