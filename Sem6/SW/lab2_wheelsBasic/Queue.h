@@ -6,11 +6,11 @@ class Queue {
 private:
     struct Node {
         T element;
-        Node* next = nullptr;
+        Node* next;
     };
 
 public:
-    void push(const T& element) {
+    void push(T element) {
         Node* n = new Node{element, nullptr};
         if (tail) {
             tail->next = n;

@@ -3,6 +3,7 @@
 #include "Queue.h"
 #include "Wheels.h"
 #include "Dashboard.h"
+#include "Beeper.h"
 #include "LiquidCrystal_I2C.h"
 
 #ifndef Car_h
@@ -14,7 +15,7 @@ struct Context {
     Car* car;
     uint8_t speed;
     int cm;
-    unsigned long last_update_time;
+    unsigned long timestamp;
 };
 
 struct Command {
@@ -23,8 +24,8 @@ struct Command {
 };
 
 class Car {
-  public:
-    Car(uint8_t LCD_addr,
+public:
+    Car(uint8_t LCD_addr, int beep_pin,
         int pinRightForward, int pinRightBack, int pinRightSpeed,
         int pinLeftForward, int pinLeftBack, int pinLeftSpeed
     );
@@ -43,9 +44,10 @@ class Car {
     void keepGoing(int time_ms);
     void setSpeed(uint8_t speed);
 
-  private:
+private:
     LiquidCrystal_I2C lcd;
     Wheels wheels;
+    Beeper beeper;
     Dashboard dashboard;
     Queue<Command*> commands;
     unsigned long last_update_time = millis();

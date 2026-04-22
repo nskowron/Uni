@@ -15,8 +15,6 @@
 
 #include <Arduino.h>
 
-#include "LiquidCrystal_I2C.h"
-
 #ifndef Wheels_h
 #define Wheels_h
 

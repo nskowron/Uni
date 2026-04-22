@@ -79,6 +79,7 @@ char* animation_frame_2[2] = {
 Dashboard::Dashboard(const Wheels* wheels, LiquidCrystal_I2C* lcd) 
     : wheels{wheels}
     , lcd{lcd}
+    , last_update_time{millis()}
     , animation_frame_time{100}
     , animation_frame{0}
 {
@@ -91,32 +92,6 @@ Dashboard::Dashboard(const Wheels* wheels, LiquidCrystal_I2C* lcd)
 }
 
 void Dashboard::update() {
-    unsigned long current_time = millis();
-
-    // animation
-    if (current_time - animation_frame_time >= 100) {
-        animation_frame = !animation_frame;
-        char** frame = animation_frame ? animation_frame_1 : animation_frame_2;
-        lcd->setCursor(6, 0);
-        lcd->print(frame[0]);
-        lcd->setCursor(6, 1);
-        lcd->print(frame[1]);
-    }
-
-    // speed
-    short total_speed = (wheels->speed_left * wheels->direction_left + wheels->speed_right * wheels->direction_right) / 2;
-    if (total_speed == 0) {
-        lcd->setCursor(15, 0);
-    } else if (total_speed > 0) {
-        lcd->setCursor(total_speed < 10 ? 14 : total_speed < 100 ? 13 : 12, 0);
-        lcd->print("+");
-    } else {
-        lcd->setCursor(total_speed > -10 ? 14 : total_speed > -100 ? 13 : 12, 0);
-        lcd->print("-");
-        total_speed = -total_speed; // quick abs
-    }
-    lcd->print(total_speed);
-
     // engines
     lcd->setCursor(0, 1);
     if (wheels->direction_left == 0 || wheels->speed_left == 0) {
@@ -152,7 +127,33 @@ void Dashboard::update() {
         }
     }
 
-    last_update_time = current_time;
+    // speed
+    short total_speed = (wheels->speed_left * wheels->direction_left + wheels->speed_right * wheels->direction_right) / 2;
+    if (total_speed == 0) {
+        lcd->setCursor(15, 0);
+    } else if (total_speed > 0) {
+        lcd->setCursor(total_speed < 10 ? 14 : total_speed < 100 ? 13 : 12, 0);
+        lcd->print("+");
+    } else {
+        lcd->setCursor(total_speed > -10 ? 14 : total_speed > -100 ? 13 : 12, 0);
+        lcd->print("-");
+        total_speed = -total_speed; // quick abs
+    }
+    lcd->print(total_speed);
+
+    // animation
+    unsigned long current_time = millis();
+
+    if (total_speed != 0 && current_time - last_update_time >= animation_frame_time) {
+        animation_frame = !animation_frame;
+        char** frame = animation_frame ? animation_frame_1 : animation_frame_2;
+        lcd->setCursor(6, 0);
+        lcd->print(frame[0]);
+        lcd->setCursor(6, 1);
+        lcd->print(frame[1]);
+
+        last_update_time = current_time;
+    }
 }
 
 void Dashboard::update(int distance) {

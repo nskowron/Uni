@@ -5,11 +5,12 @@
 #define DELAY_PER_CM_PER_SPEED 5000
 #define MAX_SPEED 255
 
-Car::Car(uint8_t LCD_addr,
+Car::Car(uint8_t LCD_addr, int beep,
     int rF, int rB, int rS,
     int lF, int lB, int lS
 )   : lcd{LCD_addr, 16, 2}
     , dashboard{&wheels, &lcd}
+    , beeper{&wheels, beep}
 {
     lcd.init();
     lcd.backlight();
@@ -18,7 +19,8 @@ Car::Car(uint8_t LCD_addr,
 
 void Car::update() {
     dashboard.update();
-    if(!commands.empty()) {
+    beeper.update();
+    if (!commands.empty()) {
         Command* command = commands.top();
         if(command->call(&command->context)) {
             commands.pop();
@@ -31,72 +33,95 @@ bool Car::busy() {
 }
 
 void Car::goForward(int cm) {
-    forward();
     commands.push(new Command{
-        Context{this, 0, cm, last_update_time},
+        Context{this, 0, cm, 0},
         [](Context* c){
-        // check speed
-        auto& [car, t1, cm, last_update_time] = *c;
-        auto& wheels = car->wheels;
+            // check speed
+            auto& [car, _, cm, timestamp] = *c;
+            auto& wheels = car->wheels;
+            uint8_t speed = wheels.speed_left > wheels.speed_right ? wheels.speed_left : wheels.speed_right;
 
-        uint8_t speed = wheels.speed_left > wheels.speed_right ? wheels.speed_left : wheels.speed_right;
-        if(speed == 0) { // set max speed bc why not
-            speed = MAX_SPEED;
-        }
-        wheels.setSpeed(speed);
+            if (timestamp == 0) { // uninitialized
+                timestamp = millis();
 
-        // calculate delay
-        int goal_delay = DELAY_PER_CM_PER_SPEED / speed * c->cm;
-        int elapsed_delay = millis() - last_update_time;
-        
-        // calculate distance to go
-        int distance_to_go = std::max(c->cm - c->cm * elapsed_delay / goal_delay, 0);
+                if (speed == 0) { // set max speed bc why not
+                    speed = MAX_SPEED;
+                }
+                wheels.setSpeed(speed);
+                wheels.forward();
+            }
 
-        // update dashboard
-        car->dashboard.update(distance_to_go);
+            // calculate delay
+            int goal_delay = DELAY_PER_CM_PER_SPEED / speed * cm;
+            int elapsed_delay = millis() - timestamp;
+            
+            // calculate distance to go
+            int distance_to_go = max(cm - cm * elapsed_delay / goal_delay, 0);
 
-        // check if done
-        return elapsed_delay >= goal_delay;
+            // update dashboard
+            car->dashboard.update(distance_to_go);
+
+            // check if done
+            return elapsed_delay >= goal_delay;
     }});
 }
 
 void Car::goBack(int cm) {
-    back();
-    tasks.push([&this, =cm, =last_update_time] () {
-        // check speed
-        uint8_t speed = this->speed_left > this->speed_right ? this->speed_left : this->speed_right;
-        if(speed == 0) { // set max speed bc why not
-            speed = MAX_SPEED;
-        }
-        wheels.setSpeed(speed);
+    commands.push(new Command{
+        Context{this, 0, cm, 0},
+        [](Context* c){
+            // check speed
+            auto& [car, _, cm, timestamp] = *c;
+            auto& wheels = car->wheels;
+            uint8_t speed = wheels.speed_left > wheels.speed_right ? wheels.speed_left : wheels.speed_right;
 
-        // calculate delay
-        int goal_delay = DELAY_PER_CM_PER_SPEED / speed * cm;
-        int elapsed_delay = millis() - last_update_time;
-        
-        // calculate distance to go
-        int distance_to_go = std::max(cm - cm * elapsed_delay / goal_delay, 0);
+            if (timestamp == 0) { // uninitialized
+                timestamp = millis();
 
-        // update dashboard
-        dashboard.update(distance_to_go);
+                if (speed == 0) { // set max speed bc why not
+                    speed = MAX_SPEED;
+                }
+                wheels.setSpeed(speed);
+                wheels.back();
+            }
 
-        // check if done
-        return elapsed_delay >= goal_delay;
-    });
+            // calculate delay
+            int goal_delay = DELAY_PER_CM_PER_SPEED / speed * cm;
+            int elapsed_delay = millis() - timestamp;
+            
+            // calculate distance to go
+            int distance_to_go = max(cm - cm * elapsed_delay / goal_delay, 0);
+
+            // update dashboard
+            car->dashboard.update(distance_to_go);
+
+            // check if done
+            return elapsed_delay >= goal_delay;
+    }});
 }
 
 void Car::forward() {
-    tasks.push([&this] () {
-        wheels.forward();
-        return true;
-    });
+    commands.push(new Command{
+        Context{this, 0, 0, 0},
+        [](Context* c){
+            auto& [car, _1, _2, _3] = *c;
+            auto& wheels = car->wheels;
+
+            wheels.forward();
+            return true;
+    }});
 }
 
 void Car::back() {
-    tasks.push([&this] () {
-        wheels.back();
-        return true;
-    });
+    commands.push(new Command{
+        Context{this, 0, 0, 0},
+        [](Context* c){
+            auto& [car, _1, _2, _3] = *c;
+            auto& wheels = car->wheels;
+
+            wheels.back();
+            return true;
+    }});
 }
 
 void Car::left(int deg) {
@@ -108,22 +133,43 @@ void Car::right(int deg) {
 }
 
 void Car::stop() {
-    tasks.push([&this] () {
-        wheels.stop();
-        return true;
-    });
+    commands.push(new Command{
+        Context{this, 0, 0, 0},
+        [](Context* c){
+            auto& [car, _1, _2, _3] = *c;
+            auto& wheels = car->wheels;
+
+            wheels.stop();
+            return true;
+    }});
 }
 
 void Car::keepGoing(int time_ms) {
-    tasks.push([&this, =time_ms, =last_update_time] () {
-        int elapsed_time = (millis() - last_update_time);
-        return elapsed_time >= time_ms;
-    });
+    commands.push(new Command{
+        Context{this, 0, time_ms, 0},
+        [](Context* c){
+            auto& [car, _, time_ms, timestamp] = *c;
+
+            if (timestamp == 0) { // uninitialized
+                timestamp = millis();
+            }
+
+            // calculate delay
+            int elapsed_delay = millis() - timestamp;
+
+            // check if done
+            return elapsed_delay >= time_ms;
+    }});
 }
 
 void Car::setSpeed(uint8_t speed) {
-    tasks.push([&this, =speed] () {
-        wheels.setSpeed(speed);
-        return true;
-    });
+    commands.push(new Command{
+        Context{this, speed, 0, 0},
+        [](Context* c){
+            auto& [car, speed, _1, _2] = *c;
+            auto& wheels = car->wheels;
+
+            wheels.setSpeed(speed);
+            return true;
+    }});
 }

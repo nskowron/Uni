@@ -2,17 +2,16 @@
 #define Dashboard_h
 
 #include "LiquidCrystal_I2C.h"
-
 #include "Wheels.h"
 
 class Dashboard {
-  public:
+public:
     Dashboard(const Wheels* wheels, LiquidCrystal_I2C* lcd);
 
     void update();
     void update(int distance);
 
-  private:
+private:
     Wheels* wheels;
     LiquidCrystal_I2C* lcd;
     unsigned long last_update_time = millis();
