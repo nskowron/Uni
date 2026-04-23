@@ -46,7 +46,7 @@ public:
 
 public:
     Speedometer speedometer;
-private:
+// private:
     LiquidCrystal_I2C lcd;
     Wheels wheels;
     Beeper beeper;
