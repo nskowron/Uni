@@ -31,6 +31,10 @@ public:
         Node* n = head;
         head = head->next;
         delete n;
+
+        if (!head) {
+            tail = nullptr;
+        }
     }
     bool empty() {
         return head == nullptr;

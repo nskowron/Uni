@@ -12,8 +12,6 @@ Car::Car(uint8_t LCD_addr, int beep,
     , dashboard{&wheels, &lcd}
     , beeper{&wheels, beep}
 {
-    lcd.init();
-    lcd.backlight();
     wheels.attach(rF, rB, rS, lF, lB, lS);
 }
 
@@ -21,9 +19,12 @@ void Car::update() {
     dashboard.update();
     beeper.update();
     speedometer.update();
+    Serial.println("car update");
     if (!commands.empty()) {
+        Serial.println("running command");
         Command* command = commands.top();
         if(command->call(&command->context)) {
+            Serial.println("command finished");
             commands.pop();
         }
     }
@@ -53,8 +54,11 @@ void Car::goForward(int cm) {
             }
 
             // calculate delay
-            int goal_delay = DELAY_PER_CM_PER_SPEED / speed * cm;
-            int elapsed_delay = millis() - timestamp;
+            unsigned long goal_delay = cm * DELAY_PER_CM_PER_SPEED / speed;
+            unsigned long elapsed_delay = millis() - timestamp;
+
+            Serial.println(goal_delay);
+            Serial.println(elapsed_delay);
             
             // calculate distance to go
             int distance_to_go = max(cm - cm * elapsed_delay / goal_delay, 0);
@@ -87,8 +91,11 @@ void Car::goBack(int cm) {
             }
 
             // calculate delay
-            int goal_delay = DELAY_PER_CM_PER_SPEED / speed * cm;
-            int elapsed_delay = millis() - timestamp;
+            unsigned long goal_delay = cm * DELAY_PER_CM_PER_SPEED / speed;
+            unsigned long elapsed_delay = millis() - timestamp;
+
+            Serial.println(goal_delay);
+            Serial.println(elapsed_delay);
             
             // calculate distance to go
             int distance_to_go = max(cm - cm * elapsed_delay / goal_delay, 0);
@@ -109,6 +116,7 @@ void Car::forward() {
             auto& wheels = car->wheels;
 
             wheels.forward();
+
             return true;
     }});
 }

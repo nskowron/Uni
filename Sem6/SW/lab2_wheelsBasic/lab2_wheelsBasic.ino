@@ -1,23 +1,29 @@
 #include "Car.h"
 
-Car c{0x27,13,4,3,5,2,7,6};
+Car* c = nullptr; // {0x27,13,4,3,5,2,7,6};
 volatile char cmd;
 uint8_t speed;
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
+  c = new Car{0x27,13,4,3,5,2,7,6};
+
+  // put your setup code here, to run once:
+  
   Serial.println("sanity check");
 
   speed = 0;
-  c.setSpeed(speed);
+  c->setSpeed(speed);
 }
 
 void loop() {
-  c.update();
-  if (!c.busy()) {
-    c.goForward(10);
-    c.goBack(10);
+  delay(50);
+  // Serial.println("updating");
+  c->update();
+  if (!c->busy()) {
+    Serial.println("enqueuing");
+    c->goForward(10);
+    c->goBack(10);
   }
 }
 

@@ -76,18 +76,24 @@ char* animation_frame_2[2] = {
     "/ | \\"
 };
 
-Dashboard::Dashboard(const Wheels* wheels, LiquidCrystal_I2C* lcd) 
+Dashboard::Dashboard(const Wheels* wheels, LiquidCrystal_I2C* _lcd) 
     : wheels{wheels}
-    , lcd{lcd}
     , last_update_time{millis()}
     , animation_frame_time{100}
     , animation_frame{0}
 {
+    Serial.println("dupa4");
+    lcd = _lcd;
+    lcd->init();
+    lcd->backlight();
+    lcd->clear();
+    Serial.println("dupa5");
     lcd->createChar(ARR_UP_2, arr_up_2);
     lcd->createChar(ARR_DOWN_2, arr_down_2);
     lcd->createChar(ARR_UP_1, arr_up_1);
     lcd->createChar(ARR_DOWN_1, arr_down_1);
     lcd->createChar(ARR_STOP, arr_stop);
+    Serial.println("dupa6");
     update(0);
 }
 
