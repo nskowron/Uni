@@ -1,0 +1,208 @@
+---
+title: Sprawozdanie 1
+date: today
+author: Nel Skowronek 279679
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+geometry: 
+    - top=2cm
+    - left=1.5cm
+    - right=1.5cm
+    - bottom=2cm
+---
+
+# Zadanie 1
+
+## Liczby Gaussa $\mathbb{Z}[i]$
+
+### Implementacja Liczb Gaussa
+
+W celu implementacji Liczb Gaussa w Haskellu najpierw zaimplementowałam rozszerzenie dowolnego pierścienia o jednostkę urojoną dziedziczące po klasach `Num` i `Fractional`.
+
+Taka implementacja umożliwia definiowanie dzielenia z resztą i NWD w bardzo prosty sposób - podnoszę liczby Gaussa do liczb zespolonych, wykonuję na nich dzielenie a wynik zaokrąglam do najbliższej liczby Gaussa. Do wyznaczenia NWD używam algorytmu Euklidesa. Wszystkie działania przenoszą się naturalnie dzięki powyższej implementacji, dlatego wystarczy napisać:
+
+```haskell
+-- division with remainder
+divG :: Gaussian -> Gaussian -> (Gaussian, Gaussian)
+divG _ (Complex 0 0) = error "Division by zero"
+divG a b =
+    let q = roundC (fromGaussian a / fromGaussian b)
+        r = a - q * b
+    in (q, r)
+
+-- GCD
+gcdG :: Gaussian -> Gaussian -> Gaussian
+gcdG a (Complex 0 0) = a
+gcdG a b =
+    let (_, r) = divG a b
+    in gcdG b r
+
+-- LCM
+lcmG :: Gaussian -> Gaussian -> Gaussian
+lcmG a b = 
+    let (q, _) = divG (a * b) (gcdG a b)
+    in q
+```
+
+### Wywołania
+
+\begin{verbatim}
+ghci> normG (Complex a b)
+7.280109889280518
+ghci> divG (Complex (c + a) (d + b)) (Complex e f)
+(1 + 0i,4 + 4i)
+\end{verbatim}
+
+To jest tylko jeden z możliwych wyników dzielenia. Aby znaleźć wszystkich innych kandydatów możemy podzielić te liczby jako liczby zespolone:
+
+\begin{verbatim}
+ghci> (Complex (c + a) (d + b)) / (Complex e f)
+1.4923076923076923 + -6.153846153846154e-2i
+\end{verbatim}
+
+Jak widać Haskell zaokrąglił ten wynik poprawie do liczby $1 + 0i$, ale można sprawdzić jeszcze pozostałych kandydatów będących różnymi możliwymi zaokrągleniami tej liczby. Warunek jest taki, że nie będą oddaleni od wyniku dzielenia w liczbach zespolonych o $\ge 1$:
+
+\begin{verbatim}
+ghci> candidates = [Complex a b | a <- [1, 2], b <- [-1, 0]]
+ghci> filter (\c -> normC (fromGaussian c - (Complex 1.49 (negate 0.06))) < 1.0) candidates
+[1 + 0i,2 + 0i]
+\end{verbatim}
+
+A więc mamy tylko dwa możliwe wyniki.
+
+### NWD kilku liczb
+
+Rozszerzenie powyżej implementacji na listę liczb jest bardzo proste, wystarczy użyc `foldl1` (analogicznie dla NWW):
+
+```haskell
+gcdListG :: [Gaussian] -> Gaussian
+gcdListG = foldl1 gcdG
+```
+
+\begin{verbatim}
+ghci> xs :: [Gaussian]; xs = [Complex a b, Complex c d, Complex e d]
+ghci> gcdListG xs
+1 + 0i
+ghci> lcmListG xs
+618 + -381i
+\end{verbatim}
+
+Również dzięki użyciu `foldl1` przypadek z pustą listą jest automatycznie wyłapany przez Haskella i zwraca error, a dla jednoelementowej listy zwraca po prostu ten jeden element.
+
+Dodatkowo, aby dostać wszystkie możliwe wyniki dla NWD i NWW, należy powyższe wyniki przemnożyć przez $\pm 1$, $\pm i$, co daje 4 możliwe wyniki.
+
+# Zadanie 2
+
+## Wielomiany $\mathbb{R}[x]$
+
+Pierwszy pomysł był taki, aby wielomiany zaimplementować jako listę współczynników przy każdej kolejnej potędze równej indeksowi w tej liście. Niestety to się zbyt dobrze nie rozszerzy na multiindeksy i wprowadzi wątpliwości (jakiemu multiindeksowi odpowiada k-ta pozycja w liście itp.). A więc finalnie zdecydowałam się zaimplementować wielomiany jako mapę indeks -> współczynnik co łatwo rozszerza się na różne rodzaje indeksów a dodatkowo jest "sparse", więc nie zajmuje zbędnej pamięci dla np. jednomianów o wysokim stopniu.
+
+Normę zaimplementowałam jako stopień Leading Monomiala, dzielenie na wzór dzielenia pisemnego a NWW i NWD za pomocą algorytmu Euklidesa tak jak w poprzednim zadaniu:
+
+```haskell
+-- division with remainder
+divP :: (Ord a, Eq k, Num a, Num k, Fractional k) => 
+    Polynomial a k -> Polynomial a k -> (Polynomial a k, Polynomial a k)
+divP _ 0 = error "Division by zero"
+divP xs ys =
+    let go acc xs ys =
+            let (ax, kx) = ltP xs
+                (ay, ky) = ltP ys
+                q = Polynomial (Map.singleton (ax - ay) (kx / ky))
+            in if ay <= ax && q /= 0
+                then go (acc + q) (xs - q * ys) ys
+                else acc
+        q = go 0 xs ys
+        r = xs - q * ys
+    in (q, r)
+
+egcdP :: (Ord a, Eq k, Num a, Num k, Fractional k) => 
+    Polynomial a k -> Polynomial a k -> (Polynomial a k, Polynomial a k, Polynomial a k)
+egcdP a 0 = (a, 1, 0)
+egcdP a b =
+    let (q, r) = divP a b
+        (g, s, t) = egcdP b r
+    in (g, t, s - q * t)
+```
+
+\begin{verbatim}
+ghci> x = Polynomial (Map.fromList [(c, a), (0, b)])
+ghci> y = Polynomial (Map.fromList [(1, 1), (0, 1)])
+ghci> normRx x
+9
+ghci> divP x y
+(2.0x^0 + -2.0x^1 + 2.0x^2 + -2.0x^3 + 2.0x^4 + -2.0x^5 + 2.0x^6 + -2.0x^7 + 2.0x^8,5.0x^0)
+\end{verbatim}
+
+\begin{verbatim}
+ghci> v = Polynomial $ Map.fromList [(3, a), (2, b), (1, c), (0, d)]
+ghci> w = Polynomial $ Map.fromList [(3, d), (2, e), (1, f)]
+ghci> egcdP v w
+(4.310185185185186x^0,0.7183641975308643x^0 + 2.041666666666668x^1 + 2.7222222222222228x^2,-2.0794753086419764x^0 + -2.7978395061728403x^1 + -0.9074074074074076x^2)
+\end{verbatim}
+
+# Zadanie 3
+
+## Porządki Produktowe
+
+### Elementy $\le$ - minimalne - algorytm
+
+Mój algorytm przyjmuje skończoną listę (reprezentującą zbiór) elementów i dla każdego elementu porównuje go z każdym innym i zwraca te, dla których nie ma elementu $\le$ - mniejszego. Czas działania: $O(n^2)$.
+
+```haskell
+-- <= - minimal elements from a list of multiindices
+minMI :: (Ord a) => [Multiindex a] -> [Multiindex a]
+minMI xs = go [] xs where
+    go acc [] = acc
+    go acc (y:ys) = 
+        if any (\x -> x <= y && x /= y) xs 
+        then go acc ys
+        else go (y:acc) ys
+```
+
+### Porównania
+
+\begin{verbatim}
+ghci> xs = [Multiindex [a, b], Multiindex [c, d], Multiindex [e, f]]
+ghci> [show x ++ " <= " ++ show y ++ " : " ++ show (x <= y) | x <- xs, y <- xs]
+[
+    "Multiindex [2,7] <= Multiindex [2,7] : True",
+    "Multiindex [2,7] <= Multiindex [9,6] : False",
+    "Multiindex [2,7] <= Multiindex [7,9] : True",
+    "Multiindex [9,6] <= Multiindex [2,7] : False",
+    "Multiindex [9,6] <= Multiindex [9,6] : True",
+    "Multiindex [9,6] <= Multiindex [7,9] : False",
+    "Multiindex [7,9] <= Multiindex [2,7] : False",
+    "Multiindex [7,9] <= Multiindex [9,6] : False",
+    "Multiindex [7,9] <= Multiindex [7,9] : True"
+]
+ghci> xs = [Multiindex [a, c, e], Multiindex [b, d, f]]
+ghci> [show x ++ " <= " ++ show y ++ " : " ++ show (x <= y) | x <- xs, y <- xs]
+[
+    "Multiindex [2,9,7] <= Multiindex [2,9,7] : True",
+    "Multiindex [2,9,7] <= Multiindex [7,6,9] : False",
+    "Multiindex [7,6,9] <= Multiindex [2,9,7] : False",
+    "Multiindex [7,6,9] <= Multiindex [7,6,9] : True"
+]
+\end{verbatim}
+
+### Elementy $\le$ - minimalne
+
+Z tego powodu, że algorytm działa na zbiorach skończonych, trzeba te zbiory ograniczyć ręcznie:
+
+\begin{verbatim}
+ghci> setA = filter 
+    (\\(x, y) -> (x - a)^2 + (y - b)^2 < 5) 
+    [(x, y) | x <- [0 .. a + 3], y <- [0 .. b + 3]]
+ghci> minMI [Multiindex [x, y] | (x, y) <- setA]
+[Multiindex [2,5],Multiindex [1,6],Multiindex [0,7]]
+ghci> setB = filter 
+    (\\(w, x, y, z) -> (w - c)^2 + (x - d)^2 + (y - e)^2 + (z - f)^2 > 224) 
+    [(w, x, y, z) | w <- [0 .. c + 15], x <- [0 .. d + 15], y <- [0 .. e + 15], z <- [0 .. f + 15]]
+ghci> minMI [Multiindex [w, x, y, z] | (w, x, y, z) <- setB]
+[Multiindex [0,0,0,0]]
+\end{verbatim}
+
+# Kod Źródłowy
+
+[Link do pełnej implementacji](https://github.com/nskowron/Uni/blob/master/Sem6/WZA/lab1.hs)
