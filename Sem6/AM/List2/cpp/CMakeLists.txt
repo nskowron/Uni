@@ -4,4 +4,6 @@ file(GLOB SOURCE src/*.cpp)
 include_directories(include)
 
 add_executable(exc1_opt ${SOURCE} exc1_opt.cpp)
+add_executable(exc2_opt ${SOURCE} exc2_opt.cpp)
 add_executable(exc1 ${SOURCE} exc1.cpp)
+add_executable(exc2 ${SOURCE} exc2.cpp)

@@ -12,7 +12,7 @@ n = len(list(problem.get_nodes()))
 
 # open cpp process
 p = subprocess.Popen(
-    ["./cpp/build/bin/exc2"],
+    ["./cpp/build/bin/exc2_opt"],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     text=True
@@ -28,9 +28,19 @@ p.stdin.flush()
 print("Data sent to C++ process.")
 
 # receive results from cpp
-results = p.stdout.readline().strip().split()
-avg_cost = float(results[0])
-best_cost = int(results[1])
+rows = []
 
-print(f"Average cost: {avg_cost}")
-print(f"Best cost: {best_cost}")
+trial = 0
+while True:
+    trial += 1
+    print(f"Trial {trial}...")
+    line = p.stdout.readline()
+    if line == "":
+        break
+    rows.append(line.strip().split())
+
+# save results to csv
+with open("opt/tabu.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["tabuLength", "iter", "neighbourhood", "cost"])
+    writer.writerows(rows)
