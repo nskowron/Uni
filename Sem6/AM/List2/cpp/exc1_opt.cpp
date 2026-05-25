@@ -27,10 +27,10 @@ int main() {
     // random number generators
     std::random_device rd;
     std::mt19937 mt{rd()};
-    std::uniform_real_distribution randInitialTemp(10.0, 1000.0);
-    std::uniform_real_distribution randCoolingRate(0.9, 0.995);
-    std::uniform_int_distribution randEpochs(500, 2000);
-    std::uniform_int_distribution randStepsPerEpoch(5, 50);
+    std::uniform_real_distribution randInitialTemp(10.0, 10000.0);
+    std::uniform_real_distribution randCoolingRate(0.85, 0.995);
+    std::uniform_int_distribution randEpochs(10, 1000);
+    std::uniform_real_distribution randStepsPerEpoch(0.1, 10.0);
     
     for (int trial = 0; trial < NUM_TRIALS; ++trial) {
 
@@ -38,7 +38,7 @@ int main() {
         double initialTemp = randInitialTemp(mt);
         double coolingRate = randCoolingRate(mt);
         int epochs = randEpochs(mt);
-        int stepsPerEpoch = randStepsPerEpoch(mt);
+        double stepsPerEpoch = randStepsPerEpoch(mt);
         float avg_cost = 0;
 
         // run annealing with random parameters

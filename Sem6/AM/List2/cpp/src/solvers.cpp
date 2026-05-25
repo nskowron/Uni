@@ -11,7 +11,7 @@ int annealing(
     double initialTemp, 
     double coolingRate, 
     int epochs, 
-    int stepsPerEpoch
+    double stepsPerEpoch
 ) {
     // initializing
     const int n = solution.size();
@@ -29,7 +29,7 @@ int annealing(
 
     // main loop
     for (int epoch = 0; epoch < epochs; ++epoch) {
-        for (int trial = 0; trial < stepsPerEpoch; ++trial) {
+        for (int trial = 0; trial < stepsPerEpoch * n; ++trial) {
 
             // generate a random invert neighbor
             auto [i, j] = neighbors[randNeighbor(mt)];
@@ -42,7 +42,7 @@ int annealing(
                 weights[solution[i]][solution[(j + 1) % n]];          
 
             // accept the new solution if its better or with a probability
-            if (cost_reduction > 0 || exp(cost_reduction / temp) > randProb(mt)) {
+            if (cost_reduction > 0 || std::exp(cost_reduction / temp) > randProb(mt)) {
                 std::reverse(solution.begin() + i, solution.begin() + j + 1);
                 currCost -= cost_reduction;
 
@@ -65,7 +65,7 @@ int tabuSearch(
     std::vector<int>& solution, 
     int tabuLength, 
     int maxIterWithoutImprovement, 
-    int neighborhoodSize
+    double neighborhoodSize
 ) {
     // initializing
     const int n = solution.size();
@@ -87,7 +87,7 @@ int tabuSearch(
         int bestNeighborCostReduction = 0;
         std::pair<int, int> bestNeighbor = {-1, -1};
 
-        for (int k = 0; k < neighborhoodSize; k++) {
+        for (int k = 0; k < neighborhoodSize * n; k++) {
             
             // generate a random invert neighbor
             auto [i, j] = neighbors[randNeighbor(mt)];
@@ -156,6 +156,44 @@ int getSolutionCost(
     }
     cost += weights[solution[n - 1]][solution[0]]; // close the cycle
     return cost;
+}
+
+double getInitialTemp(
+    const std::vector<std::vector<int>>& weights, 
+    int numSamples
+) {
+    // initializing
+    int n = weights.size();
+    std::vector<std::pair<int, int>> neighbors = getInvertNeighbors(n);
+    std::vector<int> solution(n);
+    for (int i = 0; i < n; ++i) {
+        solution[i] = i;
+    }
+    double totalCostReduction = 0.0;
+
+    // random number generator
+    std::random_device rd;
+    std::mt19937 mt{rd()};
+    std::uniform_int_distribution randNeighbor{0, (int)neighbors.size() - 1};
+
+    for (int sample = 0; sample < numSamples; ++sample) {
+        std::shuffle(solution.begin(), solution.end(), mt);
+        int currCost = getSolutionCost(weights, solution);
+
+        // generate a random invert neighbor
+        auto [i, j] = neighbors[randNeighbor(mt)];
+
+        // calculate the neighbors cost reduction
+        int cost_reduction = 
+            weights[solution[i]][solution[(i - 1 + n) % n]] + 
+            weights[solution[j]][solution[(j + 1) % n]] - 
+            weights[solution[j]][solution[(i - 1 + n) % n]] -
+            weights[solution[i]][solution[(j + 1) % n]]; 
+
+        totalCostReduction += cost_reduction;
+    }
+
+    return std::abs(totalCostReduction) / numSamples;
 }
 
 std::vector<std::pair<int, int>> getInvertNeighbors(int n) {

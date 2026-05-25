@@ -22,7 +22,7 @@ objective <- function(x) {
 }
 
 result <- optim(
-  par = c(100, 0.95, 100, 20),   # starting point
+  par = c(1000, 0.95, 0, 5),   # starting point
 
   fn = objective,
 

@@ -42,10 +42,10 @@ int main() {
         int cost = annealing(
             weights, 
             solution,
-            73.535, 
-            0.994964, 
-            1810, 
-            40
+            getInitialTemp(weights),
+            0.9186,
+            524,
+            8.7
         );
 
         avg_cost = avg_cost * (i / (i + 1.0f)) + cost / (i + 1.0f);

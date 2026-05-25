@@ -27,16 +27,16 @@ int main() {
     // random number generators
     std::random_device rd;
     std::mt19937 mt{rd()};
-    std::uniform_int_distribution randTabuLength(50, 1000);
-    std::uniform_int_distribution randIter(50, 2000);
-    std::uniform_int_distribution randNeighbourhood(5, 100);
+    std::uniform_int_distribution randTabuLength(50, 5000);
+    std::uniform_int_distribution randIter(50, 5000);
+    std::uniform_real_distribution randNeighbourhood(0.0, 1.0);
     
     for (int trial = 0; trial < NUM_TRIALS; ++trial) {
 
         // initialize parameters
         int tabuLength = randTabuLength(mt);
         int iter = randIter(mt);
-        int neighbourhood = randNeighbourhood(mt);
+        double neighbourhood = randNeighbourhood(mt);
         float avg_cost = 0;
 
         // run tabu search with random parameters

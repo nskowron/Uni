@@ -5,51 +5,70 @@ mainfont: Latin Modern Roman
 sansfont: Latin Modern Roman
 ---
 
-```{r}
-data <- read.csv("List2/opt/annealing.csv")
+# Zadanie 1
 
-model <- lm(
-  cost ~ temp + cooling + epochs + steps +
-            I(temp^2) + I(cooling^2) + I(steps^2) + I(epochs^2) +
-            temp:cooling + temp:epochs + temp:steps +
-            cooling:epochs + cooling:steps +
-            epochs:steps,
-  data = data
-)
+### Wybór parametrów:
 
-objective <- function(x) {
+W celu doboru najlepszych parametrów dla Symulowanego Wyżarzania 500 razy wylosowałam wartości parametrów (`initialTemp`, `coolingRate`, `epochs`, `stepsPerEpoch`) i uruchomiłam algorytm kilka razy dla każdego zestawu. Następnie, traktując średni koszt rozwiązania jako "response variable", stworzyłam model regresji liniowej w R, na podstawie którego wybrałam najlepsze parametry. \
 
-  newdata <- data.frame(
-    temp = x[1],
-    cooling = x[2],
-    epochs = x[3],
-    steps = x[4]
-  )
+Temperatura początkowa okazała się nie mieć aż tak dużego wpływu na wynik, nawet gdy zamiast ustalonej wartosci wybierałam ją na podstawie średniego `costReduction` (średniej redukcji kosztu dla losowych sąsiadów). Z tego powodu zostawiłam `initialTemp` = 100.0. Reszta parametrów po optymalizacji miała wartości:
 
-  predict(model, newdata = newdata)
-}
+- `coolingRate` = 0.9186
+- `epochs` = 524
+- `stepsPerEpoch` = 8.7
 
-result <- optim(
-  par = c(100, 0.95, 100, 20),   # starting point
+### Wyniki:
 
-  fn = objective,
+|    Data   | Avg. Solution | Best Solution |
+| :-------: | :--------: | :--------: |
+|  wi29.tsp |  28839.0  |  28294  |
+|  dj38.tsp |   7141.4  |   6656  |
+| qa194.tsp |   10309.6  |  10152  |
+| uy734.tsp |   88300.8   |  87902  |
+| zi929.tsp |  106692.0 |  105314 |
+| mu1979.tsp |  99332.4  |   97085   |
+| ca4663.tsp | 1700070.0 |  1682439  |
+| tz6117.tsp | 557884.0 |  552004  |
+| eg7146.tsp | 254877.0 |   250507  |
+| ei8246.tsp |  310462.0  |  308307 |
 
-  method = "L-BFGS-B",
+# Zadanie 2
 
-  lower = c(
-    min(data$temp),
-    min(data$cooling),
-    min(data$epochs),
-    min(data$steps)
-  ),
+### Wybór parametrów:
 
-  upper = c(
-    max(data$temp),
-    max(data$cooling),
-    max(data$epochs),
-    max(data$steps)
-  )
-)
+Parametry dobrałam w taki sam sposób jak w zadaniu 1. Tym razem `tabuLength` okazał się nie mieć aż tak dużego wpływu na wynik, więc ustawiłam go na 500. Reszta parametrów po optymalizacji miała wartości:
 
-print(result$par)
-```
+- `maxIterWithoutImprovement` = 76
+- `neighborhoodSize` = 0.82
+
+### Wyniki:
+
+|    Data   | Avg. Solution | Best Solution |
+| :-------: | :--------: | :--------: |
+|  wi29.tsp |   37007.2  |  30663  |
+|  dj38.tsp |  12057.2  |   9426  |
+| qa194.tsp |  17806.8  |  15409  |
+| uy734.tsp |  178668.0  |  165201  |
+| zi929.tsp |  167833.0 |  155497 |
+| mu1979.tsp |  191061.0 |  178072 |
+| ca4663.tsp | 2859130.0 |  2796128 |
+| tz6117.tsp | 916469.0 |  892358 |
+| eg7146.tsp | 397294.0 |   383654 |
+| ei8246.tsp |  564467.0 |  538260 |
+
+# Porównanie metod
+
+|    Data   | Local Search | Local Search on MST | Simulated Annealing | Tabu Search |
+| :----------: | :------------: | :-----------: | :-----------: | :-----------: |
+|  wi29.tsp |  29663.8  |  29400.6  |    28839.0    | 37007.2 |
+|  dj38.tsp |  7581.6  |   7323.4  |     7141.4   | 12057.2 |
+| qa194.tsp |  10684.2  |  10156.0  |    10309.6    | 17806.8 |
+| uy734.tsp |  88670.8  |  84340.0  |    88300.8    | 178668.0 |
+| zi929.tsp |  107098.0  |  100578.0 |   106692.0   | 167833.0 |
+| mu1979.tsp | 94045.4  |   92978.6   |  99332.4 |   191061.0 |
+| ca4663.tsp |  1428915.2 |  1369259.0  |  1700070.0 |   2859130.0 | 
+| tz6117.tsp |  454060.2 |   454066.8  |  557884.0  |   916469.0 |
+| eg7146.tsp |  194600.2  |   195387.8  |  254877.0  |   397294.0 |
+| ei8246.tsp |  235919.0  |   235855.0  |  310462.0  |  564467.0 |
+
+Local Search na MST zdecydowanie pozostaje najlepszą metodą do tej pory, natomiast Symulowane Wyżarzanie wydaje się prawie tak samo dobre, szczególnie biorąc pod uwagę że czas jego działania jest bardzo krótki, i szczególnie dobrze radzi sobie z mniejszymi instancjami - nawet lepiej niż Local Search na MST. Tabu Search wydaje się działać najgorzej.

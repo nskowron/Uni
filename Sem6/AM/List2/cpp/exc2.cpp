@@ -42,9 +42,9 @@ int main() {
         int cost = tabuSearch(
             weights, 
             solution,
-            52, 
-            1434, 
-            78
+            500, 
+            76, 
+            0.82
         );
 
         avg_cost = avg_cost * (i / (i + 1.0f)) + cost / (i + 1.0f);
