@@ -1,0 +1,54 @@
+---
+title: TPI - Zadanie 57
+author: Nel Skowronek
+date: today
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+---
+
+Aby pokazać, że $3\text{SAT}_3$ jest NP-zupełny, zredukujemy do niego (według wskazówki) problem $3\text{SAT}$.
+
+# Redukcja
+
+Dla danego wejścia dla problemu $3\text{SAT}$ wykonujemy następujące kroki:
+
+### Dodanie "auxillary variables"
+
+Każde kolejne wystąpienie zmiennej $x_i$ zastępujemy nową, sztuczną zmienną $x_{ij}$, gdzie $j$ indeksuje nam liczbę wystąpień i służy tylko do rozróżnienia zmiennych. \newline
+
+Przykład:
+
+$$
+\begin{matrix}
+    (x_1 \lor \bar{x_2}) \land (x_1 \lor x_3) \land (\bar{x_1} \lor x_2 \lor x_4) \\
+    \downarrow \\
+    (x_{11} \lor \bar{x_{21}}) \land (x_{12} \lor x_{31}) \land (\bar{x_{13}} \lor x_{22} \lor x_{41}) \\
+\end{matrix}
+$$
+
+Po tym kroku, otrzymujemy problem, w którym każda zmienna występuje tylko raz.
+
+### Dodanie klauzul zapewniających spójność
+
+Aby nowo otrzymany problem był równoważny z oryginalnym, musimy zapewnić:
+
+$$
+\forall_i (x_{i1} \equiv x_{i2} \equiv \dotsc \equiv x_{ij})
+$$
+
+Sprowadzamy do CNF:
+
+$$
+\begin{matrix}
+    \Updownarrow \\
+    (x_{i1} \implies x_{i2}) \land \dotsc \land (x_{i(j-1)} \implies x_{ij}) \land (x_{ij} \implies x_{i1}) \\
+    \Updownarrow \\
+    (\bar{x_{i1}} \lor x_{i2}) \land \dotsc \land (\bar{x_{i(j-1)}} \lor x_{ij}) \land (\bar{x_{ij}} \lor x_{i1}) \\
+\end{matrix}
+$$
+
+Po dodaniu takich klauzul dla każdej oryginalnej zmiennej $x_i$, otrzymujemy problem równoważny z oryginalnym problemem w formie $3\text{SAT}_3$ (Żadna zmienna nie występuje więcej niż 3 razy i nie dodaliśmy żadnej klauzuli mającej więcej niż 3 literały).
+
+# Podsumowanie
+
+Zredukowaliśmy problem $3\text{SAT}$ do problemu $3\text{SAT}_3$, a więc $3\text{SAT}_3$ jest na pewno NP-trudny. Jako że $3\text{SAT}_3$ jest szczególnym wariantem $\text{SAT} \in \text{NP}$ to $3\text{SAT}_3 \in \text{NP}$, a więc jest NP-zupełny.
