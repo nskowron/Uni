@@ -71,6 +71,9 @@ lcmListG = foldl1 lcmG
 -- k - coefficients type
 newtype Polynomial a k = Polynomial (Map.Map a k)
 
+instance (Show a, Show k) => Show (Polynomial a k) where
+    show (Polynomial xs) = drop 3 $ Map.foldrWithKey (\a x acc -> acc ++ " + " ++ show x ++ "x^" ++ show a) "" xs
+
 instance (Ord a, Eq k, Num a, Num k) => Num (Polynomial a k) where
     (Polynomial xs) + (Polynomial ys) = Polynomial $ Map.filter (/= 0) $ Map.unionWith (+) xs ys
     (Polynomial xs) * (Polynomial ys) = Polynomial $ Map.filter (/= 0) $ Map.unionsWith (+)
@@ -83,9 +86,6 @@ instance (Ord a, Eq k, Num a, Num k) => Eq (Polynomial a k) where
 
 -- Real Polynomials
 type Rx = Polynomial Integer Double
-
-instance Show Rx where
-    show (Polynomial xs) = drop 3 $ Map.foldlWithKey (\acc a x -> acc ++ " + " ++ show x ++ "x^" ++ show a) "" xs
 
 -- leading stuff
 ltP :: (Ord a, Eq k, Num a, Num k) => Polynomial a k -> (a, k)
@@ -112,7 +112,7 @@ divP xs ys =
             let (ax, kx) = ltP xs
                 (ay, ky) = ltP ys
                 q = Polynomial (Map.singleton (ax - ay) (kx / ky))
-            in if ay <= ax && q /= 0
+            in if (ax - ay) >= 0 && q /= 0
                 then go (acc + q) (xs - q * ys) ys
                 else acc
         q = go 0 xs ys
@@ -142,8 +142,10 @@ lcmP a b =
 
 -- 3
 -- Multiindices
-newtype Multiindex a = Multiindex [a]
-    deriving (Eq, Show)
+newtype Multiindex a = Multiindex [a] deriving (Eq)
+
+instance (Show a) => Show (Multiindex a) where
+    show (Multiindex xs) = "(" ++ drop 2 (foldl (\acc x -> acc ++ ", " ++ show x) "" xs) ++ ")"
 
 instance (Ord a) => Ord (Multiindex a) where
     (Multiindex xs) <= (Multiindex ys) = 
