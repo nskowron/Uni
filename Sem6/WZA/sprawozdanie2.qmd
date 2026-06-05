@@ -1,0 +1,140 @@
+---
+title: Sprawozdanie 2
+date: today
+author: Nel Skowronek 279679
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+geometry: 
+    - top=1cm
+    - left=1.5cm
+    - right=1.5cm
+    - bottom=2cm
+---
+
+# Zadanie 4
+
+## Wielomiany wielu zmiennych rzeczywistych
+
+Wielomiany wielu zmiennych zaimplementowałam jako wielomiany (zaimplementowane w poprzedniej liście) mapujące multiindeksy liczb całkowitych (też zaimplementowane w poprzedniej liście) na współczynniki rzeczywiste:
+
+```haskell
+type Rx_ = Polynomial (Multiindex Integer) Double
+```
+
+## Porządki na jednomianach
+
+Porządki (Lex, GradedLex) zaimplementowałam jako wrappery na multiindeksach, które nadpisują sposób w jaki są porównywane. Standardowy Lex używa haskellowskiej funkcji `compare`, która automatycznie porównuje listy leksykograficznie. GradedLex porównuje najpierw sumę elementów multiindeksu (czyli stopień jednomianu) a dopiero potem leksykograficznie. Dodatkowo stworzyłam funkcje pomocnicze permutujące multiindeksy i odwracające ich permutację. W ten sposób można łatwo uzyskać permutowany wariant zarówno Lex jak i GradedLex (spermutować wszystkie multiindeksy, wykonać na nich obliczenia standardowym wariantem porządku, potem odwrócić permutację).
+
+## Polynomial Reduce
+
+Algorytm zaimplementowałam korzystając z funkcji z poprzedniego sprawozdania:
+
+```haskell
+polynomialReduce :: (Ord a, Eq k, Num a, Num k, Fractional k) => 
+    Polynomial a k -> [Polynomial a k] -> ([Polynomial a k], Polynomial a k)
+polynomialReduce f gs = go f (V.replicate (length gs) 0) 0
+    where
+        vgs = V.fromList gs
+        vltgs = V.map (\g -> Polynomial $ Map.fromList [ltP g]) vgs
+        go 0 qs r = (V.toList qs, r)
+        go p qs r = 
+            let ltp = Polynomial (Map.fromList [ltP p])
+            in case V.findIndex (\ltg -> snd (divP ltp ltg) == 0) vltgs of
+                Nothing -> go (p - ltp) qs (r + ltp)
+                Just i ->
+                    let q = fst $ divP ltp (vltgs V.! i)
+                    in go (p - q * (vgs V.! i)) (qs V.// [(i, (qs V.! i) + q)]) r
+```
+
+## Ćw. 37
+
+$$
+\begin{matrix}
+    f = x^3 - x^2y - x^2z \\
+    g_1 = x^2y - z \\
+    g_2 = xy - 1 \\
+\end{matrix}
+$$
+
+Szukamy $q_1, q_2, r$ takich, że $f = q_1 g_1 + q_2 g_2 + r$. 
+
+### Wyniki dla redukcji przez $(g_1, g_2)$:
+
+$$
+\begin{matrix}
+    q_1 = -1 \\
+    q_2 = 0 \\
+    r = x^3 - x^2z - z \\
+\end{matrix}
+$$
+
+### Wyniki dla redukcji przez $(g_2, g_1)$:
+
+$$
+\begin{matrix}
+    q_1 = -x \\
+    q_2 = 0 \\
+    r = x^3 - x^2z - x \\
+\end{matrix}
+$$
+
+### Różnice w wynikach
+
+Po wyłączeniu czynnika $x^3$ do reszty (niepodzielny przez Leading Termy $g_1$ i $g_2$) następnym Leading Termem jest $-x^2z$, który jest podzielny przez Leading Termy obu wielomianów. Zatem wybór wielomianu, przez który dzielimy, zależy w tym momencie tylko i wyłącznie od kolejności wielomianów w liście. Stąd różne wyniki.
+
+### Czy $r_1 - r_2 \in \langle g_1, g_2 \rangle$
+
+$$
+\begin{matrix}
+    f = q_{11} g_1 + q_{21} g_2 + r_1 \\
+    f = q_{12} g_2 + q_{22} g_1 + r_2 \\
+    \Downarrow \\
+    r_1 - r_2 = (q_{22} - q_{11}) g_1 + (q_{12} - q_{21}) g_2 \\
+\end{matrix}
+$$
+
+Różnica reszt jest kombinacją liniową $g_1$ i $g_2$, więc należy do idealu $\langle g_1, g_2 \rangle$.
+
+## Różne porządki
+
+Dla mojego numeru indeksu otrzymujemy wielomian: 
+
+$$
+h = x^2y^7 - y^9z^6 + x^7z^9
+$$
+
+Niestety, dla wszystkich porządków $x^2y^7$ nigdy nie będzie Leading Termem, więc nie wystarczy wybrać 3 porządków, które dałyby różne Leading Termy. Trzeba dobrać takie wielomiany, które mają różne Leading Termy dla różnych porządków. W zasadzie wystarczy jeden wielomian:
+
+$$
+g = x^3z + xz^3 - y^2
+$$
+
+### Standardowy Lex
+
+$$
+\begin{matrix}
+    LT(h) = x^7z^9, \ LT(g) = x^3z \\
+    q = x^4z^8 - x^2z^{10} + xy^2z^7 + z^{12} \\
+    r = x^2y^7 - 2x^2y^2z^{10} + xy^4z^7 - xz^{15} - y^9z^6 + y^2z^{12}  \\
+\end{matrix}
+$$
+
+### Permutowany Lex (2, 0, 1)
+
+$$
+\begin{matrix}
+    LT(h) = x^7z^9, \ LT(g) = xz^3 \\
+    q = -x^{12} + x^{10}z^2 - x^8z^4 - 2x^7y^2z + x^6z^6 + x^5y^2z^3 + x^4y^4 \\
+    r = x^{15}z - x^{12}y^2 + 3x^{10}y^2z^2 - 3x^7y^4z + x^4y^6 + x^2y^7 - y^9z^6 \\
+\end{matrix}
+$$
+
+### Permutowany Lex (1, 0, 2)
+
+$$
+\begin{matrix}
+    LT(h) = y^9z^6, \ LT(g) = -y^2 \\
+    q = x^9yz^9 - x^8yz^2 + 3x^7yz^{11} + x^6y^3z^8 - 2x^6yz^4 - x^5y^3z + 3x^5yz^{13} + 2x^4y^3z^{10} \\ - x^4yz^6 + x^3y^5z^7 - x^3y^3z^3 + x^3yz^{15} - x^2y^5 + x^2y^3z^{12} + xy^5z^9 + y^7z^6 \\
+    r = -x^{12}yz^{10} + x^{11}yz^3 - 4x^{10}yz^{12} + 3x^9yz^5 - 6x^8yz^{14} + 3x^7yz^7 + x^7z^9 - 4x^6yz^{16} + x^5yz^9 - x^4yz^{18} \\
+\end{matrix}
+$$
