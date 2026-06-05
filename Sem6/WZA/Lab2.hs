@@ -1,11 +1,10 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-} -- deriving Num
 
 module Lab2 where
 
 import Lab1
 import qualified Data.Vector as V
 import qualified Data.Map as Map
-import Lab1 (divP)
 
 -- 1
 -- Real multivariable polynomials
@@ -36,11 +35,10 @@ instance (Show a) => Show (GradedLex a) where
 
 instance (Ord a, Num a) => Ord (GradedLex a) where
     compare (GradedLex (Multiindex xs)) (GradedLex (Multiindex ys)) =
-        let sumX = sum xs
-            sumY = sum ys
-        in if sumX == sumY
+        let diff = sum $ zipWith (-) xs ys
+        in if diff == 0
             then compare xs ys
-            else compare sumX sumY
+            else compare diff 0
 
 gradedLexPerm :: [Int] -> Multiindex a -> GradedLex a
 gradedLexPerm perm (Multiindex xs) = GradedLex $ Multiindex (map (xs !!) perm)
@@ -52,7 +50,6 @@ polynomialReduce f gs = go f (V.replicate (length gs) 0) 0
     where
         vgs = V.fromList gs
         vltgs = V.map ltP vgs -- vector of leading terms of gs
-        lt p = let (a, k) = ltP p in Polynomial (Map.singleton a k) -- syntactic sugar for leading term of p
         go 0 qs r = (V.toList qs, r)
         go p qs r = 
             let ltp = Polynomial (Map.fromList [ltP p])

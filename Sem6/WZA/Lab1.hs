@@ -71,18 +71,21 @@ lcmListG = foldl1 lcmG
 -- k - coefficients type
 newtype Polynomial a k = Polynomial (Map.Map a k)
 
-instance (Show a, Show k) => Show (Polynomial a k) where
+instance (Show a, Show k, Ord a, Eq k, Num a, Num k) => Show (Polynomial a k) where
+    show 0 = "0"
     show (Polynomial xs) = drop 3 $ Map.foldrWithKey (\a x acc -> acc ++ " + " ++ show x ++ "x^" ++ show a) "" xs
 
 instance (Ord a, Eq k, Num a, Num k) => Num (Polynomial a k) where
     (Polynomial xs) + (Polynomial ys) = Polynomial $ Map.filter (/= 0) $ Map.unionWith (+) xs ys
     (Polynomial xs) * (Polynomial ys) = Polynomial $ Map.filter (/= 0) $ Map.unionsWith (+)
         [Map.singleton (ax + ay) (kx * ky) | (ax, kx) <- Map.assocs xs, (ay, ky) <- Map.assocs ys]
-    negate (Polynomial xs) = Polynomial (Map.map negate xs)
-    fromInteger n = Polynomial (Map.singleton 0 (fromInteger n))
+    negate (Polynomial xs) = Polynomial $ Map.map negate xs
+    signum (Polynomial xs) = Polynomial $ Map.map signum xs
+    abs (Polynomial xs) = Polynomial $ Map.map abs xs
+    fromInteger n = Polynomial $ Map.filter (/= 0) $ Map.singleton 0 (fromInteger n)
 
 instance (Ord a, Eq k, Num a, Num k) => Eq (Polynomial a k) where
-    xs == ys = ltP (xs - ys) == (0, 0)
+    xs == ys = lcP (xs - ys) == 0
 
 -- Real Polynomials
 type Rx = Polynomial Integer Double
@@ -91,7 +94,7 @@ type Rx = Polynomial Integer Double
 ltP :: (Ord a, Eq k, Num a, Num k) => Polynomial a k -> (a, k)
 ltP (Polynomial xs) = 
     if Map.null xs
-    then ltP 0
+    then (0, 0)
     else Map.findMax xs
 
 lmP :: (Ord a, Eq k, Num a, Num k) => Polynomial a k -> a
@@ -111,8 +114,10 @@ divP xs ys =
     let go acc xs ys =
             let (ax, kx) = ltP xs
                 (ay, ky) = ltP ys
-                q = Polynomial (Map.singleton (ax - ay) (kx / ky))
-            in if (ax - ay) >= 0 && q /= 0
+                a = ax - ay
+                k = kx / ky
+                q = Polynomial (Map.singleton a k)
+            in if abs a == a && k /= 0 -- orderings of a can be weird
                 then go (acc + q) (xs - q * ys) ys
                 else acc
         q = go 0 xs ys
@@ -157,6 +162,8 @@ instance (Num a) => Num (Multiindex a) where
     (Multiindex xs) + (Multiindex ys) = Multiindex (zipWith (+) xs ys)
     (Multiindex xs) * (Multiindex ys) = Multiindex (zipWith (*) xs ys) -- todo
     negate (Multiindex xs) = Multiindex (map negate xs)
+    signum (Multiindex xs) = Multiindex (map signum xs)
+    abs (Multiindex xs) = Multiindex (map abs xs)
     fromInteger n = Multiindex $ repeat (fromInteger n)
 
 -- <= - minimal elements from a list of multiindices
