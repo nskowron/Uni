@@ -13,7 +13,7 @@ for filename in filenames:
 
     # open cpp process
     p = subprocess.Popen(
-        ["./cpp/build/bin/exc2"],
+        ["./cpp/build/bin/exc1"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         text=True
