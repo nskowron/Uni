@@ -2,7 +2,7 @@ import tsplib95 as tsp
 import csv
 import subprocess
 
-filenames = ["wi29.tsp", "dj38.tsp", "qa194.tsp", "uy734.tsp"]
+filenames = ["ei8246.tsp"]
 
 for filename in filenames:
     # load data
@@ -13,7 +13,7 @@ for filename in filenames:
 
     # open cpp process
     p = subprocess.Popen(
-        ["./cpp/build/bin/exc1"],
+        ["./cpp/build/bin/exc2"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         text=True

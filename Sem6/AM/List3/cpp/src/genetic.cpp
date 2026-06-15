@@ -5,6 +5,7 @@
 #include <thread>
 #include <iterator>
 #include <functional>
+#include <utility>
 
 #include "genetic.hpp"
 
@@ -26,34 +27,45 @@ const Individual& tournamentSelection(
 
 Individual crossoverOX1(
     const std::vector<std::vector<int>>& weights,
-    const Individual& parent1, 
-    const Individual& parent2, 
-    std::mt19937& mt, 
-    std::uniform_int_distribution<int>& randGene
+    const std::vector<std::pair<int, int>>& neighbors,
+    const Individual& parent1,
+    const Individual& parent2,
+    std::mt19937& mt,
+    std::uniform_int_distribution<int>& randInvert
 ) {
     const int n = parent1.tour.size();
-    Individual child;
-    child.tour.reserve(n);
-    std::vector<bool> visited(n, false);
-    
-    // get a random segment
-    int a = randGene(mt);
-    int b = randGene(mt);
-    if (a > b) std::swap(a, b);
 
-    // copy segment from parent 1
-    for (int i = 0; a + i <= b; ++i) {
-        int city = parent1.tour[a + i];
-        child.tour.push_back(city);
-        visited[city] = true;
+    Individual child;
+    child.tour.resize(n, -1);
+
+    std::vector<bool> visited(n, false);
+
+    // random segment
+    auto [a, b] = neighbors[randInvert(mt)];
+
+    // copy segment from parent1
+    for (int i = a; i <= b; i++) {
+        child.tour[i] = parent1.tour[i];
+        visited[parent1.tour[i]] = true;
     }
 
-    // fill remaining from parent 2
-    for (int i = 0; i < n; ++i) {
-        int city = parent2.tour[i];
+    // fill remaining positions from parent2
+    int childPos = (b + 1) % n;
+    int parentPos = (b + 1) % n;
+
+    while (true) {
+        int city = parent2.tour[parentPos];
+
         if (!visited[city]) {
-            child.tour.push_back(city);
+            child.tour[childPos] = city;
+            visited[city] = true;
+            childPos = (childPos + 1) % n;
         }
+
+        parentPos = (parentPos + 1) % n;
+
+        if (parentPos == (b + 1) % n)
+            break;
     }
 
     return child;
@@ -65,16 +77,17 @@ int genetic(
     int populationSize,
     int generations,
     double mutationRate,
-    double tournamentSize
+    int tournamentSize
 ) {
     const int n = solution.size();
+    std::vector<std::pair<int, int>> neighbors = getInvertNeighbors(n);
     Individual bestIndividual{solution, getSolutionCost(weights, solution)};
     std::vector<Individual> population(populationSize - 1);
 
     // random number generators
     std::random_device rd;
     std::mt19937 mt{rd()};
-    std::uniform_int_distribution<int> randGene(0, n - 1);
+    std::uniform_int_distribution<int> randInvert(0, neighbors.size() - 1);
     std::uniform_int_distribution<int> randParent(0, populationSize - 1);
     std::uniform_real_distribution<double> randProb(0.0, 1.0);
 
@@ -106,21 +119,24 @@ int genetic(
         while (nextGeneration.size() < populationSize) {
             
             // tournament selection
-            const Individual& parent1 = tournamentSelection(population, tournamentSize * populationSize, mt, randParent);
-            const Individual& parent2 = tournamentSelection(population, tournamentSize * populationSize, mt, randParent);
+            const Individual& parent1 = tournamentSelection(population, tournamentSize, mt, randParent);
+            const Individual& parent2 = tournamentSelection(population, tournamentSize, mt, randParent);
 
             // crossover
-            Individual child = crossoverOX1(weights, parent1, parent2, mt, randGene);
+            Individual child = crossoverOX1(weights, neighbors, parent1, parent2, mt, randInvert);
 
             // mutation (inverse)
             if (randProb(mt) < mutationRate) {
-                int a = randGene(mt);
-                int b = randGene(mt);
-                if (a > b) std::swap(a, b);
+                auto [a, b] = neighbors[randInvert(mt)];
                 std::reverse(child.tour.begin() + a, child.tour.begin() + b + 1);
             }
 
-            child.cost = getSolutionCost(weights, child.tour);
+            // local search step
+            child.cost = annealing(
+                weights,
+                neighbors,
+                child.tour
+            );
             nextGeneration.push_back(child);
         }
 
@@ -137,12 +153,13 @@ int genetic(
 
 void island(
     const std::vector<std::vector<int>>& weights,
+    const std::vector<std::pair<int, int>>& neighbors,
     std::vector<Individual>& population,
     Individual& solution,
     int generations,
     int migrationInterval,
     double mutationRate,
-    double tournamentSize,
+    int tournamentSize,
     std::barrier<std::function<void()>>& syncPoint
 ) {
     const int n = solution.tour.size();
@@ -152,7 +169,7 @@ void island(
     // random number generators
     std::random_device rd;
     std::mt19937 mt{rd()};
-    std::uniform_int_distribution<int> randGene(0, n - 1);
+    std::uniform_int_distribution<int> randInvert(0, neighbors.size() - 1);
     std::uniform_int_distribution<int> randParent(0, population.size() - 1);
     std::uniform_real_distribution<double> randProb(0.0, 1.0);
 
@@ -172,21 +189,23 @@ void island(
         while (nextGeneration.size() < population.size()) {
             
             // tournament selection
-            const Individual& parent1 = tournamentSelection(population, tournamentSize * population.size(), mt, randParent);
-            const Individual& parent2 = tournamentSelection(population, tournamentSize * population.size(), mt, randParent);
+            const Individual& parent1 = tournamentSelection(population, tournamentSize, mt, randParent);
+            const Individual& parent2 = tournamentSelection(population, tournamentSize, mt, randParent);
 
             // crossover
-            Individual child = crossoverOX1(weights, parent1, parent2, mt, randGene);
+            Individual child = crossoverOX1(weights, neighbors, parent1, parent2, mt, randInvert);
 
             // mutation (inverse)
             if (randProb(mt) < mutationRate) {
-                int a = randGene(mt);
-                int b = randGene(mt);
-                if (a > b) std::swap(a, b);
+                auto [a, b] = neighbors[randInvert(mt)];
                 std::reverse(child.tour.begin() + a, child.tour.begin() + b + 1);
             }
 
-            child.cost = getSolutionCost(weights, child.tour);
+            child.cost = annealing(
+                weights,
+                neighbors,
+                child.tour
+            );
             nextGeneration.push_back(child);
         }
 
@@ -213,10 +232,11 @@ int islands(
     int generations,
     int migrationInterval,
     double mutationRate,
-    double tournamentSize,
-    double migrationRate
+    int tournamentSize,
+    int migrationSize
 ) {
     const int n = solution.size();
+    std::vector<std::pair<int, int>> neighbors = getInvertNeighbors(n);
     int solutionCost = getSolutionCost(weights, solution);
     std::vector<Individual> islandsSolutions(numIslands, {solution, solutionCost});
     std::vector<std::vector<Individual>> islandsPopulations(numIslands, std::vector<Individual>(populationSize - 1));
@@ -239,7 +259,6 @@ int islands(
     std::barrier<std::function<void()>> syncPoint(
         numIslands,
         [&]() {
-            int migrationSize = migrationRate * populationSize;
             for (auto& population : islandsPopulations) {
                 std::sort(population.begin(), population.end(), 
                     [](const Individual& a, const Individual& b) { return a.cost < b.cost; });
@@ -265,6 +284,7 @@ int islands(
         threads.emplace_back(
             island, 
             std::cref(weights), 
+            std::cref(neighbors),
             std::ref(islandsPopulations[i]), 
             std::ref(islandsSolutions[i]), 
             generations, 
@@ -289,6 +309,72 @@ int islands(
 
     solution = bestIndividual.tour;
     return bestIndividual.cost;
+}
+
+int annealing(
+    const std::vector<std::vector<int>>& weights, 
+    const std::vector<std::pair<int, int>>& neighbors,
+    std::vector<int>& solution, 
+    double initialTemp, 
+    double coolingRate, 
+    int epochs, 
+    double stepsPerEpoch
+) {
+    // initializing
+    const int n = solution.size();
+    int currCost = getSolutionCost(weights, solution);
+    int bestCost = currCost;
+    std::vector<int> bestSolution = solution;
+    double temp = initialTemp;
+
+    // random number generators
+    std::random_device rd;
+    std::mt19937 mt{rd()};
+    std::uniform_int_distribution randNeighbor{0, (int)neighbors.size() - 1};
+    std::uniform_real_distribution<double> randProb(0.0, 1.0);  
+
+    // main loop
+    for (int epoch = 0; epoch < epochs; ++epoch) {
+        for (int trial = 0; trial < stepsPerEpoch * n; ++trial) {
+
+            // generate a random invert neighbor
+            auto [i, j] = neighbors[randNeighbor(mt)];
+
+            // calculate the neighbors cost reduction
+            int cost_reduction = 
+                weights[solution[i]][solution[(i - 1 + n) % n]] + 
+                weights[solution[j]][solution[(j + 1) % n]] - 
+                weights[solution[j]][solution[(i - 1 + n) % n]] -
+                weights[solution[i]][solution[(j + 1) % n]];          
+
+            // accept the new solution if its better or with a probability
+            if (cost_reduction > 0 || std::exp(cost_reduction / temp) > randProb(mt)) {
+                std::reverse(solution.begin() + i, solution.begin() + j + 1);
+                currCost -= cost_reduction;
+
+                // update best solution
+                if (currCost < bestCost) {
+                    bestCost = currCost;
+                    bestSolution = solution;
+                }
+            }
+        }
+        temp *= coolingRate;
+    }
+
+    solution = bestSolution;
+    return bestCost;
+}
+
+std::vector<std::pair<int, int>> getInvertNeighbors(int n) {
+    std::vector<std::pair<int, int>> neighbors;
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            if (i == 0 && j == n - 1) continue;
+            neighbors.push_back({i, j});
+        }
+    }
+    return neighbors;
 }
 
 int getSolutionCost(

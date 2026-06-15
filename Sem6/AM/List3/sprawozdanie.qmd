@@ -1,0 +1,59 @@
+---
+title: "Sprawozdanie z listy 3"
+author: "Nel Skowronek"
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+---
+
+# Algorytm Genetyczny i Memetyczny
+
+Sam algorytm genetyczny, jak widać poniżej, radził sobie bardzo słabo. W celu poprawy, ulepszyłam go do algorytmu memetycznego poprzez zastosowanie Symulowanego Wyżarzania na potomstwie każdego kolejnego pokolenia. Wyżarzanie jest szybkie i radziło sobie bardzo dobrze z tym problemem w poprzedniej liście. 
+
+|    Data    | Avg. Genetic  | Best Genetic  | Avg. Memetic | Best Memetic |
+| :--------: | :-----------: | :-----------: | :----------: | :----------: |
+|  wi29.tsp  |    28335.6    |     27603     |    27603.0   |    27603     |
+|  dj38.tsp  |     6866.1    |      6656     |     6656.0   |     6656     |
+|  qa194.tsp |    10801.1    |     10463     |    10524.9   |    10342     |
+|  uy734.tsp |    303020.0   |     289835    |    89861.2   |    88322     |
+|  zi929.tsp |    419921.0   |     405234    |   113005.0   |    110235    |
+| mu1979.tsp |   1148390.0   |    1109921    |   130518.0   |    127381    |
+| ca4663.tsp |   45166100.0  |    44117899   |  1796660.0   |   1743929    |
+| tz6117.tsp |   15432700.0  |    15303748   |   685110.0   |    638837    |
+| eg7146.tsp |   6815220.0   |    6741525    |   426460.0   |    415516    |
+| ei8246.tsp |   8571020.0   |    8546877    |   487235.0   |    480430    |
+
+# Algorytm Wyspowy Współbieżny
+
+Zaimplementowałam również wersję wyspową (też memetyczną) z użyciem `std::thread` i `std::barrier`, który pozwala na zrównoleglenie obliczeń na procesorze oraz na bardzo eleganckie wywołanie funkcji migracji w momencie dotarcia wszystkich wątków do "bariery".
+
+|    Data    | Avg. Islands  | Best Islands  |
+| :--------: | :-----------: | :-----------: |
+|  wi29.tsp  |    27603.0    |     27603     |
+|  dj38.tsp  |     6656.0    |      6656     |
+|  qa194.tsp |    10309.3    |     10148     |
+|  uy734.tsp |     87510.8   |      86282    |
+|  zi929.tsp |    110042.0   |     108884    |
+| mu1979.tsp |    126641.0   |     124069    |
+| ca4663.tsp |   1715400.0   |    1679212    |
+| tz6117.tsp |    623858.0   |     614034    |
+| eg7146.tsp |    413563.0   |     406048    |
+| ei8246.tsp |    472597.0   |     467882    |
+
+# Porównanie Metod
+
+|    Data    | Local Search | Local Search on MST | Simulated Annealing | Tabu Search |   Genetic  |   Memetic  |   Islands  |
+|:----------:|:---------:|:---------:|:---------:|:--------:|:---------:|:--------:|:---------:|
+| wi29.tsp   |      29663.8 |             29400.6 |             28839.0 |     37007.2 |    28335.6 |    27603.0 |    27603.0 |
+| dj38.tsp   |       7581.6 |              7323.4 |              7141.4 |     12057.2 |     6866.1 |     6656.0 |     6656.0 |
+| qa194.tsp  |      10684.2 |             10156.0 |             10309.6 |     17806.8 |    10801.1 |    10524.9 |    10309.3 |
+| uy734.tsp  |      88670.8 |             84340.0 |             88300.8 |    178668.0 |   303020.0 |    89861.2 |    87510.8 |
+| zi929.tsp  |     107098.0 |            100578.0 |            106692.0 |    167833.0 |   419921.0 |   113005.0 |   110042.0 |
+| mu1979.tsp |      94045.4 |             92978.6 |             99332.4 |    191061.0 |  1148390.0 |   130518.0 |   126641.0 |
+| ca4663.tsp |    1428915.2 |           1369259.0 |           1700070.0 |   2859130.0 | 45166100.0 |  1796660.0 |  1715400.0 |
+| tz6117.tsp |     454060.2 |            454066.8 |            557884.0 |    916469.0 | 15432700.0 |   685110.0 |   623858.0 |
+| eg7146.tsp |     194600.2 |            195387.8 |            254877.0 |    397294.0 |  6815220.0 |   426460.0 |   413563.0 |
+| ei8246.tsp |     235919.0 |            235855.0 |            310462.0 |    564467.0 |  8571020.0 |   487235.0 |   472597.0 |
+
+W przypadku algorytmów genetycznych można zauważyć to samo co w przypadku wyżarzania lub tabu search - dla małych danych zachowują się tak samo dobrze a nawet lepiej niż local search na MST, natomiast dla dużych danych już radzą sobie trochę gorzej. Ze względu na naturę tego akurat problemu Local Search na MST jest najlepszym wyborem, zarówno przez to że daje najlepsze wyniki jak i jego szybki czas działania. Jedyny algorytm, który był od niego szybszy to Symulowane Wyżarzanie, które pozostaje solidną alternatywą. 
+
+Algorytmy genetyczne z reguły nie są stworzone do rozwiązywania takich problemów jak TSP, w których mamy dostęp do dodatkowych informacji, które możemy "exploitować" (takie jak MST) w celu szybszego zbliżenia się do rozwiązania. Natomiast wyróżniają się i przydają się bardzo w problemach typu "black box", w których nie wiemy w jaki sposób wyliczana jest funkcja oceny oraz nie możemy zakładać, że drobne lokalne zmiany w rozwiązaniu są równoważne drobnym zmianom w ocenie tego rozwiązania.
