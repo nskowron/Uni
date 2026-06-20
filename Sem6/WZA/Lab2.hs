@@ -8,7 +8,7 @@ import qualified Data.Map as Map
 
 -- 1
 -- Real multivariable polynomials
-type Rx_ = Polynomial (Multiindex Integer) Double
+type Rx_ = Polynomial (Lex (Multiindex Integer)) Double
 
 -- Different monomial orderings
 -- Lex
@@ -55,8 +55,8 @@ instance (Ord a, Num a) => Ord (GradedLex a) where
             else compare diff 0
 
 -- Polynomial Reduce
-polynomialReduce :: (Ord a, Eq k, Num a, Num k, Fractional k) => 
-    Polynomial a k -> [Polynomial a k] -> ([Polynomial a k], Polynomial a k)
+polynomialReduce :: (Ord a, Eq k, Num a, Num k, Fractional k) 
+    => Polynomial a k -> [Polynomial a k] -> ([Polynomial a k], Polynomial a k)
 polynomialReduce f gs = go f (V.replicate (length gs) 0) 0
     where
         vgs = V.fromList gs
