@@ -84,15 +84,6 @@ instance (Ord a, Eq k, Num a, Num k) => Num (Polynomial a k) where
     abs (Polynomial xs) = Polynomial $ Map.map abs xs
     fromInteger n = Polynomial $ Map.filter (/= 0) $ Map.singleton 0 (fromInteger n)
 
--- consider normalizing to get rid of Ord k
-instance (Ord a, Ord k, Eq k, Num a, Num k) => Ord (Polynomial a k) where
-    compare x y = 
-        let ltx = ltP x
-            lty = ltP y
-        in if ltx == lty
-            then compare (x - Polynomial (Map.fromList [ltx])) (y - Polynomial (Map.fromList [lty]))
-            else compare ltx lty
-
 instance (Ord a, Eq k, Num a, Num k) => Eq (Polynomial a k) where
     xs == ys = lcP (xs - ys) == 0
 
