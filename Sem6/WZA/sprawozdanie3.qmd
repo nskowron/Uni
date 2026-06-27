@@ -54,39 +54,194 @@ Algorytm również działa bezpośrednio tak jak podano na wykładzie - dodaje r
 
 ## Układ Równań
 
-- $f(x, y, z) = 10z$
-
-$$
+```{=latex}
+\begin{minipage}[t]{0.5\textwidth}
+\vspace{0pt}
+\[
+f(x, y, z) = 10z
+\]
+\vspace{5pt}
+\[
 \begin{matrix}
     \text{Baza Groebnera} & \text{Wyeliminowane } z \\
     x^2 + y^2 - z^2 & x^2 + y^2 \\
     10z & \\
 \end{matrix}
-$$
-
-$$
+\]
+\vspace{5pt}
+\[
 \mathcal{I}_f = \langle x^2 + y^2 \rangle, \ V(\mathcal{I}_f) = \left\{ \mathbb{0} \right\}
-$$
+\]
+\par
+\vspace{8pt}
+Przecięcie stożka z płaszczyzną \( z = 0 \) daje tylko jeden punkt: \( \mathbb{0} \).
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\vspace{0pt}
+\includegraphics[width=\linewidth]{image.png}
+\end{minipage}
 
-Przecięcie stożka z płaszczyzną $z = 0$ daje tylko jeden punkt: $\mathbb{0}$.
+\vspace{5pt}
+\hrule
+\vspace{5pt}
 
-- $f(x, y, z) = z + 7$
-
-$$
+\begin{minipage}[t]{0.5\textwidth}
+\vspace{0pt}
+\[
+f(x, y, z) = z + 7
+\]
+\vspace{5pt}
+\[
 \begin{matrix}
     \text{Baza Groebnera} & \text{Wyeliminowane } z \\
     x^2 + y^2 - z^2 & x^2 + y^2 - 7^2 \\
     z + 7 & \\
 \end{matrix}
-$$
-
-$$
+\]
+\vspace{5pt}
+\[
 \mathcal{I}_f = \langle x^2 + y^2 - 7^2 \rangle, \ V(\mathcal{I}_f) = \left\{ (x, y) : x^2 + y^2 = 7^2 \right\}
-$$
+\]
+\par
+\vspace{8pt}
+Przecięcie stożka (podwójnego) z płaszczyzną nieco niższą niż wcześniej \( z = -7 \) daje koło o promieniu \( 7 \).
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\vspace{0pt}
+\includegraphics[width=\linewidth]{image-1.png}
+\end{minipage}
 
-Przecięcie stożka (podwójnego) z płaszczyzną nieco niższą niż wcześniej $z = -7$ daje koło o promieniu 7.
+\vspace{5pt}
+\hrule
+\vspace{5pt}
 
-- $f(x, y, z) = x + z - 8$
+\begin{minipage}[t]{0.5\textwidth}
+\vspace{0pt}
+\[
+f(x, y, z) = x + z - 8
+\]
+\vspace{5pt}
+\[
+\begin{matrix}
+    \text{Baza Groebnera} & \text{Wyeliminowane } z \\
+    x^2 + y^2 - z^2 & y^2 + 16x - 64 \\
+    x + z - 8 & \\
+    y^2 - 16z + 64 & \\
+\end{matrix}
+\]
+\vspace{5pt}
+\[
+\mathcal{I}_f = \langle y^2 + 16x - 64 \rangle, \ V(\mathcal{I}_f) = \left\{ (x, y) : y^2 + 16x = 64 \right\}
+\]
+\par
+\vspace{8pt}
+Płaszczyzna pochyła \( z = -x + 8 \) jest równoległa do tworzącej stożka, więc przecięcie (rzut tego przecięcia) daje parabolę.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\vspace{0pt}
+\includegraphics[width=\linewidth]{image-2.png}
+\end{minipage}
 
-![Rozmaitość](image.png)
-![Rozmaitość](image-1.png)
+\vspace{5pt}
+\hrule
+\vspace{5pt}
+
+\begin{minipage}[t]{0.5\textwidth}
+\vspace{0pt}
+\[
+f(x, y, z) = x + y + z + 10
+\]
+\vspace{5pt}
+\[
+\begin{matrix}
+    \text{Baza Groebnera} & \text{Wyeliminowane } z \\
+    x^2 + y^2 - z^2 & -2xy - 20x - 20y - 100 \\
+    x + y + z + 10 & \\
+    2y^2 + 2yz + 20y + 20z + 100 & \\
+\end{matrix}
+\]
+\vspace{5pt}
+\[
+\begin{matrix}
+    \mathcal{I}_f = \langle -2xy - 20x - 20y - 100 \rangle, \\
+    V(\mathcal{I}_f) = \left\{ (x, y) : -2xy - 20x - 20y = 100 \right\} \\
+\end{matrix}
+\]
+\par
+\vspace{8pt}
+Płaszczyzna \( z = -x - y - 10 \) omija środek układu współrzędnych, ale jest na tyle stroma, że przecina się ze stożkiem powyżej i poniżej w nieskończoność - tworząc hiperbolę.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\vspace{0pt}
+\includegraphics[width=\linewidth]{image-3.png}
+\end{minipage}
+
+\vspace{5pt}
+\hrule
+\vspace{5pt}
+
+\begin{minipage}[t]{0.5\textwidth}
+\vspace{0pt}
+\[
+f(x, y, z) = \frac{y}{2} + z + 1
+\]
+\vspace{5pt}
+\[
+\begin{matrix}
+    \text{Baza Groebnera} & \text{Wyeliminowane } z \\
+    x^2 + y^2 - z^2 & x^2 + \frac{3}{4}y^2 - y - 1 \\
+    \frac{y}{2} + z + 1 & \\
+\end{matrix}
+\]
+\vspace{5pt}
+\[
+\begin{matrix}
+    \mathcal{I}_f = \langle x^2 + \frac{3}{4}y^2 - y - 1 \rangle, \\ 
+    V(\mathcal{I}_f) = \left\{ (x, y) : x^2 + \frac{3}{4}y^2 - y = 1 \right\} \\
+\end{matrix}
+\]
+\par
+\vspace{8pt}
+Płaszczyzna \( z = -\frac{y}{2} -1 \) jest jest mniej stroma niż stożek, więc rzut przecięcia daje elipsę.
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\vspace{0pt}
+\includegraphics[width=\linewidth]{image-4.png}
+\end{minipage}
+```
+
+## Drugi Układ Równań
+
+```{=latex}
+\begin{minipage}[t]{0.5\textwidth}
+\vspace{0pt}
+\[
+\begin{matrix}\left\{
+    (x^2 + y^2 - 2x)^2 = z^2(x^2 + y^2) \\
+    x + 2y + 3z = 0 \\
+\right.\end{matrix}
+\]
+\vspace{5pt}
+\[
+\begin{matrix}
+    \text{Baza Groebnera} & \text{Wyeliminowane } z \\
+    (x^2 + y^2 - 2x)^2 - z^2(x^2 + y^2) \\
+    x + 2y + 3z & \\
+    25y^2 + 120y^3z + 40y^3 + 229y^2z^2 + 156y^2z + 16y^2 + 204yz^3 + 216yz^2 + 48yz + 72z^4 + 108z^3 + 36z^2
+\end{matrix}
+\]
+\par
+\vspace{8pt}
+Przecięcie stożka z płaszczyzną \( z = 0 \) daje tylko jeden punkt: \( \mathbb{0} \).
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\vspace{0pt}
+\includegraphics[width=\linewidth]{image.png}
+\end{minipage}
+```
