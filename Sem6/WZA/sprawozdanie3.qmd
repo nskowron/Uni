@@ -1,0 +1,92 @@
+---
+title: Sprawozdanie 3
+date: today
+author: Nel Skowronek 279679
+mainfont: Latin Modern Roman
+sansfont: Latin Modern Roman
+geometry: 
+    - top=1cm
+    - left=1.5cm
+    - right=1.5cm
+    - bottom=2cm
+---
+
+# Zadanie 6
+
+## Wielomiany $\mathbb{R}[x_1, ..., x_n]$ i `PolynomialReduce`
+
+Zaimplementowane w poprzedniej liście.
+
+## `Syzygium(`$f, g$`)`
+
+Aby zaimplementować Syzygium, potrzebne było zdefiniowanie, użytej w poniższym kodzie, funkcji `lcmM` (Least Common Multiplier Multiindex), obliczający NWW dwóch multiindeksów (monomiali) poprzez wzięcie maksimum na każdej pozycji. 
+
+```haskell
+syzygium :: (Ord a, Eq k, Num a, Num k, Fractional k) 
+    => Polynomial a k -> Polynomial a k -> Polynomial a k
+syzygium f g =
+    let x = Polynomial $ Map.singleton (lcmM (lmP f) (lmP g)) 1
+        ltf = Polynomial $ Map.fromList [ltP f]
+        ltg = Polynomial $ Map.fromList [ltP g]
+    in f * fst (divP x ltf) - g * fst (divP x ltg)
+```
+
+Funkcja oblicza bezpośrednio ze wzoru podanego na wykładzie: $S(f, g) = \frac{\bar{x}^\gamma}{LT(f)} \cdot f - \frac{\bar{x}^\gamma}{LT(g)} \cdot g$ , $\bar{x}^\gamma = NWW(LM(f), LM(g))$.
+
+## `Buchberger(`$\mathcal{G}$`)`
+
+```haskell
+buchberger :: (Ord a, Eq k, Num a, Num k, Fractional k) 
+    => [Polynomial a k] -> [Polynomial a k]
+buchberger c = 
+    let g = nubBy (\f g -> snd (divP f g) == 0) $ 
+            c ++ 
+            filter (/= 0) 
+            [snd $ polynomialReduce (syzygium f g) c
+            | f <- c, g <- c
+            ]
+    in if g == c
+        then g
+        else buchberger g
+```
+
+Algorytm również działa bezpośrednio tak jak podano na wykładzie - dodaje redukcje syzygiów wielomianów ze zbioru, aż nic więcej w ten sposób nie zostanie dodane. Nie jest to najbardziej optymalna implementacja, ponieważ używa list zamiast zbiorów, jako że zbiór wymagałby zdefiniowania całkowitego porządku na wielomianach. Natomiast to pozwala na bardziej kreatywne usuwanie duplikatów z listy poprzez `nubBy (\f g -> snd (divP f g) == 0)`, który usuwa nie tylko te dokładnie równe sobie wielomiany, ale też takie, w których jeden jest wielokrotnością drugiego (redundantny w kontekście baz Groebnera i ideałów).
+
+## Układ Równań
+
+- $f(x, y, z) = 10z$
+
+$$
+\begin{matrix}
+    \text{Baza Groebnera} & \text{Wyeliminowane } z \\
+    x^2 + y^2 - z^2 & x^2 + y^2 \\
+    10z & \\
+\end{matrix}
+$$
+
+$$
+\mathcal{I}_f = \langle x^2 + y^2 \rangle, \ V(\mathcal{I}_f) = \left\{ \mathbb{0} \right\}
+$$
+
+Przecięcie stożka z płaszczyzną $z = 0$ daje tylko jeden punkt: $\mathbb{0}$.
+
+- $f(x, y, z) = z + 7$
+
+$$
+\begin{matrix}
+    \text{Baza Groebnera} & \text{Wyeliminowane } z \\
+    x^2 + y^2 - z^2 & x^2 + y^2 - 7^2 \\
+    z + 7 & \\
+\end{matrix}
+$$
+
+$$
+\mathcal{I}_f = \langle x^2 + y^2 - 7^2 \rangle, \ V(\mathcal{I}_f) = \left\{ (x, y) : x^2 + y^2 = 7^2 \right\}
+$$
+
+Przecięcie stożka (podwójnego) z płaszczyzną nieco niższą niż wcześniej $z = -7$ daje koło o promieniu 7.
+
+- $f(x, y, z) = x + z - 8$
+
+![Rozmaitość](image.png)
+![Rozmaitość](image-1.png)
